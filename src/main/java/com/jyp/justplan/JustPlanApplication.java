@@ -7,7 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class JustPlanApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(JustPlanApplication.class, args);
+		SpringApplication app = new SpringApplication(JustPlanApplication.class);
+		app.setAdditionalProfiles("local");
+		app.run(args);
 	}
-
 }
