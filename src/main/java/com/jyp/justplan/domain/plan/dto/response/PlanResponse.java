@@ -19,15 +19,26 @@ public class PlanResponse {
     private ZonedDateTime startDate;
     private ZonedDateTime endDate;
     private boolean isPublic;
-    private long originPlanId;
+    private PlanResponse originPlan;
 
-    public static PlanResponse toDto(Plan plan) {
+    public static PlanResponse toDto(Plan plan, int depth) {
+        if (depth == 0 || plan.getOriginPlan() == null) {
+            return new PlanResponse(plan.getPlanId(),
+                    plan.getTitle(),
+                    plan.getRegion(),
+                    plan.getStartDate(),
+                    plan.getEndDate(),
+                    plan.isPublic(),
+                    null);
+        }
+
+        PlanResponse originPlan = toDto(plan.getOriginPlan(), depth - 1);
         return new PlanResponse(plan.getPlanId(),
                 plan.getTitle(),
                 plan.getRegion(),
                 plan.getStartDate(),
                 plan.getEndDate(),
                 plan.isPublic(),
-                plan.getOriginPlan().getPlanId());
+                originPlan);
     }
 }

@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class PlanCopyRequest {
+public class PlanIdRequest {
     private long originPlanId;
 }

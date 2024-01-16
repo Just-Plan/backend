@@ -2,7 +2,7 @@ package com.jyp.justplan.domain.plan.presentation;
 
 import com.jyp.justplan.api.response.ApiResponseDto;
 import com.jyp.justplan.domain.plan.application.PlanService;
-import com.jyp.justplan.domain.plan.dto.request.PlanCopyRequest;
+import com.jyp.justplan.domain.plan.dto.request.PlanIdRequest;
 import com.jyp.justplan.domain.plan.dto.request.PlanCreateRequest;
 import com.jyp.justplan.domain.plan.dto.request.PlanUpdateRequest;
 import com.jyp.justplan.domain.plan.dto.response.PlanResponse;
@@ -36,7 +36,7 @@ public class PlanController {
     /* 플랜 복제 (가져오기) */
     @PostMapping("/copy")
     public ApiResponseDto<PlanResponse> copyPlan (
-            @RequestBody PlanCopyRequest request
+            @RequestBody PlanIdRequest request
     ) {
         PlanResponse response = planService.copyPlan(request);
         return ApiResponseDto.successResponse(response);
@@ -48,6 +48,15 @@ public class PlanController {
             @RequestBody PlanUpdateRequest request
     ) {
         PlanResponse response = planService.updatePlan(request);
+        return ApiResponseDto.successResponse(response);
+    }
+
+    /* 플랜 공개 여부 수정 */
+    @PatchMapping("/public")
+    public ApiResponseDto<PlanResponse> updatePlanPublic (
+            @RequestBody PlanIdRequest request
+    ) {
+        PlanResponse response = planService.updatePlanPublic(request);
         return ApiResponseDto.successResponse(response);
     }
 
