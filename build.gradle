@@ -52,6 +52,9 @@ dependencies {
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
+
+	// H2 데이터베이스 의존성 추가 (테스트용)
+	testImplementation 'com.h2database:h2'
 }
 
 tasks.named('bootBuildImage') {
