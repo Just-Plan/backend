@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.ZonedDateTime;
+import java.util.Set;
 
 @Getter
 @AllArgsConstructor
@@ -13,6 +14,7 @@ import java.time.ZonedDateTime;
 public class PlanUpdateRequest {
     private long planId;
     private String title;
+    private Set<String> tags;
     // TODO: 지역 추가 시, 해당 enum이나 테이블 값으로 변경
     private ZonedDateTime startDate;
     private ZonedDateTime endDate;

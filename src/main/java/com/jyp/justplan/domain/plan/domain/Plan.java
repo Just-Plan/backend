@@ -1,5 +1,6 @@
 package com.jyp.justplan.domain.plan.domain;
 
+import com.jyp.justplan.domain.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,11 +14,11 @@ import java.time.ZonedDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Plan {
+public class Plan extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "plan_id")
-    private long planId;
+    private long id;
 
     @NotNull
     private String title;
@@ -37,18 +38,9 @@ public class Plan {
     @Column(name = "is_public")
     private boolean isPublic = true;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "origin_plan_id")
     private Plan originPlan;
-
-    // TODO: BaseTimeEntity를 상속받아서 사용하도록 변경
-    @CreatedDate
-    @Column(name = "created_at", updatable = false)
-    private ZonedDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(name = "updated_at")
-    private ZonedDateTime updatedAt;
 
     public Plan(String title, ZonedDateTime startDate, ZonedDateTime endDate, String region) {
         this.title = title;
