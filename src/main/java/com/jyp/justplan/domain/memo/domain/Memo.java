@@ -29,6 +29,7 @@ public class Memo extends BaseEntity {
 
     public void update(MemoRequestDto memoRequestDto) {
         this.content = memoRequestDto.getContent();
+        this.color = memoRequestDto.getColor();
     }
     public void reset() {
         this.content = "";

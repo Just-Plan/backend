@@ -22,6 +22,7 @@ public class MemoService {
 
         Memo memo = memoRequestDto.toEntity().toBuilder()
                 .content(memoRequestDto.getContent())
+                .color(memoRequestDto.getColor())
                 .build();
 
         Memo savedMemo = memoRepository.save(memo);
