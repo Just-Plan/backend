@@ -11,10 +11,12 @@ import lombok.NoArgsConstructor;
 public class MemoRequestDto {
 
     private String content;
+    private String color;
 
     public Memo toEntity() {
         return Memo.builder()
                 .content(content)
+                .color(color)
                 .build();
     }
 }
