@@ -25,6 +25,8 @@ public class PlanResponse {
     private PlanResponse originPlan;
     private Set<String> tags;
 
+    /* 마지막 plan일 경우, originPlan은 null, 이를 처리하기 위한 생성자 */
+    // TODO: 유지보수를 위해, depth를 유연하게 처리할 수 있도록 변경 (서비스 레이어에서 처리)
     public PlanResponse(long planId, String title, String region, ZonedDateTime startDate, ZonedDateTime endDate, boolean isPublic, Set<String> tags) {
         this.planId = planId;
         this.title = title;

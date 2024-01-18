@@ -21,12 +21,7 @@ public class PlanService {
     private final PlanRepository planRepository;
     private final PlanTagService planTagService;
 
-    /* 플랜 조회 */
-    public PlanResponse getPlan(Long planId) {
-        Plan plan = planRepository.getById(planId);
-        return getPlanResponse(plan);
-    }
-
+    /* Plan을 통한 PlanResponse 반환 (origin Plan 정보 포함) */
     private PlanResponse getPlanResponse(Plan plan) {
         Set<String> tags = planTagService.findTagsByPlan(plan);
 
@@ -37,6 +32,12 @@ public class PlanService {
         } else {
             return PlanResponse.toDto(plan, tags);
         }
+    }
+
+    /* 플랜 조회 */
+    public PlanResponse getPlan(Long planId) {
+        Plan plan = planRepository.getById(planId);
+        return getPlanResponse(plan);
     }
 
     /* 플랜 생성 */
