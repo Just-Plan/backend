@@ -67,7 +67,7 @@ public class PlanService {
         return getPlanResponse(plan);
     }
 
-    /* 플랜 수정 (제목, 여행 일자) */
+    /* 플랜 수정 (제목, 여행 일자, 태그) */
     @Transactional
     public PlanResponse updatePlan(PlanUpdateRequest request) {
         Plan plan = planRepository.getById(request.getPlanId());

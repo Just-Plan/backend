@@ -33,6 +33,10 @@ public class PlanTagService {
         Set<PlanTag> origin_planTags = planTagRepository.findByPlan(plan);
         Set<PlanTag> new_planTags = mapPlanTag(plan, tags);
 
+        if (origin_planTags.equals(new_planTags)) {
+            return origin_planTags;
+        }
+
         // 없어진 태그 삭제
         origin_planTags.forEach(tag -> {
             if (!new_planTags.contains(tag)) {

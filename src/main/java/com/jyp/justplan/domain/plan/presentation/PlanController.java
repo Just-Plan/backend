@@ -16,6 +16,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @Tag(name = "Plan", description = "일정 API")
 @RestController
 @RequiredArgsConstructor
@@ -47,7 +49,7 @@ public class PlanController {
     @PostMapping
     public ApiResponseDto<PlanResponse> createPlan (
             @Parameter(description = "일정 생성을 위한 데이터", required = true)
-            @RequestBody PlanCreateRequest request
+            @Valid @RequestBody PlanCreateRequest request
     ) {
         PlanResponse response = planService.savePlan(request);
         return ApiResponseDto.successResponse(response);
@@ -62,13 +64,13 @@ public class PlanController {
     @Parameter(name = "planId", description = "복제할 일정의 아이디", required = true, example = "1")
     @PostMapping("/copy")
     public ApiResponseDto<PlanResponse> copyPlan (
-            @RequestBody PlanIdRequest request
+            @Valid @RequestBody PlanIdRequest request
     ) {
         PlanResponse response = planService.copyPlan(request);
         return ApiResponseDto.successResponse(response);
     }
 
-    /* 플랜 수정 (제목, 여행 일자) */
+    /* 플랜 수정 (제목, 여행 일자, 태그) */
     @Operation(summary = "일정 수정", description = "일정을 수정합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공",
@@ -77,7 +79,7 @@ public class PlanController {
     @PatchMapping
     public ApiResponseDto<PlanResponse> updatePlan (
             @Parameter(description = "수정하고자 하는 일정 아이디와 수정할 데이터를 포함한 dto", required = true)
-            @RequestBody PlanUpdateRequest request
+            @Valid @RequestBody PlanUpdateRequest request
     ) {
         PlanResponse response = planService.updatePlan(request);
         return ApiResponseDto.successResponse(response);
@@ -92,7 +94,7 @@ public class PlanController {
     @PatchMapping("/public")
     public ApiResponseDto<PlanResponse> updatePlanPublic (
             @Parameter(description = "공개 여부를 전환하고자 하는 일정의 아이디를 포함한 데이터", required = true)
-            @RequestBody PlanIdRequest request
+            @Valid @RequestBody PlanIdRequest request
     ) {
         PlanResponse response = planService.updatePlanPublic(request);
         return ApiResponseDto.successResponse(response);
