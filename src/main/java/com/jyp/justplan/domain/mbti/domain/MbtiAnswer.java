@@ -1,7 +1,10 @@
 package com.jyp.justplan.domain.mbti.domain;
 
+import static javax.persistence.EnumType.*;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -25,7 +28,8 @@ public class MbtiAnswer {
     private String answer;
 
     @Column(name = "attribute", nullable = false, length = 1)
-    private String attribute;
+    @Enumerated(STRING)
+    private MbtiAnswerType attribute;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private MbtiQuestion question;
