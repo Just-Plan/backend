@@ -11,7 +11,7 @@ public enum ResponseCode {
     VALIDATION_ERROR(4001, "Validation Error"),
     TYPE_MISMATCH_ERROR(4002, "Type Mismatch Error"),
     METHOD_NOT_ALLOWED(4003, "Method Not Allowed"),
-    ACCESS_DENIED(4004, "Access Denied"),
+    NOT_FOUND(4004, "Not Found"),
     INTERNAL_SERVER_ERROR(5000, "Internal Server Error"),
     RESOURCE_NOT_FOUND(5001, "Resource Not Found"),
     DATA_INTEGRITY_VIOLATION(5002, "Data Integrity Violation");

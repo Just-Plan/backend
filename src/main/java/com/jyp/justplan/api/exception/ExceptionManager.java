@@ -1,5 +1,6 @@
 package com.jyp.justplan.api.exception;
 
+import com.amazonaws.services.kms.model.NotFoundException;
 import com.jyp.justplan.api.response.ApiResponseDto;
 import com.jyp.justplan.api.response.ResponseCode;
 import lombok.extern.slf4j.Slf4j;
@@ -53,9 +54,9 @@ public class ExceptionManager {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ApiResponseDto<?> handleAccessDeniedException(AccessDeniedException e) {
+    public ApiResponseDto<?> handleAccessDeniedException(NotFoundException e) {
         log.info("AccessDeniedException: {}", e.getMessage());
-        return ApiResponseDto.exceptionResponse(ResponseCode.ACCESS_DENIED, "Access Denied: " + e.getMessage());
+        return ApiResponseDto.exceptionResponse(ResponseCode.NOT_FOUND, "Not Found: " + e.getMessage());
     }
 
     @ExceptionHandler(Exception.class)

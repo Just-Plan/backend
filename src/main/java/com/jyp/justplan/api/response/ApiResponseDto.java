@@ -48,6 +48,6 @@ public class ApiResponseDto<T> {
                 errors.put(error.getObjectName(), error.getDefaultMessage());
             }
         });
-        return new ApiResponseDto<>(ResponseCode.VALIDATION_ERROR.getCode(), errors, ResponseCode.VALIDATION_ERROR.getMessage());
+        return new ApiResponseDto<>(ResponseCode.BAD_ERROR.getCode(), errors, ResponseCode.BAD_ERROR.getMessage());
     }
 }
