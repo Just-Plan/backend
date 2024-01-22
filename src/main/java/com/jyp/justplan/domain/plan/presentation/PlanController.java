@@ -17,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.awt.print.Pageable;
+import java.util.List;
 
 @Tag(name = "Plan", description = "일정 API")
 @RestController
@@ -25,7 +27,25 @@ import javax.validation.Valid;
 public class PlanController {
     private final PlanService planService;
 
-    /* 플랜 조회 */
+    /* 전체 플랜 조회 */
+    @Operation(summary = "일정 전체 조회", description = "전체 일정을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
+    })
+    @GetMapping
+    public ApiResponseDto<List<PlanResponse>> getPlans (
+            @RequestParam(required = false, defaultValue = "") String type,
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "10") int size,
+            @RequestParam(required = false, defaultValue = "createdAt") String sort
+    ) {
+        List<PlanResponse> response = planService.getPlans(type, page, size, sort);
+
+        return ApiResponseDto.successResponse(response);
+    }
+
+    /* 플랜 단일 조회 */
     @Operation(summary = "일정 조회", description = "일정 아이디에 대한 일정을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공",

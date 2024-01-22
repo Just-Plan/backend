@@ -9,10 +9,16 @@ import com.jyp.justplan.domain.plan.dto.request.PlanCreateRequest;
 import com.jyp.justplan.domain.plan.dto.request.PlanUpdateRequest;
 import com.jyp.justplan.domain.plan.dto.response.PlanResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +40,20 @@ public class PlanService {
         }
     }
 
-    /* 플랜 조회 */
+    /* 전체 플랜 조회 */
+    public List<PlanResponse> getPlans(String type, int page, int size, String sort) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sort).descending());
+
+        Page<Plan> plans = planRepository.findAll(pageable);
+
+        List<PlanResponse> planResponses = plans.stream()
+                .map(this::getPlanResponse)
+                .collect(Collectors.toList());
+
+        return planResponses;
+    }
+
+    /* 플랜 단일 조회 */
     public PlanResponse getPlan(Long planId) {
         Plan plan = planRepository.getById(planId);
         return getPlanResponse(plan);
