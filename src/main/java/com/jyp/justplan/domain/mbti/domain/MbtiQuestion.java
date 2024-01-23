@@ -4,6 +4,7 @@ import static javax.persistence.EnumType.STRING;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -41,14 +42,20 @@ public class MbtiQuestion {
     @OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
     private List<MbtiAnswer> answers = new ArrayList<>();
 
+    public static List<MbtiQuestion> selectRandomQuestions(List<MbtiQuestion> allQuestions, int count) {
+        List<MbtiQuestion> randomQuestions = new ArrayList<>();
 
-    public static List<MbtiQuestion> selectRandomQuestions(List<MbtiQuestion> allQuestions) {
-        Random random = new Random();
-        return Arrays.stream(MbtiQuestionType.values())
-            .flatMap(type -> allQuestions.stream()
+        for (MbtiQuestionType type : MbtiQuestionType.values()) {
+            List<MbtiQuestion> questionsOfType = allQuestions.stream()
                 .filter(question -> question.getAttribute() == type)
-                .sorted((q1, q2) -> random.nextInt(2) - 1)
-                .limit(3))
-            .toList();
+                .collect(Collectors.toList());
+
+            Collections.shuffle(questionsOfType);
+
+            randomQuestions.addAll(questionsOfType.stream()
+                .limit(count)
+                .toList());
+        }
+        return randomQuestions;
     }
 }

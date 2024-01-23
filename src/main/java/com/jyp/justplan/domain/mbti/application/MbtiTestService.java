@@ -22,7 +22,7 @@ public class MbtiTestService {
     private final MbtiAnswerRepository mbtiAnswerRepository;
 
     public List<MbtiQuestionResponse> getRandomQuestions() {
-        List<MbtiQuestion> mbtiQuestions = MbtiQuestion.selectRandomQuestions(mbtiQuestionRepository.findAll());
+        List<MbtiQuestion> mbtiQuestions = MbtiQuestion.selectRandomQuestions(mbtiQuestionRepository.findAll(), 3);
         return mbtiQuestions.stream().map(MbtiQuestionResponse::new).toList();
     }
 
