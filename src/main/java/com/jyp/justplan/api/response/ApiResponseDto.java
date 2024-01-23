@@ -29,8 +29,8 @@ public class ApiResponseDto<T> {
         return new ApiResponseDto<>(ResponseCode.SUCCESS.getCode(), null, null);
     }
 
-    public static ApiResponseDto<?> errorResponse(ResponseCode code) {
-        return new ApiResponseDto<>(code.getCode(), null, code.getMessage());
+    public static ApiResponseDto<?> errorResponse(ResponseCode code, Exception e) {
+        return new ApiResponseDto<>(code.getCode(), null, e.getMessage());
     }
 
     public static ApiResponseDto<?> exceptionResponse(ResponseCode code, String message) {
