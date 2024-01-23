@@ -1,9 +1,9 @@
-package com.jyp.justplan.domain.memo.presentation;
+package com.jyp.justplan.domain.place.presentation;
 
 import com.jyp.justplan.api.response.ApiResponseDto;
-import com.jyp.justplan.domain.memo.dto.request.MemoRequestDto;
-import com.jyp.justplan.domain.memo.dto.response.MemoResponseDto;
-import com.jyp.justplan.domain.memo.application.MemoService;
+import com.jyp.justplan.domain.place.dto.request.MemoRequest;
+import com.jyp.justplan.domain.place.dto.response.MemoResponse;
+import com.jyp.justplan.domain.place.application.MemoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,29 +16,29 @@ public class MemoController {
 
     /*CREATE*/
     @PostMapping
-    public ApiResponseDto<MemoResponseDto> createMemo(@RequestBody MemoRequestDto memoRequestDto) {
-        MemoResponseDto response = memoService.createMemo(memoRequestDto);
+    public ApiResponseDto<MemoResponse> createMemo(@RequestBody MemoRequest memoRequest) {
+        MemoResponse response = memoService.createMemo(memoRequest);
         return ApiResponseDto.successResponse(response);
     }
 
     /*READ*/
     @GetMapping("/{id}")
-    public ApiResponseDto<MemoResponseDto> getMemo(@PathVariable Long id) {
-        MemoResponseDto response = memoService.findMemoById(id);
+    public ApiResponseDto<MemoResponse> getMemo(@PathVariable Long id) {
+        MemoResponse response = memoService.findMemoById(id);
         return ApiResponseDto.successResponse(response);
     }
 
     /*UPDATE*/
     @PatchMapping("/{id}")
-    public ApiResponseDto<MemoResponseDto> updateMemo(@RequestBody MemoRequestDto memoRequestDto, @PathVariable Long id) {
-        MemoResponseDto response = memoService.updateMemo(memoRequestDto, id);
+    public ApiResponseDto<MemoResponse> updateMemo(@RequestBody MemoRequest memoRequest, @PathVariable Long id) {
+        MemoResponse response = memoService.updateMemo(memoRequest, id);
         return ApiResponseDto.successResponse(response);
     }
 
     /*RESET*/
     @PatchMapping("/reset/{id}")
-    public ApiResponseDto<MemoResponseDto> resetMemo(@PathVariable Long id) {
-        MemoResponseDto response = memoService.resetMemo(id);
+    public ApiResponseDto<MemoResponse> resetMemo(@PathVariable Long id) {
+        MemoResponse response = memoService.resetMemo(id);
         return ApiResponseDto.successResponse(response);
     }
 
