@@ -22,7 +22,6 @@ public class CityController {
     // 랜덤한 count 개의 도시 정보를 가져온다.
     @Operation(summary = "랜덤한 도시 호출", description = "랜덤한 n 개의 도시를 호출합니다.")
     @ApiResponse(responseCode = "200", description = "랜덤한 도시 호출")
-
     @GetMapping("/api/cities/random/{count}")
     public ApiResponseDto<CitiesResponse> getCities(
         @Parameter(description = "도시 리스트 길이", example = "10", required = true)
