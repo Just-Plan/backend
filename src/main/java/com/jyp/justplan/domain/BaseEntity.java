@@ -14,6 +14,7 @@ public class BaseEntity {
     @Column(name = "updated_at", nullable = false)
     private ZonedDateTime updatedAt;
 
+    @Column(name = "deleted_at")
     private ZonedDateTime deletedAt;
     @PrePersist
     public void onPrePersist() {

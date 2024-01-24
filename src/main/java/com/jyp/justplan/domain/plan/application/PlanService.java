@@ -3,16 +3,22 @@ package com.jyp.justplan.domain.plan.application;
 import com.jyp.justplan.domain.plan.application.tag.PlanTagService;
 import com.jyp.justplan.domain.plan.domain.Plan;
 import com.jyp.justplan.domain.plan.domain.PlanRepository;
+import com.jyp.justplan.domain.plan.domain.tag.PlanTag;
 import com.jyp.justplan.domain.plan.domain.tag.Tag;
 import com.jyp.justplan.domain.plan.dto.request.PlanIdRequest;
 import com.jyp.justplan.domain.plan.dto.request.PlanCreateRequest;
 import com.jyp.justplan.domain.plan.dto.request.PlanUpdateRequest;
 import com.jyp.justplan.domain.plan.dto.response.PlanResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Set;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,18 +29,38 @@ public class PlanService {
 
     /* Plan을 통한 PlanResponse 반환 (origin Plan 정보 포함) */
     private PlanResponse getPlanResponse(Plan plan) {
-        Set<String> tags = planTagService.findTagsByPlan(plan);
+        List<PlanTag> tags = planTagService.findTagsByPlan(plan);
 
         if (plan.getOriginPlan() != null) {
-            Set<String> originTags = planTagService.findTagsByPlan(plan.getOriginPlan());
-            PlanResponse originPlan = PlanResponse.toDto(plan.getOriginPlan(), originTags);
-            return PlanResponse.toDto(plan, tags, originPlan);
+            List<PlanTag> originTags = planTagService.findTagsByPlan(plan.getOriginPlan());
+            List<String> originTagNames = originTags.stream()
+                    .map(tag -> tag.getTag().getName())
+                    .collect(Collectors.toList());
+
+            PlanResponse originPlan = PlanResponse.toDto(plan.getOriginPlan(), originTagNames);
+            return PlanResponse.toDto(plan, originTagNames, originPlan);
         } else {
-            return PlanResponse.toDto(plan, tags);
+            List<String> tagNames = tags.stream()
+                    .map(tag -> tag.getTag().getName())
+                    .collect(Collectors.toList());
+            return PlanResponse.toDto(plan, tagNames);
         }
     }
 
-    /* 플랜 조회 */
+    /* 전체 플랜 조회 */
+    public List<PlanResponse> getPlans(String type, int page, int size, String sort) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sort).descending());
+
+        Page<Plan> plans = planRepository.findAll(pageable);
+
+        List<PlanResponse> planResponses = plans.stream()
+                .map(this::getPlanResponse)
+                .collect(Collectors.toList());
+
+        return planResponses;
+    }
+
+    /* 플랜 단일 조회 */
     public PlanResponse getPlan(Long planId) {
         Plan plan = planRepository.getById(planId);
         return getPlanResponse(plan);
@@ -61,17 +87,23 @@ public class PlanService {
                 origin_plan.getRegion()));
         plan.setOriginPlan(origin_plan);
 
-        Set<String> origin_tags = planTagService.findTagsByPlan(origin_plan);
-        planTagService.savePlanTag(plan, origin_tags);
+        List<PlanTag> origin_tags = planTagService.findTagsByPlan(origin_plan);
+        planTagService.savePlanTag(plan, getTagNames(origin_tags));
 
         return getPlanResponse(plan);
+    }
+
+    private static List<String> getTagNames(List<PlanTag> tags) {
+        return tags.stream()
+                .map(tag -> tag.getTag().getName())
+                .collect(Collectors.toList());
     }
 
     /* 플랜 수정 (제목, 여행 일자, 태그) */
     @Transactional
     public PlanResponse updatePlan(PlanUpdateRequest request) {
         Plan plan = planRepository.getById(request.getPlanId());
-        Set<String> tags = request.getTags();
+        List<String> tags = request.getTags();
 
         planTagService.savePlanTag(plan, tags);
 
