@@ -14,7 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
-import java.util.Set;
+import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -29,7 +29,7 @@ class PlanServiceTest {
     private PlanRepository planRepository;
 
     private final String 일정_이름 = "일정 이름";
-    private final Set<String> 일정_태그 = Set.of("태그1", "태그2");
+    private final List<String> 일정_태그 = List.of("태그1", "태그2");
     private final ZonedDateTime 일정_시작_날짜 = ZonedDateTime.of(2024, 1, 19, 0, 0, 0 ,0, ZonedDateTime.now().getZone());
     private final ZonedDateTime 일정_종료_날짜 = ZonedDateTime.of(2024, 1, 20, 0, 0, 0 ,0, ZonedDateTime.now().getZone());
     private final String 일정_지역 = "서울";
@@ -132,7 +132,7 @@ class PlanServiceTest {
 
         Plan savedPlan = planRepository.save(request.toEntity());
 
-        PlanUpdateRequest planUpdateRequest = new PlanUpdateRequest(savedPlan.getId(), "수정된 일정 이름", Set.of("수정된 태그1", "수정된 태그2"), 일정_시작_날짜, 일정_종료_날짜);
+        PlanUpdateRequest planUpdateRequest = new PlanUpdateRequest(savedPlan.getId(), "수정된 일정 이름", List.of("수정된 태그1", "수정된 태그2"), 일정_시작_날짜, 일정_종료_날짜);
 
         /* when */
         PlanResponse actual = planService.updatePlan(planUpdateRequest);
@@ -140,7 +140,7 @@ class PlanServiceTest {
         /* then */
         assertAll(
                 () -> assertEquals("수정된 일정 이름", actual.getTitle()),
-                () -> assertEquals(Set.of("수정된 태그1", "수정된 태그2"), actual.getTags()),
+                () -> assertEquals(List.of("수정된 태그1", "수정된 태그2"), actual.getTags()),
                 () -> assertEquals(일정_시작_날짜, actual.getStartDate()),
                 () -> assertEquals(일정_종료_날짜, actual.getEndDate()),
                 () -> assertEquals(일정_지역, actual.getRegion()),
