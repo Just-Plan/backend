@@ -7,6 +7,7 @@ import com.jyp.justplan.domain.user.domain.UserRepository;
 import com.jyp.justplan.domain.user.dto.response.EmailAuthCheckResponse;
 import com.jyp.justplan.domain.user.dto.response.EmailAuthCreateResponse;
 import com.jyp.justplan.domain.user.exception.EmailAuthException;
+import com.jyp.justplan.domain.user.exception.UserException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -68,9 +69,9 @@ public class EmailAuthService {
 
             mailSender.send(message);
         } catch (MessagingException e) {
-            throw new RuntimeException(e);
+            throw new EmailAuthException(e.getMessage());
         } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+            throw new EmailAuthException(e.getMessage());
         }
     }
 
@@ -79,11 +80,11 @@ public class EmailAuthService {
         UUID uuid = UUID.fromString(token);
         EmailAuth emailAuth = emailAuthRepository.findByEmailToken(uuid);
         if (emailAuth == null) {
-            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+            throw new EmailAuthException("유효하지 않은 토큰입니다.");
         } else if (emailAuth.isEmailVerified()) {
-            throw new IllegalArgumentException("이미 인증된 이메일입니다.");
+            throw new EmailAuthException("이미 인증된 이메일입니다.");
         } else if (emailAuth.isExpired()) {
-            throw new IllegalArgumentException("만료된 토큰입니다.");
+            throw new EmailAuthException("만료된 토큰입니다.");
         }
 
         emailAuth.verifyEmail();
@@ -92,10 +93,10 @@ public class EmailAuthService {
     /* 이메일 인증 확인 */
     public EmailAuthCheckResponse isEmailVerified(String email, long id) {
         EmailAuth emailAuth = emailAuthRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 아이디입니다."));
+                .orElseThrow(() -> new EmailAuthException("유효하지 않은 아이디입니다."));
 
         if (!emailAuth.getEmail().equals(email)) {
-            throw new RuntimeException("유효하지 않은 이메일입니다.");
+            throw new EmailAuthException("유효하지 않은 이메일입니다.");
         }
 
         return new EmailAuthCheckResponse(emailAuth.getEmail(), emailAuth.isEmailVerified());

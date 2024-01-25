@@ -4,6 +4,7 @@ package com.jyp.justplan.domain.user.application;
 import com.jyp.justplan.domain.user.UserDetailsImpl;
 import com.jyp.justplan.domain.user.domain.User;
 import com.jyp.justplan.domain.user.domain.UserRepository;
+import com.jyp.justplan.domain.user.exception.UserException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,7 +24,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> {
-                    return new RuntimeException("Invalid email.");
+                    return new UserException("Invalid email.");
                 });
 
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
