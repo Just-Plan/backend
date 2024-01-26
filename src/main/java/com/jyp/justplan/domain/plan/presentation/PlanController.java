@@ -5,6 +5,7 @@ import com.jyp.justplan.domain.plan.application.PlanService;
 import com.jyp.justplan.domain.plan.dto.request.PlanIdRequest;
 import com.jyp.justplan.domain.plan.dto.request.PlanCreateRequest;
 import com.jyp.justplan.domain.plan.dto.request.PlanUpdateRequest;
+import com.jyp.justplan.domain.plan.dto.response.PlanDetailResponse;
 import com.jyp.justplan.domain.plan.dto.response.PlanResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -53,10 +54,10 @@ public class PlanController {
     })
     @Parameter(name = "planId", description = "조회할 일정의 아이디", required = true, example = "1")
     @GetMapping("/{planId}")
-    public ApiResponseDto<PlanResponse> getPlan (
+    public ApiResponseDto<PlanDetailResponse> getPlan (
             @PathVariable Long planId
     ) {
-        PlanResponse response = planService.getPlan(planId);
+        PlanDetailResponse response = planService.getPlan(planId);
         return ApiResponseDto.successResponse(response);
     }
 
@@ -67,11 +68,11 @@ public class PlanController {
                     content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
     })
     @PostMapping
-    public ApiResponseDto<PlanResponse> createPlan (
+    public ApiResponseDto<PlanDetailResponse> createPlan (
             @Parameter(description = "일정 생성을 위한 데이터", required = true)
             @Valid @RequestBody PlanCreateRequest request
     ) {
-        PlanResponse response = planService.savePlan(request);
+        PlanDetailResponse response = planService.savePlan(request);
         return ApiResponseDto.successResponse(response);
     }
 
@@ -97,26 +98,11 @@ public class PlanController {
                     content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
     })
     @PatchMapping
-    public ApiResponseDto<PlanResponse> updatePlan (
+    public ApiResponseDto<PlanDetailResponse> updatePlan (
             @Parameter(description = "수정하고자 하는 일정 아이디와 수정할 데이터를 포함한 dto", required = true)
             @Valid @RequestBody PlanUpdateRequest request
     ) {
-        PlanResponse response = planService.updatePlan(request);
-        return ApiResponseDto.successResponse(response);
-    }
-
-    /* 플랜 공개 여부 수정 */
-    @Operation(summary = "일정 공개 여부 수정", description = "일정의 공개 여부를 수정합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공",
-                    content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
-    })
-    @PatchMapping("/public")
-    public ApiResponseDto<PlanResponse> updatePlanPublic (
-            @Parameter(description = "공개 여부를 전환하고자 하는 일정의 아이디를 포함한 데이터", required = true)
-            @Valid @RequestBody PlanIdRequest request
-    ) {
-        PlanResponse response = planService.updatePlanPublic(request);
+        PlanDetailResponse response = planService.updatePlan(request);
         return ApiResponseDto.successResponse(response);
     }
 

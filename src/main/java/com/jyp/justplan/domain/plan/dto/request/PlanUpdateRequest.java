@@ -42,6 +42,21 @@ public class PlanUpdateRequest {
     @NotNull(message = "일정 종료 날짜는 필수 값입니다.")
     private ZonedDateTime endDate;
 
+    @Schema(description = "일정 공개 여부", example = "true")
+    @NotNull(message = "일정 공개 여부는 필수 값입니다.")
+    private boolean published;
+
+    @Schema(description = "예산")
+    @NotNull(message = "예산은 필수 값입니다.")
+    private BudgetUpdateRequest budget;
+
+    @Schema(description = "지출 내역 사용 여부", example = "true")
+    @NotNull(message = "지출 내역 사용 여부는 필수 값입니다.")
+    private boolean useExpense;
+
+    @Schema(description = "지출 내역")
+    private ExpenseUpdateRequest expense;
+
     @AssertTrue(message = "일정 시작 날짜는 종료 날짜보다 늦을 수 없습니다.")
     private boolean isStartDateBeforeEndDate() {
         return startDate.isBefore(endDate);
@@ -53,5 +68,10 @@ public class PlanUpdateRequest {
                 (startDate.isEqual(MAX_DATE) || startDate.isBefore(MAX_DATE)) &&
                 (endDate.isEqual(MIN_DATE) || endDate.isAfter(MIN_DATE)) &&
                 (endDate.isEqual(MAX_DATE) || endDate.isBefore(MAX_DATE));
+    }
+
+    @AssertTrue(message = "지출 내역을 사용할 경우에만 지출 내역을 입력할 수 있습니다.")
+    private boolean isExpenseValid() {
+        return useExpense == (expense != null);
     }
 }

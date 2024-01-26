@@ -1,5 +1,7 @@
 package com.jyp.justplan.domain.plan.application;
 
+import com.jyp.justplan.domain.plan.application.budget.BudgetService;
+import com.jyp.justplan.domain.plan.application.expense.ExpenseService;
 import com.jyp.justplan.domain.plan.application.tag.PlanTagService;
 import com.jyp.justplan.domain.plan.domain.Plan;
 import com.jyp.justplan.domain.plan.domain.PlanRepository;
@@ -8,6 +10,9 @@ import com.jyp.justplan.domain.plan.domain.tag.Tag;
 import com.jyp.justplan.domain.plan.dto.request.PlanIdRequest;
 import com.jyp.justplan.domain.plan.dto.request.PlanCreateRequest;
 import com.jyp.justplan.domain.plan.dto.request.PlanUpdateRequest;
+import com.jyp.justplan.domain.plan.dto.response.BudgetResponse;
+import com.jyp.justplan.domain.plan.dto.response.ExpenseResponse;
+import com.jyp.justplan.domain.plan.dto.response.PlanDetailResponse;
 import com.jyp.justplan.domain.plan.dto.response.PlanResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,10 +31,20 @@ import java.util.stream.Collectors;
 public class PlanService {
     private final PlanRepository planRepository;
     private final PlanTagService planTagService;
+    private final BudgetService budgetService;
+    private final ExpenseService expenseService;
 
     /* Plan을 통한 PlanResponse 반환 (origin Plan 정보 포함) */
-    private PlanResponse getPlanResponse(Plan plan) {
+    private PlanDetailResponse getPlanDetailResponse(Plan plan) {
+        // 일정에 해당하는 태그 조회
         List<PlanTag> tags = planTagService.findTagsByPlan(plan);
+        List<String> tagNames = getTagNames(tags);
+
+        // 일정에 해당하는 예산 조회
+        BudgetResponse budgetResponse = budgetService.getBudget(plan);
+
+        // 일정에 해당하는 지출 조회
+        ExpenseResponse expenseResponse = plan.isUseExpense() ? expenseService.getExpense(plan) : null;
 
         if (plan.getOriginPlan() != null) {
             List<PlanTag> originTags = planTagService.findTagsByPlan(plan.getOriginPlan());
@@ -38,13 +53,17 @@ public class PlanService {
                     .collect(Collectors.toList());
 
             PlanResponse originPlan = PlanResponse.toDto(plan.getOriginPlan(), originTagNames);
-            return PlanResponse.toDto(plan, originTagNames, originPlan);
+            return PlanDetailResponse.toDto(plan, tagNames, originPlan, budgetResponse, expenseResponse);
         } else {
-            List<String> tagNames = tags.stream()
-                    .map(tag -> tag.getTag().getName())
-                    .collect(Collectors.toList());
-            return PlanResponse.toDto(plan, tagNames);
+            return PlanDetailResponse.toDto(plan, tagNames, budgetResponse, expenseResponse);
         }
+    }
+
+    private PlanResponse getPlanResponse(Plan plan) {
+        List<PlanTag> tags = planTagService.findTagsByPlan(plan);
+        List<String> tagNames = getTagNames(tags);
+
+        return PlanResponse.toDto(plan, tagNames);
     }
 
     /* 전체 플랜 조회 */
@@ -61,19 +80,22 @@ public class PlanService {
     }
 
     /* 플랜 단일 조회 */
-    public PlanResponse getPlan(Long planId) {
+    public PlanDetailResponse getPlan(Long planId) {
         Plan plan = planRepository.getById(planId);
-        return getPlanResponse(plan);
+        return getPlanDetailResponse(plan);
     }
 
     /* 플랜 생성 */
     @Transactional
-    public PlanResponse savePlan(PlanCreateRequest request) {
+    public PlanDetailResponse savePlan(PlanCreateRequest request) {
         Plan plan = planRepository.save(request.toEntity());
+
+        budgetService.createBudget(plan);
+        expenseService.createExpense(plan);
 
         planTagService.savePlanTag(plan, request.getTags());
 
-        return getPlanResponse(plan);
+        return getPlanDetailResponse(plan);
     }
 
     /* 플랜 복제 (가져오기) */
@@ -100,24 +122,31 @@ public class PlanService {
     }
 
     /* 플랜 수정 (제목, 여행 일자, 태그) */
+    /* + 예산, 지출, 공개 여부, 지출 여부 수정 */
     @Transactional
-    public PlanResponse updatePlan(PlanUpdateRequest request) {
+    public PlanDetailResponse updatePlan(PlanUpdateRequest request) {
         Plan plan = planRepository.getById(request.getPlanId());
         List<String> tags = request.getTags();
 
+        // 태그 수정
         planTagService.savePlanTag(plan, tags);
 
+        // 제목, 여행 일자
         plan.updatePlan(request.getTitle(), request.getStartDate(), request.getEndDate());
 
-        return getPlanResponse(plan);
-    }
+        // 공개 여부, 지출 여부 수정
+        plan.updatePublic(request.isPublished());
+        plan.updateUseExpense(request.isUseExpense());
 
-    /* 플랜 공개 여부 수정 */
-    @Transactional
-    public PlanResponse updatePlanPublic(PlanIdRequest request) {
-        Plan plan = planRepository.getById(request.getOriginPlanId());
-        plan.updatePublic(!plan.isPublic());
-        return getPlanResponse(plan);
+        // 예산 수정
+        budgetService.updateBudget(plan, request.getBudget());
+
+        if (plan.isUseExpense()) {
+            // 지출 수정
+            expenseService.updateExpense(plan, request.getExpense());
+        }
+
+        return getPlanDetailResponse(plan);
     }
 
     /* 플랜 삭제 */
