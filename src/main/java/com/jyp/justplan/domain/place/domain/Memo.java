@@ -1,7 +1,7 @@
-package com.jyp.justplan.domain.memo.domain;
+package com.jyp.justplan.domain.place.domain;
 
 import com.jyp.justplan.domain.BaseEntity;
-import com.jyp.justplan.domain.memo.dto.request.MemoRequestDto;
+import com.jyp.justplan.domain.place.dto.request.MemoRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,13 +21,14 @@ public class Memo extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "MEMO_ID")
     private Long id;
     @Column(length = 100)
     private String content;
     @Column(length = 20)
     private String color;
 
-    public void update(MemoRequestDto memoRequestDto) {
+    public void update(MemoRequest memoRequestDto) {
         this.content = memoRequestDto.getContent();
         this.color = memoRequestDto.getColor();
     }

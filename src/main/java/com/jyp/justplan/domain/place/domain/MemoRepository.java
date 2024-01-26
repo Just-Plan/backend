@@ -1,6 +1,5 @@
-package com.jyp.justplan.domain.memo.domain;
+package com.jyp.justplan.domain.place.domain;
 
-import com.jyp.justplan.domain.memo.domain.Memo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
