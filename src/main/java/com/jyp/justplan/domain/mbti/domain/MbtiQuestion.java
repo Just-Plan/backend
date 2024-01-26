@@ -3,18 +3,17 @@ package com.jyp.justplan.domain.mbti.domain;
 import static javax.persistence.EnumType.STRING;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.Getter;
@@ -39,7 +38,8 @@ public class MbtiQuestion {
     @Enumerated(STRING)
     private MbtiQuestionType attribute;
 
-    @OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "question_id", updatable = false, nullable = false)
     private List<MbtiAnswer> answers = new ArrayList<>();
 
     public static List<MbtiQuestion> selectRandomQuestions(List<MbtiQuestion> allQuestions, int count) {
