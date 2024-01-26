@@ -62,10 +62,10 @@ class PlanTest {
         Plan plan = new Plan(일정_이름, 일정_시작_날짜, 일정_종료_날짜, 일정_지역);
 
         /* when */
-        plan.updatePublic(!plan.isPublic());
+        plan.updatePublic(!plan.isPublished());
 
         /* then */
-        assertThat(plan.isPublic()).isFalse();
+        assertThat(plan.isPublished()).isFalse();
     }
 
     @Test
