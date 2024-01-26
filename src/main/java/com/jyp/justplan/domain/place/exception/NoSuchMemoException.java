@@ -1,4 +1,4 @@
-package com.jyp.justplan.domain.memo.exception;
+package com.jyp.justplan.domain.place.exception;
 
 import com.jyp.justplan.api.exception.BusinessException;
 import com.jyp.justplan.api.response.ResponseCode;

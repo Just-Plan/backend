@@ -1,10 +1,10 @@
-package com.jyp.justplan.domain.memo.application;
+package com.jyp.justplan.domain.place.application;
 
-import com.jyp.justplan.domain.memo.domain.MemoRepository;
-import com.jyp.justplan.domain.memo.domain.Memo;
-import com.jyp.justplan.domain.memo.dto.request.MemoRequestDto;
-import com.jyp.justplan.domain.memo.dto.response.MemoResponseDto;
-import com.jyp.justplan.domain.memo.exception.NoSuchMemoException;
+import com.jyp.justplan.domain.place.domain.MemoRepository;
+import com.jyp.justplan.domain.place.domain.Memo;
+import com.jyp.justplan.domain.place.dto.request.MemoRequest;
+import com.jyp.justplan.domain.place.dto.response.MemoResponse;
+import com.jyp.justplan.domain.place.exception.NoSuchMemoException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,39 +18,39 @@ public class MemoService {
 
     /*CREATE*/
     @Transactional
-    public MemoResponseDto createMemo(MemoRequestDto memoRequestDto) {
+    public MemoResponse createMemo(MemoRequest memoRequest) {
 
-        Memo memo = memoRequestDto.toEntity().toBuilder()
-                .content(memoRequestDto.getContent())
-                .color(memoRequestDto.getColor())
+        Memo memo = memoRequest.toEntity().toBuilder()
+                .content(memoRequest.getContent())
+                .color(memoRequest.getColor())
                 .build();
 
         Memo savedMemo = memoRepository.save(memo);
-        return MemoResponseDto.of(savedMemo);
+        return MemoResponse.of(savedMemo);
     }
 
     /*READ*/
-    public MemoResponseDto findMemoById(Long memoId) {
+    public MemoResponse findMemoById(Long memoId) {
         Memo existingMemo = findMemo(memoId);
-        return MemoResponseDto.of(existingMemo);
+        return MemoResponse.of(existingMemo);
     }
 
     /*UPDATE*/
     @Transactional
-    public MemoResponseDto updateMemo(MemoRequestDto memoRequestDto, Long memoId) {
+    public MemoResponse updateMemo(MemoRequest memoRequest, Long memoId) {
         Memo existingMemo = findMemo(memoId);
-        existingMemo.update(memoRequestDto);
+        existingMemo.update(memoRequest);
         Memo savedMemo = memoRepository.save(existingMemo);
-        return MemoResponseDto.of(savedMemo);
+        return MemoResponse.of(savedMemo);
     }
 
     /*RESET*/
     @Transactional
-    public MemoResponseDto resetMemo(Long memoId) {
+    public MemoResponse resetMemo(Long memoId) {
         Memo existingMemo = findMemo(memoId);
         existingMemo.reset();
         Memo savedMemo = memoRepository.save(existingMemo);
-        return MemoResponseDto.of(savedMemo);
+        return MemoResponse.of(savedMemo);
     }
 
     /*DELETE*/

@@ -1,6 +1,6 @@
-package com.jyp.justplan.domain.memo.dto.request;
+package com.jyp.justplan.domain.place.dto.request;
 
-import com.jyp.justplan.domain.memo.domain.Memo;
+import com.jyp.justplan.domain.place.domain.Memo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class MemoRequestDto {
+public class MemoRequest {
 
     private String content;
     private String color;
