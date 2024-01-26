@@ -60,7 +60,7 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
             user = User.builder()
                     .email(email)
                     .name(nickname)
-                    .password(encoder.encode(loginId))
+                    .password("{bcrypt}"+encoder.encode(loginId))
                     .provider(provider)
                     .providerId(providerId)
                     .role(UserRole.USER)

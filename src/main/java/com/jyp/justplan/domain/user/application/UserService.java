@@ -12,15 +12,17 @@ import com.jyp.justplan.domain.user.dto.response.UserSignInResponseInfo;
 import com.jyp.justplan.domain.user.exception.UserException;
 import com.jyp.justplan.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -29,7 +31,7 @@ public class UserService {
     private final EmailAuthRepository emailAuthRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
-    private final PasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
     private final RedisTemplate<String, String> redisTemplate;
 
     /* 회원가입 */
@@ -41,7 +43,7 @@ public class UserService {
         User user = new User(
                 userSignUpRequest.getEmail(),
                 userSignUpRequest.getName(),
-                passwordEncoder.encode(userSignUpRequest.getPassword())
+                passwordEncoder.encode("{bcrypt}"+userSignUpRequest.getPassword())
         );
 
         User savedUser = userRepository.save(user);
