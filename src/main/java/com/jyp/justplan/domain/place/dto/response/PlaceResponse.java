@@ -14,6 +14,7 @@ public class PlaceResponse {
 
     private int day;
     private int orderNum;
+    private Long memoId;
     private String content;
     private String color;
     private String name;
@@ -27,6 +28,7 @@ public class PlaceResponse {
         return new PlaceResponse(
                 place.getDay(),
                 place.getOrderNum(),
+                place.getMemo().getId(),
                 place.getMemo().getContent(),
                 place.getMemo().getColor(),
                 place.getGooglePlace().getName(),

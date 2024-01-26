@@ -9,7 +9,5 @@ import lombok.NoArgsConstructor;
 @Getter
 public class PlaceUpdateRequest {
     private Long id;
-    private int day;
     private int orderNum;
 }
-
