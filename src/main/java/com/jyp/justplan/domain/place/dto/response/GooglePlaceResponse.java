@@ -12,6 +12,7 @@ import java.util.List;
 @Getter
 public class GooglePlaceResponse {
 
+    private Long id;
     private String name;
     private String formattedAddress;
     private List<String> types;
@@ -21,6 +22,7 @@ public class GooglePlaceResponse {
 
     public static GooglePlaceResponse of(GooglePlace googlePlace) {
         return new GooglePlaceResponse(
+                googlePlace.getId(),
                 googlePlace.getName(),
                 googlePlace.getAddress(),
                 Collections.singletonList(googlePlace.getTypes()),

@@ -11,6 +11,7 @@ import java.util.List;
 @Getter
 public class GooglePlaceApiResultResponse{
 
+    private Long Id;
     private String name;
     @JsonProperty("formatted_address")
     private String formattedAddress;

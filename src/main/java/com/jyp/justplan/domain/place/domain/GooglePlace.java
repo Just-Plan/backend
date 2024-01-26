@@ -1,5 +1,6 @@
 package com.jyp.justplan.domain.place.domain;
 
+import com.jyp.justplan.domain.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +16,7 @@ import javax.persistence.*;
 @Entity
 @SQLDelete(sql = "UPDATE place SET deleted_at = NOW() WHERE id = ?")
 @Where(clause = "deleted_at is null")
-public class GooglePlace {
+public class GooglePlace extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -12,7 +12,7 @@ import java.util.List;
 public class GooglePlaceRequest {
 
     private String name;
-    private String address;
+    private String formattedAddress;
     private List<String> types;
     private double lat;
     private double lng;
@@ -21,7 +21,7 @@ public class GooglePlaceRequest {
     public GooglePlace toEntity() {
         return GooglePlace.builder()
                 .name(name)
-                .address(address)
+                .address(formattedAddress)
                 .types(types.toString())
                 .lat(lat)
                 .lng(lng)

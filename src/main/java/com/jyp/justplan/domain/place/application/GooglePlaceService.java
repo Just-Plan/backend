@@ -3,7 +3,6 @@ package com.jyp.justplan.domain.place.application;
 import com.jyp.justplan.domain.place.domain.GooglePlace;
 import com.jyp.justplan.domain.place.domain.GooglePlaceRepository;
 import com.jyp.justplan.domain.place.GooglePlacesProperties;
-import com.jyp.justplan.domain.place.domain.PlaceRepository;
 import com.jyp.justplan.domain.place.dto.request.GooglePlaceRequest;
 import com.jyp.justplan.domain.place.dto.response.GooglePlaceApiResultResponse;
 import com.jyp.justplan.domain.place.dto.response.GooglePlaceResponse;
@@ -22,14 +21,12 @@ import java.util.stream.Collectors;
 public class GooglePlaceService {
 
     private final GooglePlaceRepository googlePlaceRepository;
-    private final PlaceRepository placeRepository;
     private final GooglePlacesProperties googlePlacesProperties;
     private final WebClient webClient;
 
     @Autowired
-    public GooglePlaceService(GooglePlaceRepository googlePlaceRepository, PlaceRepository placeRepository, GooglePlacesProperties googlePlacesProperties, WebClient.Builder webClientBuilder) {
+    public GooglePlaceService(GooglePlaceRepository googlePlaceRepository, GooglePlacesProperties googlePlacesProperties, WebClient.Builder webClientBuilder) {
         this.googlePlaceRepository = googlePlaceRepository;
-        this.placeRepository = placeRepository;
         this.googlePlacesProperties = googlePlacesProperties;
         this.webClient = webClientBuilder.baseUrl("https://maps.googleapis.com/maps/api/place").build();
     }
@@ -61,6 +58,7 @@ public class GooglePlaceService {
                 : null;
 
         return new GooglePlaceResponse(
+                result.getId(),
                 result.getName(),
                 result.getFormattedAddress(),
                 result.getTypes(),
@@ -75,12 +73,6 @@ public class GooglePlaceService {
     public GooglePlaceResponse createGooglePlace(GooglePlaceRequest googlePlaceRequest) {
 
         GooglePlace googlePlace = googlePlaceRequest.toEntity().toBuilder()
-                .name(googlePlaceRequest.getName())
-                .address(googlePlaceRequest.getAddress())
-                .types(googlePlaceRequest.getTypes().toString())
-                .lat(googlePlaceRequest.getLat())
-                .lng(googlePlaceRequest.getLng())
-                .photoReference(googlePlaceRequest.getPhotoReference())
                 .build();
 
         GooglePlace savedGooglePlace = googlePlaceRepository.save(googlePlace);
