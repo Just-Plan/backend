@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
-import java.util.Set;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -77,7 +77,7 @@ class PlanTagRepositoryTest {
 
         /* when */
         PlanTag savedPlanTag = planTagRepository.save(planTag);
-        Set<PlanTag> foundPlanTag = planTagRepository.findByPlan(plan);
+        List<PlanTag> foundPlanTag = planTagRepository.findByPlan(plan);
 
         /* then */
         assertAll(

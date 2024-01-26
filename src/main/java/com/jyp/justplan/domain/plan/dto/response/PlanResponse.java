@@ -8,8 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.ZonedDateTime;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -21,42 +20,16 @@ public class PlanResponse {
     private String region;
     private ZonedDateTime startDate;
     private ZonedDateTime endDate;
-    private boolean isPublic;
-    private PlanResponse originPlan;
-    private Set<String> tags;
+    private boolean published;
+    private List<String> tags;
 
-    /* 마지막 plan일 경우, originPlan은 null, 이를 처리하기 위한 생성자 */
-    // TODO: 유지보수를 위해, depth를 유연하게 처리할 수 있도록 변경 (서비스 레이어에서 처리)
-    public PlanResponse(long planId, String title, String region, ZonedDateTime startDate, ZonedDateTime endDate, boolean isPublic, Set<String> tags) {
-        this.planId = planId;
-        this.title = title;
-        this.region = region;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.isPublic = isPublic;
-        this.originPlan = null;
-        this.tags = tags;
-    }
-
-    public static PlanResponse toDto(Plan plan, Set<String> tags, PlanResponse originPlan) {
+    public static PlanResponse toDto(Plan plan, List<String> tags) {
         return new PlanResponse(plan.getId(),
                 plan.getTitle(),
                 plan.getRegion(),
                 plan.getStartDate(),
                 plan.getEndDate(),
-                plan.isPublic(),
-                originPlan,
-                tags
-                );
-    }
-
-    public static PlanResponse toDto(Plan plan, Set<String> tags) {
-        return new PlanResponse(plan.getId(),
-                plan.getTitle(),
-                plan.getRegion(),
-                plan.getStartDate(),
-                plan.getEndDate(),
-                plan.isPublic(),
+                plan.isPublished(),
                 tags
         );
     }

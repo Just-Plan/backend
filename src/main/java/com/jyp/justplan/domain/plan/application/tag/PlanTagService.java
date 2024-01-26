@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,26 +22,25 @@ public class PlanTagService {
     private final PlanTagRepository planTagRepository;
 
     /* 태그 조회 */
-    public Set<String> findTagsByPlan(Plan plan) {
-        Set<String> tags = planTagRepository.findByPlan(plan).stream()
-                .map(planTag -> planTag.getTag().getName())
-                .collect(Collectors.toSet());
-        return tags;
+    public List<PlanTag> findTagsByPlan(Plan plan) {
+        return planTagRepository.findByPlanOrderByUpdatedAtAsc(plan);
     }
 
     /* 일정-태그 생성 */
     @Transactional
-    public Set<PlanTag> savePlanTag(Plan plan, Set<String> tags) {
-        Set<PlanTag> origin_planTags = planTagRepository.findByPlan(plan);
-        Set<PlanTag> new_planTags = mapPlanTag(plan, tags);
+    public List<PlanTag> savePlanTag(Plan plan, List<String> tags) {
+        List<PlanTag> origin_planTags = planTagRepository.findByPlan(plan);
+        List<PlanTag> new_planTags = mapPlanTag(plan, tags);
 
         if (origin_planTags.equals(new_planTags)) {
             return origin_planTags;
         }
 
         // 없어진 태그 삭제
+        Set<Tag> deleted_plan = new HashSet<>();
         origin_planTags.forEach(tag -> {
             if (!new_planTags.contains(tag)) {
+                deleted_plan.add(tag.getTag());
                 planTagRepository.delete(tag);
             }
         });
@@ -52,23 +53,23 @@ public class PlanTagService {
         });
 
         // 사용하지 않는 태그 삭제
-        origin_planTags.forEach(tag -> {
-            if (!planTagRepository.existsByTag(tag.getTag())) {
-                tagService.deleteTag(tag.getTag());
+        deleted_plan.forEach(tag -> {
+            if (!planTagRepository.existsByTag(tag)) {
+                tagService.deleteTag(tag);
             }
         });
 
-        return new_planTags;
+        return planTagRepository.findByPlanOrderByUpdatedAtAsc(plan);
     }
 
     /* 일정에 대한 태그 매핑 */
-    private Set<PlanTag> mapPlanTag(Plan plan, Set<String> tags) {
-        Set<PlanTag> planTags = tags.stream()
+    private List<PlanTag> mapPlanTag(Plan plan, List<String> tags) {
+        List<PlanTag> planTags = tags.stream()
                 .map(tag -> {
                     Tag findTag = tagService.findOrCreateTag(tag);
                     return findOrCreatePlanTag(plan, findTag);
                 })
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
         return planTags;
     }
 
@@ -86,7 +87,7 @@ public class PlanTagService {
     /* 일정-태그 삭제 */
     @Transactional
     public void deletePlanTag(Plan plan) {
-        Set<PlanTag> deletedPlanTags = planTagRepository.deleteByPlan(plan);
+        List<PlanTag> deletedPlanTags = planTagRepository.deleteByPlan(plan);
         deletedPlanTags.forEach(planTag -> {
             if (!planTagRepository.existsByTag(planTag.getTag())) {
                 tagService.deleteTag(planTag.getTag());

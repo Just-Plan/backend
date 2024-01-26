@@ -30,14 +30,16 @@ public class Plan extends BaseEntity {
     @Column(name = "end_date")
     private ZonedDateTime endDate;
 
-    @Column(name = "is_public")
-    private boolean isPublic = true;
+    private boolean published = true;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "origin_plan_id")
     private Plan originPlan;
 
     private boolean deleted = false;
+
+    @Column(name = "use_expense")
+    private boolean useExpense = false;
 
     public Plan(String title, ZonedDateTime startDate, ZonedDateTime endDate, String region) {
         this.title = title;
@@ -52,8 +54,11 @@ public class Plan extends BaseEntity {
         this.endDate = end_date;
     }
 
-    public void updatePublic (boolean is_public) {
-        this.isPublic = is_public;
+    public void updatePublic (boolean published) {
+        this.published = published;
+    }
+    public void updateUseExpense (boolean use_expense) {
+        this.useExpense = use_expense;
     }
 
     public void setOriginPlan (Plan origin_plan) {
