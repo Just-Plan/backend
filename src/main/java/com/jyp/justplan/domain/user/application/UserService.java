@@ -12,15 +12,17 @@ import com.jyp.justplan.domain.user.dto.response.UserSignInResponseInfo;
 import com.jyp.justplan.domain.user.exception.UserException;
 import com.jyp.justplan.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -29,7 +31,7 @@ public class UserService {
     private final EmailAuthRepository emailAuthRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
-    private final PasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
     private final RedisTemplate<String, String> redisTemplate;
 
     /* 회원가입 */
@@ -41,7 +43,7 @@ public class UserService {
         User user = new User(
                 userSignUpRequest.getEmail(),
                 userSignUpRequest.getName(),
-                passwordEncoder.encode(userSignUpRequest.getPassword())
+                passwordEncoder.encode("{bcrypt}"+userSignUpRequest.getPassword())
         );
 
         User savedUser = userRepository.save(user);
@@ -52,14 +54,14 @@ public class UserService {
 
     private EmailAuth getEmailAuth(String email, long authId) {
         EmailAuth emailAuth = emailAuthRepository.findById(authId)
-                .orElseThrow(() -> new RuntimeException("해당 이메일 인증이 존재하지 않습니다."));
+                .orElseThrow(() -> new UserException("해당 이메일 인증이 존재하지 않습니다."));
 
         if (!emailAuth.getEmail().equals(email)) {
-            throw new RuntimeException("이메일 인증이 일치하지 않습니다.");
+            throw new UserException("이메일 인증이 일치하지 않습니다.");
         } else if (!emailAuth.isEmailVerified()) {
-            throw new RuntimeException("이메일 인증이 완료되지 않았습니다.");
+            throw new UserException("이메일 인증이 완료되지 않았습니다.");
         } else if (emailAuth.getUser() != null) {
-            throw new RuntimeException("이미 사용된 인증입니다.");
+            throw new UserException("이미 사용된 인증입니다.");
         }
 
         return emailAuth;
@@ -68,7 +70,7 @@ public class UserService {
     /* 로그인 */
     public UserSignInResponseInfo signin(UserSignInRequest userSignInRequest) {
         User user = userRepository.findByEmail(userSignInRequest.getEmail())
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 이메일입니다."));
+                .orElseThrow(() -> new UserException("존재하지 않는 이메일입니다."));
 
         try {
             Authentication authentication = authenticationManager.authenticate(
@@ -89,10 +91,10 @@ public class UserService {
                     refreshToken
             );
         } catch (BadCredentialsException e) {
-            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+            throw new UserException("비밀번호가 일치하지 않습니다.");
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("로그인에 실패하였습니다.");
+            throw new UserException("로그인에 실패하였습니다.");
         }
     }
 
@@ -100,7 +102,7 @@ public class UserService {
     public UserResponse updateUser(UserUpdateInfoRequest userUpdateInfoRequest, UserDetailsImpl userDetails) {
         // TODO: Exception 처리
         User user = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("해당 유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new UserException("해당 유저가 존재하지 않습니다."));
         user.updateName(userUpdateInfoRequest.getName());
 
         return UserResponse.toDto(user);
@@ -109,7 +111,7 @@ public class UserService {
     /* 비밀번호 재설정 */
     public void resetPassword(UserUpdatePasswordRequest userUpdatePasswordRequest) {
         User user = userRepository.findByEmail(userUpdatePasswordRequest.getEmail())
-                .orElseThrow(() -> new RuntimeException("해당 유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new UserException("해당 유저가 존재하지 않습니다."));
 
         if("kakao".equals(user.getProvider())){
             throw new UserException();
@@ -125,10 +127,10 @@ public class UserService {
     public void deleteUser(UserDeleteRequest userDeleteRequest, UserDetailsImpl userDetails) {
         // TODO: Exception 처리
         User user = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("해당 유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new UserException("해당 유저가 존재하지 않습니다."));
 
         if (!passwordEncoder.matches(userDeleteRequest.getPassword(), user.getPassword())) {
-            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+            throw new UserException("비밀번호가 일치하지 않습니다.");
         }
 
         userRepository.delete(user);
@@ -143,7 +145,7 @@ public class UserService {
         System.out.println("refreshToken = " + refreshToken);
         String redisRefreshToken = redisTemplate.opsForValue().get(authentication.getName());
         if (!refreshToken.equals(redisRefreshToken)) {
-            throw new RuntimeException("유효하지 않은 Refresh Token 입니다.");
+            throw new UserException("유효하지 않은 Refresh Token 입니다.");
         }
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();

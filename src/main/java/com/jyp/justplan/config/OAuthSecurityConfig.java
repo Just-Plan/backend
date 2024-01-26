@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -35,6 +36,9 @@ public class OAuthSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
                 .authorizeRequests()
                 // 인증
                 //.antMatchers("/user/info").authenticated()
@@ -86,15 +90,6 @@ public class OAuthSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
                 .accessDeniedHandler(new JwtAccessDeniedHandler());
     }
-
-    private final JwtTokenProvider jwtTokenProvider;
-    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
-    @Bean
-    public PasswordEncoder getPasswordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authenticationConfiguration

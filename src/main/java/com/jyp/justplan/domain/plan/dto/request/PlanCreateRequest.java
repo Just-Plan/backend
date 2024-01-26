@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Set;
+import java.util.List;
 
 import static com.jyp.justplan.domain.Expression.*;
 
@@ -30,7 +30,7 @@ public class PlanCreateRequest {
 
     @Schema(description = "일정 태그", example = "[\"빵순이\", \"대전\"]")
     @NotNull(message = "일정 태그는 필수 값입니다.")
-    private Set<String> tags;
+    private List<String> tags;
 
     @Schema(description = "일정 시작 날짜", example = "2024-08-01T00:00:00+09:00")
     @NotNull(message = "일정 시작 날짜는 필수 값입니다.")

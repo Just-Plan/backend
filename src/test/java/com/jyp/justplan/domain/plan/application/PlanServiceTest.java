@@ -2,9 +2,8 @@ package com.jyp.justplan.domain.plan.application;
 
 import com.jyp.justplan.domain.plan.domain.Plan;
 import com.jyp.justplan.domain.plan.domain.PlanRepository;
-import com.jyp.justplan.domain.plan.dto.request.PlanCreateRequest;
-import com.jyp.justplan.domain.plan.dto.request.PlanIdRequest;
-import com.jyp.justplan.domain.plan.dto.request.PlanUpdateRequest;
+import com.jyp.justplan.domain.plan.dto.request.*;
+import com.jyp.justplan.domain.plan.dto.response.PlanDetailResponse;
 import com.jyp.justplan.domain.plan.dto.response.PlanResponse;
 import com.jyp.justplan.domain.plan.exception.NoSuchPlanException;
 import org.junit.jupiter.api.DisplayName;
@@ -14,7 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
-import java.util.Set;
+import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -29,10 +28,12 @@ class PlanServiceTest {
     private PlanRepository planRepository;
 
     private final String 일정_이름 = "일정 이름";
-    private final Set<String> 일정_태그 = Set.of("태그1", "태그2");
+    private final List<String> 일정_태그 = List.of("태그1", "태그2");
     private final ZonedDateTime 일정_시작_날짜 = ZonedDateTime.of(2024, 1, 19, 0, 0, 0 ,0, ZonedDateTime.now().getZone());
     private final ZonedDateTime 일정_종료_날짜 = ZonedDateTime.of(2024, 1, 20, 0, 0, 0 ,0, ZonedDateTime.now().getZone());
     private final String 일정_지역 = "서울";
+    private final BudgetUpdateRequest 일정_예산_수정_요청 = new BudgetUpdateRequest(10000, 20000);
+    private final ExpenseUpdateRequest 일정_지출_수정_요청 = new ExpenseUpdateRequest(10000, 20000, 30000, 40000, 50000);
 
     /* 플랜 생성 */
     @Test
@@ -42,7 +43,7 @@ class PlanServiceTest {
         PlanCreateRequest request = new PlanCreateRequest(일정_이름, 일정_태그, 일정_시작_날짜, 일정_종료_날짜, 일정_지역);
 
         /* when */
-        PlanResponse actual = planService.savePlan(request);
+        PlanDetailResponse actual = planService.savePlan(request);
 
         /* then */
         assertAll(
@@ -50,7 +51,7 @@ class PlanServiceTest {
                 () -> assertEquals(일정_시작_날짜, actual.getStartDate()),
                 () -> assertEquals(일정_종료_날짜, actual.getEndDate()),
                 () -> assertEquals(일정_지역, actual.getRegion()),
-                () -> assertEquals(true, actual.isPublic())
+                () -> assertEquals(true, actual.isPublished())
         );
     }
 
@@ -60,10 +61,10 @@ class PlanServiceTest {
     void 일정을_조회한다 () {
         /* given */
         PlanCreateRequest request = new PlanCreateRequest(일정_이름, 일정_태그, 일정_시작_날짜, 일정_종료_날짜, 일정_지역);
-        PlanResponse response = planService.savePlan(request);
+        PlanDetailResponse response = planService.savePlan(request);
 
         /* when */
-        PlanResponse actual = planService.getPlan(response.getPlanId());
+        PlanDetailResponse actual = planService.getPlan(response.getPlanId());
 
         /* then */
         assertAll(
@@ -71,7 +72,7 @@ class PlanServiceTest {
                 () -> assertEquals(일정_시작_날짜, actual.getStartDate()),
                 () -> assertEquals(일정_종료_날짜, actual.getEndDate()),
                 () -> assertEquals(일정_지역, actual.getRegion()),
-                () -> assertEquals(true, actual.isPublic())
+                () -> assertEquals(true, actual.isPublished())
         );
     }
 
@@ -91,7 +92,7 @@ class PlanServiceTest {
     void 삭제된_일정을_조회하면_예외가_발생한다 () {
         /* given */
         PlanCreateRequest request = new PlanCreateRequest(일정_이름, 일정_태그, 일정_시작_날짜, 일정_종료_날짜, 일정_지역);
-        PlanResponse response = planService.savePlan(request);
+        PlanDetailResponse response = planService.savePlan(request);
         planService.deletePlan(response.getPlanId());
 
         /* when */
@@ -106,7 +107,7 @@ class PlanServiceTest {
     void 일정을_복제한다 () {
         /* given */
         PlanCreateRequest request = new PlanCreateRequest(일정_이름, 일정_태그, 일정_시작_날짜, 일정_종료_날짜, 일정_지역);
-        PlanResponse response = planService.savePlan(request);
+        PlanDetailResponse response = planService.savePlan(request);
         PlanIdRequest planIdRequest = new PlanIdRequest(response.getPlanId());
 
         /* when */
@@ -119,7 +120,7 @@ class PlanServiceTest {
                 () -> assertEquals(일정_시작_날짜, actual.getStartDate()),
                 () -> assertEquals(일정_종료_날짜, actual.getEndDate()),
                 () -> assertEquals(일정_지역, actual.getRegion()),
-                () -> assertEquals(true, actual.isPublic())
+                () -> assertEquals(true, actual.isPublished())
         );
     }
 
@@ -130,38 +131,34 @@ class PlanServiceTest {
         /* given */
         PlanCreateRequest request = new PlanCreateRequest(일정_이름, 일정_태그, 일정_시작_날짜, 일정_종료_날짜, 일정_지역);
 
-        Plan savedPlan = planRepository.save(request.toEntity());
+        PlanDetailResponse response = planService.savePlan(request);
 
-        PlanUpdateRequest planUpdateRequest = new PlanUpdateRequest(savedPlan.getId(), "수정된 일정 이름", Set.of("수정된 태그1", "수정된 태그2"), 일정_시작_날짜, 일정_종료_날짜);
+        Plan savedPlan = planRepository.getById(response.getPlanId());
+
+        PlanUpdateRequest planUpdateRequest = new PlanUpdateRequest(
+                savedPlan.getId(),
+                "수정된 일정 이름",
+                List.of("수정된 태그1", "수정된 태그2"),
+                일정_시작_날짜,
+                일정_종료_날짜,
+                true,
+                일정_예산_수정_요청,
+                true,
+                일정_지출_수정_요청
+        );
 
         /* when */
-        PlanResponse actual = planService.updatePlan(planUpdateRequest);
+        PlanDetailResponse actual = planService.updatePlan(planUpdateRequest);
 
         /* then */
         assertAll(
                 () -> assertEquals("수정된 일정 이름", actual.getTitle()),
-                () -> assertEquals(Set.of("수정된 태그1", "수정된 태그2"), actual.getTags()),
+                () -> assertEquals(List.of("수정된 태그1", "수정된 태그2"), actual.getTags()),
                 () -> assertEquals(일정_시작_날짜, actual.getStartDate()),
                 () -> assertEquals(일정_종료_날짜, actual.getEndDate()),
                 () -> assertEquals(일정_지역, actual.getRegion()),
-                () -> assertEquals(true, actual.isPublic())
+                () -> assertEquals(true, actual.isPublished())
         );
-    }
-
-    /* 플랜 공개 여부 수정 */
-    @Test
-    @DisplayName("일정의 공개 여부를 수정한다.")
-    void 일정의_공개_여부를_수정한다 () {
-        /* given */
-        PlanCreateRequest request = new PlanCreateRequest(일정_이름, 일정_태그, 일정_시작_날짜, 일정_종료_날짜, 일정_지역);
-        PlanResponse response = planService.savePlan(request);
-        PlanIdRequest planIdRequest = new PlanIdRequest(response.getPlanId());
-
-        /* when */
-        PlanResponse actual = planService.updatePlanPublic(planIdRequest);
-
-        /* then */
-        assertThat(actual.isPublic()).isEqualTo(false);
     }
 
     /* 플랜 삭제 */
@@ -170,7 +167,7 @@ class PlanServiceTest {
     void 일정을_삭제한다 () {
         /* given */
         PlanCreateRequest request = new PlanCreateRequest(일정_이름, 일정_태그, 일정_시작_날짜, 일정_종료_날짜, 일정_지역);
-        PlanResponse response = planService.savePlan(request);
+        PlanDetailResponse response = planService.savePlan(request);
 
         /* when */
         planService.deletePlan(response.getPlanId());
