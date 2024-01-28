@@ -84,10 +84,10 @@ public class PlanController {
     })
     @Parameter(name = "planId", description = "복제할 일정의 아이디", required = true, example = "1")
     @PostMapping("/copy")
-    public ApiResponseDto<PlanResponse> copyPlan (
+    public ApiResponseDto<PlanDetailResponse> copyPlan (
             @Valid @RequestBody PlanIdRequest request
     ) {
-        PlanResponse response = planService.copyPlan(request);
+        PlanDetailResponse response = planService.copyPlan(request);
         return ApiResponseDto.successResponse(response);
     }
 
