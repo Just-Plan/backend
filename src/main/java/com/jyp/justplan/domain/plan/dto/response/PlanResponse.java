@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -18,19 +19,28 @@ public class PlanResponse {
     private long planId;
     private String title;
     private List<UserPlanResponse> users;
+    // TODO: 스크랩 수 추가
+    private BudgetResponse budget;
     private CityResponse region;
     private ZonedDateTime startDate;
     private ZonedDateTime endDate;
+    private long nights;
+    private long days;
     private boolean published;
     private List<String> tags;
 
-    public static PlanResponse toDto(Plan plan, List<UserPlanResponse> users, List<String> tags) {
-        return new PlanResponse(plan.getId(),
+    public static PlanResponse toDto(Plan plan, List<UserPlanResponse> users, BudgetResponse budget, List<String> tags) {
+        Duration duration = Duration.between(plan.getStartDate(), plan.getEndDate());
+        return new PlanResponse(
+                plan.getId(),
                 plan.getTitle(),
                 users,
+                budget,
                 new CityResponse(plan.getRegion()),
                 plan.getStartDate(),
                 plan.getEndDate(),
+                duration.toDays(),
+                duration.toDays() + 1,
                 plan.isPublished(),
                 tags
         );
