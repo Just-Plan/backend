@@ -23,11 +23,9 @@ public class Plan extends BaseEntity {
 
     private String title;
 
-    // TODO: 지역 추가 시, 해당 enum이나 테이블 값으로 변경
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "city_id")
     private City region;
-//    private String region;
 
     @Column(name = "start_date")
     private ZonedDateTime startDate;
