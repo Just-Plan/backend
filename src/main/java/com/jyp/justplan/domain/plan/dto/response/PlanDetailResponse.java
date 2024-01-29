@@ -16,6 +16,7 @@ import java.util.List;
 public class PlanDetailResponse {
     private long planId;
     private String title;
+    private List<UserPlanResponse> users;
     private CityResponse region;
     private ZonedDateTime startDate;
     private ZonedDateTime endDate;
@@ -32,6 +33,7 @@ public class PlanDetailResponse {
 
     public static PlanDetailResponse toDto (
             Plan plan,
+            List<UserPlanResponse> users,
             List<String> tags,
             CityResponse cityResponse,
             BudgetResponse budgetResponse,
@@ -40,6 +42,7 @@ public class PlanDetailResponse {
         return new PlanDetailResponse(
                 plan.getId(),
                 plan.getTitle(),
+                users,
                 cityResponse,
                 plan.getStartDate(),
                 plan.getEndDate(),
@@ -54,6 +57,7 @@ public class PlanDetailResponse {
 
     public static PlanDetailResponse toDto (
             Plan plan,
+            List<UserPlanResponse> users,
             List<String> tags,
             CityResponse cityResponse,
             PlanResponse originPlan,
@@ -63,6 +67,7 @@ public class PlanDetailResponse {
         return new PlanDetailResponse(
                 plan.getId(),
                 plan.getTitle(),
+                users,
                 cityResponse,
                 plan.getStartDate(),
                 plan.getEndDate(),
