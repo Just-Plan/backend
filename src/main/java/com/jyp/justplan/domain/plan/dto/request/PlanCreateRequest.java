@@ -41,9 +41,9 @@ public class PlanCreateRequest {
     private ZonedDateTime endDate;
 
     // TODO: 지역 추가 시, 해당 enum이나 테이블 값으로 변경
-    @Schema(description = "일정 지역", example = "대전")
+    @Schema(description = "일정 지역", example = "1")
     @NotNull(message = "일정 지역은 필수 값입니다.")
-    private String region;
+    private long regionId;
 
     @AssertTrue(message = "일정 시작 날짜는 종료 날짜보다 늦을 수 없습니다.")
     private boolean isStartDateBeforeEndDate() {
@@ -59,6 +59,6 @@ public class PlanCreateRequest {
     }
 
     public Plan toEntity() {
-        return new Plan(title, startDate, endDate, region);
+        return new Plan(title, startDate, endDate);
     }
 }

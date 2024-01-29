@@ -1,5 +1,6 @@
 package com.jyp.justplan.domain.plan.dto.response;
 
+import com.jyp.justplan.domain.city.dto.response.CityResponse;
 import com.jyp.justplan.domain.plan.domain.Plan;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -15,8 +16,7 @@ import java.util.List;
 public class PlanDetailResponse {
     private long planId;
     private String title;
-    // TODO: 지역 추가 시, 해당 enum이나 테이블 값으로 변경
-    private String region;
+    private CityResponse region;
     private ZonedDateTime startDate;
     private ZonedDateTime endDate;
     private boolean published;
@@ -33,13 +33,14 @@ public class PlanDetailResponse {
     public static PlanDetailResponse toDto (
             Plan plan,
             List<String> tags,
+            CityResponse cityResponse,
             BudgetResponse budgetResponse,
             ExpenseResponse expenseResponse
     ) {
         return new PlanDetailResponse(
                 plan.getId(),
                 plan.getTitle(),
-                plan.getRegion(),
+                cityResponse,
                 plan.getStartDate(),
                 plan.getEndDate(),
                 plan.isPublished(),
@@ -54,6 +55,7 @@ public class PlanDetailResponse {
     public static PlanDetailResponse toDto (
             Plan plan,
             List<String> tags,
+            CityResponse cityResponse,
             PlanResponse originPlan,
             BudgetResponse budget,
             ExpenseResponse expense
@@ -61,7 +63,7 @@ public class PlanDetailResponse {
         return new PlanDetailResponse(
                 plan.getId(),
                 plan.getTitle(),
-                plan.getRegion(),
+                cityResponse,
                 plan.getStartDate(),
                 plan.getEndDate(),
                 plan.isPublished(),

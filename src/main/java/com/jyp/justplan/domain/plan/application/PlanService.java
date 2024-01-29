@@ -1,5 +1,8 @@
 package com.jyp.justplan.domain.plan.application;
 
+import com.jyp.justplan.domain.city.domain.City;
+import com.jyp.justplan.domain.city.domain.CityRepository;
+import com.jyp.justplan.domain.city.dto.response.CityResponse;
 import com.jyp.justplan.domain.plan.application.budget.BudgetService;
 import com.jyp.justplan.domain.plan.application.expense.ExpenseService;
 import com.jyp.justplan.domain.plan.application.tag.PlanTagService;
@@ -10,10 +13,7 @@ import com.jyp.justplan.domain.plan.domain.tag.Tag;
 import com.jyp.justplan.domain.plan.dto.request.PlanIdRequest;
 import com.jyp.justplan.domain.plan.dto.request.PlanCreateRequest;
 import com.jyp.justplan.domain.plan.dto.request.PlanUpdateRequest;
-import com.jyp.justplan.domain.plan.dto.response.BudgetResponse;
-import com.jyp.justplan.domain.plan.dto.response.ExpenseResponse;
-import com.jyp.justplan.domain.plan.dto.response.PlanDetailResponse;
-import com.jyp.justplan.domain.plan.dto.response.PlanResponse;
+import com.jyp.justplan.domain.plan.dto.response.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class PlanService {
     private final PlanRepository planRepository;
+    private final CityRepository cityRepository;
     private final PlanTagService planTagService;
     private final BudgetService budgetService;
     private final ExpenseService expenseService;
@@ -39,6 +40,8 @@ public class PlanService {
         // 일정에 해당하는 태그 조회
         List<PlanTag> tags = planTagService.findTagsByPlan(plan);
         List<String> tagNames = getTagNames(tags);
+
+        CityResponse cityResponse = new CityResponse(plan.getRegion());
 
         // 일정에 해당하는 예산 조회
         BudgetResponse budgetResponse = budgetService.getBudget(plan);
@@ -53,9 +56,9 @@ public class PlanService {
                     .collect(Collectors.toList());
 
             PlanResponse originPlan = PlanResponse.toDto(plan.getOriginPlan(), originTagNames);
-            return PlanDetailResponse.toDto(plan, tagNames, originPlan, budgetResponse, expenseResponse);
+            return PlanDetailResponse.toDto(plan, tagNames, cityResponse, originPlan, budgetResponse, expenseResponse);
         } else {
-            return PlanDetailResponse.toDto(plan, tagNames, budgetResponse, expenseResponse);
+            return PlanDetailResponse.toDto(plan, tagNames, cityResponse, budgetResponse, expenseResponse);
         }
     }
 
@@ -67,7 +70,7 @@ public class PlanService {
     }
 
     /* 전체 플랜 조회 */
-    public List<PlanResponse> getPlans(String type, int page, int size, String sort) {
+    public PlansResponse getPlans(String type, int page, int size, String sort) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort).descending());
 
         Page<Plan> plans = planRepository.findAll(pageable);
@@ -76,7 +79,15 @@ public class PlanService {
                 .map(this::getPlanResponse)
                 .collect(Collectors.toList());
 
-        return planResponses;
+        PlansResponse plansResponse = new PlansResponse(
+                plans.getTotalElements(),
+                plans.getTotalPages(),
+                plans.getNumber(),
+                plans.getSize(),
+                planResponses
+        );
+
+        return plansResponse;
     }
 
     /* 플랜 단일 조회 */
@@ -90,6 +101,9 @@ public class PlanService {
     public PlanDetailResponse savePlan(PlanCreateRequest request) {
         Plan plan = planRepository.save(request.toEntity());
 
+        City city = cityRepository.getById(request.getRegionId());
+        plan.setRegion(city);
+
         budgetService.createBudget(plan);
         expenseService.createExpense(plan);
 
@@ -100,19 +114,23 @@ public class PlanService {
 
     /* 플랜 복제 (가져오기) */
     @Transactional
-    public PlanResponse copyPlan(PlanIdRequest request) {
+    public PlanDetailResponse copyPlan(PlanIdRequest request) {
         Plan origin_plan = planRepository.getById(request.getOriginPlanId());
         String title = origin_plan.getTitle() + " 복사본";
-        Plan plan = planRepository.save(new Plan(title,
+
+        Plan new_plan =  planRepository.save(new Plan(
+                title,
                 origin_plan.getStartDate(),
-                origin_plan.getEndDate(),
-                origin_plan.getRegion()));
-        plan.setOriginPlan(origin_plan);
+                origin_plan.getEndDate()
+                ));
+
+        new_plan.setRegion(origin_plan.getRegion());
+        new_plan.setOriginPlan(origin_plan);
 
         List<PlanTag> origin_tags = planTagService.findTagsByPlan(origin_plan);
-        planTagService.savePlanTag(plan, getTagNames(origin_tags));
+        planTagService.savePlanTag(new_plan, getTagNames(origin_tags));
 
-        return getPlanResponse(plan);
+        return getPlanDetailResponse(new_plan);
     }
 
     private static List<String> getTagNames(List<PlanTag> tags) {
