@@ -39,6 +39,7 @@ class PlanServiceTest {
     private final ZonedDateTime 일정_시작_날짜 = ZonedDateTime.of(2024, 1, 19, 0, 0, 0 ,0, ZonedDateTime.now().getZone());
     private final ZonedDateTime 일정_종료_날짜 = ZonedDateTime.of(2024, 1, 20, 0, 0, 0 ,0, ZonedDateTime.now().getZone());
     private final long 일정_지역_아이디 = 1L;
+    private final String 테스트_이메일 = "test@naver.com";
     private final BudgetUpdateRequest 일정_예산_수정_요청 = new BudgetUpdateRequest(10000, 20000);
     private final ExpenseUpdateRequest 일정_지출_수정_요청 = new ExpenseUpdateRequest(10000, 20000, 30000, 40000, 50000);
 
@@ -58,7 +59,7 @@ class PlanServiceTest {
         PlanCreateRequest request = new PlanCreateRequest(일정_이름, 일정_태그, 일정_시작_날짜, 일정_종료_날짜, 일정_지역_아이디);
 
         /* when */
-        PlanDetailResponse actual = planService.savePlan(request);
+        PlanDetailResponse actual = planService.savePlan(request, 테스트_이메일);
 
         /* then */
         assertAll(
@@ -76,7 +77,7 @@ class PlanServiceTest {
     void 일정을_조회한다 () {
         /* given */
         PlanCreateRequest request = new PlanCreateRequest(일정_이름, 일정_태그, 일정_시작_날짜, 일정_종료_날짜, 일정_지역_아이디);
-        PlanDetailResponse response = planService.savePlan(request);
+        PlanDetailResponse response = planService.savePlan(request, 테스트_이메일);
 
         /* when */
         PlanDetailResponse actual = planService.getPlan(response.getPlanId());
@@ -107,8 +108,8 @@ class PlanServiceTest {
     void 삭제된_일정을_조회하면_예외가_발생한다 () {
         /* given */
         PlanCreateRequest request = new PlanCreateRequest(일정_이름, 일정_태그, 일정_시작_날짜, 일정_종료_날짜, 일정_지역_아이디);
-        PlanDetailResponse response = planService.savePlan(request);
-        planService.deletePlan(response.getPlanId());
+        PlanDetailResponse response = planService.savePlan(request, 테스트_이메일);
+        planService.deletePlan(response.getPlanId(), 테스트_이메일);
 
         /* when */
         /* then */
@@ -122,11 +123,11 @@ class PlanServiceTest {
     void 일정을_복제한다 () {
         /* given */
         PlanCreateRequest request = new PlanCreateRequest(일정_이름, 일정_태그, 일정_시작_날짜, 일정_종료_날짜, 일정_지역_아이디);
-        PlanDetailResponse response = planService.savePlan(request);
+        PlanDetailResponse response = planService.savePlan(request, 테스트_이메일);
         PlanIdRequest planIdRequest = new PlanIdRequest(response.getPlanId());
 
         /* when */
-        PlanDetailResponse actual = planService.copyPlan(planIdRequest);
+        PlanDetailResponse actual = planService.copyPlan(planIdRequest, 테스트_이메일);
 
         /* then */
         assertAll(
@@ -146,7 +147,7 @@ class PlanServiceTest {
         /* given */
         PlanCreateRequest request = new PlanCreateRequest(일정_이름, 일정_태그, 일정_시작_날짜, 일정_종료_날짜, 일정_지역_아이디);
 
-        PlanDetailResponse response = planService.savePlan(request);
+        PlanDetailResponse response = planService.savePlan(request, 테스트_이메일);
 
         Plan savedPlan = planRepository.getById(response.getPlanId());
 
@@ -163,7 +164,7 @@ class PlanServiceTest {
         );
 
         /* when */
-        PlanDetailResponse actual = planService.updatePlan(planUpdateRequest);
+        PlanDetailResponse actual = planService.updatePlan(planUpdateRequest, 테스트_이메일);
 
         /* then */
         assertAll(
@@ -182,10 +183,10 @@ class PlanServiceTest {
     void 일정을_삭제한다 () {
         /* given */
         PlanCreateRequest request = new PlanCreateRequest(일정_이름, 일정_태그, 일정_시작_날짜, 일정_종료_날짜, 일정_지역_아이디);
-        PlanDetailResponse response = planService.savePlan(request);
+        PlanDetailResponse response = planService.savePlan(request, 테스트_이메일);
 
         /* when */
-        planService.deletePlan(response.getPlanId());
+        planService.deletePlan(response.getPlanId(), 테스트_이메일);
 
         /* then */
         assertThatThrownBy(() -> planService.getPlan(response.getPlanId()))

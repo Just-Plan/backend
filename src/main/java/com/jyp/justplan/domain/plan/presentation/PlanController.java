@@ -8,6 +8,7 @@ import com.jyp.justplan.domain.plan.dto.request.PlanUpdateRequest;
 import com.jyp.justplan.domain.plan.dto.response.PlanDetailResponse;
 import com.jyp.justplan.domain.plan.dto.response.PlanResponse;
 import com.jyp.justplan.domain.plan.dto.response.PlansResponse;
+import com.jyp.justplan.domain.user.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -16,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -71,9 +73,10 @@ public class PlanController {
     @PostMapping
     public ApiResponseDto<PlanDetailResponse> createPlan (
             @Parameter(description = "일정 생성을 위한 데이터", required = true)
-            @Valid @RequestBody PlanCreateRequest request
+            @Valid @RequestBody PlanCreateRequest request,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        PlanDetailResponse response = planService.savePlan(request);
+        PlanDetailResponse response = planService.savePlan(request, userDetails.getUsername());
         return ApiResponseDto.successResponse(response);
     }
 
@@ -86,9 +89,10 @@ public class PlanController {
     @Parameter(name = "planId", description = "복제할 일정의 아이디", required = true, example = "1")
     @PostMapping("/copy")
     public ApiResponseDto<PlanDetailResponse> copyPlan (
-            @Valid @RequestBody PlanIdRequest request
+            @Valid @RequestBody PlanIdRequest request,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        PlanDetailResponse response = planService.copyPlan(request);
+        PlanDetailResponse response = planService.copyPlan(request, userDetails.getUsername());
         return ApiResponseDto.successResponse(response);
     }
 
@@ -101,9 +105,10 @@ public class PlanController {
     @PatchMapping
     public ApiResponseDto<PlanDetailResponse> updatePlan (
             @Parameter(description = "수정하고자 하는 일정 아이디와 수정할 데이터를 포함한 dto", required = true)
-            @Valid @RequestBody PlanUpdateRequest request
+            @Valid @RequestBody PlanUpdateRequest request,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        PlanDetailResponse response = planService.updatePlan(request);
+        PlanDetailResponse response = planService.updatePlan(request, userDetails.getUsername());
         return ApiResponseDto.successResponse(response);
     }
 
@@ -116,9 +121,10 @@ public class PlanController {
     @Parameter(name = "planId", description = "삭제하고자 하는 일정의 아이디", required = true, example = "1")
     @DeleteMapping("/{planId}")
     public ApiResponseDto<?> deletePlan (
-            @PathVariable Long planId
+            @PathVariable Long planId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        planService.deletePlan(planId);
+        planService.deletePlan(planId, userDetails.getUsername());
         return ApiResponseDto.successWithoutDataResponse();
     }
 }

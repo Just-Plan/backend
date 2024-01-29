@@ -52,6 +52,12 @@ public class UserService {
         return UserResponse.toDto(savedUser);
     }
 
+    /* 유저 조회 */
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserException("해당 유저가 존재하지 않습니다."));
+    }
+
     private EmailAuth getEmailAuth(String email, long authId) {
         EmailAuth emailAuth = emailAuthRepository.findById(authId)
                 .orElseThrow(() -> new UserException("해당 이메일 인증이 존재하지 않습니다."));

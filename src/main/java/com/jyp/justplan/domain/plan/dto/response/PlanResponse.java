@@ -17,16 +17,17 @@ import java.util.List;
 public class PlanResponse {
     private long planId;
     private String title;
-    // TODO: 지역 추가 시, 해당 enum이나 테이블 값으로 변경
+    private List<UserPlanResponse> users;
     private CityResponse region;
     private ZonedDateTime startDate;
     private ZonedDateTime endDate;
     private boolean published;
     private List<String> tags;
 
-    public static PlanResponse toDto(Plan plan, List<String> tags) {
+    public static PlanResponse toDto(Plan plan, List<UserPlanResponse> users, List<String> tags) {
         return new PlanResponse(plan.getId(),
                 plan.getTitle(),
+                users,
                 new CityResponse(plan.getRegion()),
                 plan.getStartDate(),
                 plan.getEndDate(),
