@@ -39,10 +39,10 @@ public class EmailAuthController {
     * 해당 요청을 여기서 처리
     * */
     @GetMapping("/verify")
-    public ApiResponseDto<?> emailAuth(
+    public ApiResponseDto<String> emailAuth(
             @RequestParam String emailToken
     ) {
         emailAuthService.updateEmailAuth(emailToken);
-        return ApiResponseDto.successWithoutDataResponse();
+        return ApiResponseDto.successResponse("이메일 인증이 완료되었습니다.");
     }
 }
