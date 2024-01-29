@@ -1,6 +1,8 @@
 package com.jyp.justplan.domain.plan.domain;
 
 import com.jyp.justplan.domain.BaseEntity;
+import com.jyp.justplan.domain.city.domain.City;
+import com.jyp.justplan.domain.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,7 +24,10 @@ public class Plan extends BaseEntity {
     private String title;
 
     // TODO: 지역 추가 시, 해당 enum이나 테이블 값으로 변경
-    private String region;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "city_id")
+    private City region;
+//    private String region;
 
     @Column(name = "start_date")
     private ZonedDateTime startDate;
@@ -32,7 +37,7 @@ public class Plan extends BaseEntity {
 
     private boolean published = true;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "origin_plan_id")
     private Plan originPlan;
 
@@ -41,10 +46,13 @@ public class Plan extends BaseEntity {
     @Column(name = "use_expense")
     private boolean useExpense = false;
 
-    public Plan(String title, ZonedDateTime startDate, ZonedDateTime endDate, String region) {
+    public Plan(String title, ZonedDateTime startDate, ZonedDateTime endDate) {
         this.title = title;
         this.startDate = startDate;
         this.endDate = endDate;
+    }
+
+    public void setRegion(City region) {
         this.region = region;
     }
 

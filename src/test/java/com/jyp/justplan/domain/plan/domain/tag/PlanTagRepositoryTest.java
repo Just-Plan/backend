@@ -1,6 +1,9 @@
 package com.jyp.justplan.domain.plan.domain.tag;
 
+import com.jyp.justplan.domain.city.domain.City;
+import com.jyp.justplan.domain.city.domain.CityRepository;
 import com.jyp.justplan.domain.plan.domain.Plan;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,18 +22,24 @@ import static org.junit.jupiter.api.Assertions.*;
 class PlanTagRepositoryTest {
     @Autowired
     private PlanTagRepository planTagRepository;
+    @Autowired
+    private CityRepository cityRepository;
 
     private final String 일정_이름 = "일정 이름";
     private final ZonedDateTime 일정_시작_날짜 = ZonedDateTime.of(2024, 1, 19, 0, 0, 0 ,0, ZonedDateTime.now().getZone());
     private final ZonedDateTime 일정_종료_날짜 = ZonedDateTime.of(2024, 1, 20, 0, 0, 0 ,0, ZonedDateTime.now().getZone());
-    private final String 일정_지역 = "서울";
+    private final Long 일정_지역_아이디 = 1L;
     private final String 태그_이름 = "태그 이름";
 
     @Test
     @DisplayName("일정 태그를 저장한다.")
     void 일정_태그를_저장한다 () {
         /* given */
-        Plan plan = new Plan(일정_이름, 일정_시작_날짜, 일정_종료_날짜, 일정_지역);
+        Plan plan = new Plan(일정_이름, 일정_시작_날짜, 일정_종료_날짜);
+        City city = cityRepository.getById(일정_지역_아이디);
+
+        plan.setRegion(city);
+
         Tag tag = new Tag(태그_이름);
 
         PlanTag planTag = new PlanTag(plan, tag);
@@ -49,7 +58,10 @@ class PlanTagRepositoryTest {
     @DisplayName("일정 태그를 조회한다.")
     void 일정_태그를_조회한다 () {
         /* given */
-        Plan plan = new Plan(일정_이름, 일정_시작_날짜, 일정_종료_날짜, 일정_지역);
+        Plan plan = new Plan(일정_이름, 일정_시작_날짜, 일정_종료_날짜);
+        City city = cityRepository.getById(일정_지역_아이디);
+
+        plan.setRegion(city);
         Tag tag = new Tag(태그_이름);
 
         PlanTag planTag = new PlanTag(plan, tag);
@@ -70,7 +82,10 @@ class PlanTagRepositoryTest {
     @Transactional
     void 일정을_통해_일정_태그를_조회한다 () {
         /* given */
-        Plan plan = new Plan(일정_이름, 일정_시작_날짜, 일정_종료_날짜, 일정_지역);
+        Plan plan = new Plan(일정_이름, 일정_시작_날짜, 일정_종료_날짜);
+        City city = cityRepository.getById(일정_지역_아이디);
+
+        plan.setRegion(city);
         Tag tag = new Tag(태그_이름);
 
         PlanTag planTag = new PlanTag(plan, tag);
@@ -91,7 +106,10 @@ class PlanTagRepositoryTest {
     @Transactional
     void 일정과_태그를_통해_일정_태그를_조회한다 () {
         /* given */
-        Plan plan = new Plan(일정_이름, 일정_시작_날짜, 일정_종료_날짜, 일정_지역);
+        Plan plan = new Plan(일정_이름, 일정_시작_날짜, 일정_종료_날짜);
+        City city = cityRepository.getById(일정_지역_아이디);
+
+        plan.setRegion(city);
         Tag tag = new Tag(태그_이름);
 
         PlanTag planTag = new PlanTag(plan, tag);
@@ -112,7 +130,10 @@ class PlanTagRepositoryTest {
     @Transactional
     void 일정을_통해_일정_태그를_삭제한다 () {
         /* given */
-        Plan plan = new Plan(일정_이름, 일정_시작_날짜, 일정_종료_날짜, 일정_지역);
+        Plan plan = new Plan(일정_이름, 일정_시작_날짜, 일정_종료_날짜);
+        City city = cityRepository.getById(일정_지역_아이디);
+
+        plan.setRegion(city);
         Tag tag = new Tag(태그_이름);
 
         PlanTag planTag = new PlanTag(plan, tag);
@@ -132,7 +153,10 @@ class PlanTagRepositoryTest {
     @Transactional
     void 태그를_통해_일정_태그가_존재하는지_확인한다 () {
         /* given */
-        Plan plan = new Plan(일정_이름, 일정_시작_날짜, 일정_종료_날짜, 일정_지역);
+        Plan plan = new Plan(일정_이름, 일정_시작_날짜, 일정_종료_날짜);
+        City city = cityRepository.getById(일정_지역_아이디);
+
+        plan.setRegion(city);
         Tag tag = new Tag(태그_이름);
 
         PlanTag planTag = new PlanTag(plan, tag);
