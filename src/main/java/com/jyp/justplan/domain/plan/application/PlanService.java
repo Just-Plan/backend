@@ -55,17 +55,19 @@ public class PlanService {
         BudgetResponse budgetResponse = budgetService.getBudget(plan);
 
         // 일정에 해당하는 지출 조회
-        ExpenseResponse expenseResponse = plan.isUseExpense() ? expenseService.getExpense(plan) : null;
+        ExpenseResponse expenseResponse = expenseService.getExpense(plan);
 
         if (plan.getOriginPlan() != null) {
-            List<PlanTag> originTags = planTagService.findTagsByPlan(plan.getOriginPlan());
+            Plan originPlan = plan.getOriginPlan();
+            List<PlanTag> originTags = planTagService.findTagsByPlan(originPlan);
             List<String> originTagNames = originTags.stream()
                     .map(tag -> tag.getTag().getName())
                     .collect(Collectors.toList());
-            List<UserPlanResponse> originUsers = userPlanService.findUserPlanResponsesByPlan(plan.getOriginPlan());
+            List<UserPlanResponse> originUsers = userPlanService.findUserPlanResponsesByPlan(originPlan);
+            BudgetResponse originBudget = budgetService.getBudget(originPlan);
 
-            PlanResponse originPlan = PlanResponse.toDto(plan.getOriginPlan(), originUsers, originTagNames);
-            return PlanDetailResponse.toDto(plan, users, tagNames, cityResponse, originPlan, budgetResponse, expenseResponse);
+            PlanResponse originPlanResponse = PlanResponse.toDto(plan.getOriginPlan(), originUsers, originBudget, originTagNames);
+            return PlanDetailResponse.toDto(plan, users, tagNames, cityResponse, originPlanResponse, budgetResponse, expenseResponse);
         } else {
             return PlanDetailResponse.toDto(plan, users, tagNames, cityResponse, budgetResponse, expenseResponse);
         }
@@ -75,8 +77,9 @@ public class PlanService {
         List<PlanTag> tags = planTagService.findTagsByPlan(plan);
         List<String> tagNames = getTagNames(tags);
         List<UserPlanResponse> users = userPlanService.findUserPlanResponsesByPlan(plan);
+        BudgetResponse budgetResponse = budgetService.getBudget(plan);
 
-        return PlanResponse.toDto(plan, users, tagNames);
+        return PlanResponse.toDto(plan, users, budgetResponse, tagNames);
     }
 
     /* 전체 플랜 조회 */
