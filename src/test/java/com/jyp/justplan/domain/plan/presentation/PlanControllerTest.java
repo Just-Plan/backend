@@ -8,6 +8,7 @@ import com.jyp.justplan.domain.plan.domain.PlanRepository;
 import com.jyp.justplan.domain.plan.dto.request.*;
 import com.jyp.justplan.domain.plan.dto.response.PlanDetailResponse;
 import com.jyp.justplan.domain.plan.dto.response.PlanResponse;
+import com.jyp.justplan.domain.user.UserDetailsImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,10 +61,14 @@ class PlanControllerTest {
     /* 플랜 조회 */
     @Test
     @DisplayName("일정을 조회한다.")
+    @WithMockUser(username = "test@naver.com", password = "testtest!")
     void 일정을_조회한다 () throws Exception {
         /* given */
+        Authentication autentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userDetails = (UserDetailsImpl) autentication.getPrincipal();
+
         PlanCreateRequest planCreateRequest = new PlanCreateRequest(일정_이름, 일정_태그, 일정_시작_날짜, 일정_종료_날짜, 일정_지역_아이디);
-        PlanDetailResponse planResponse = planService.savePlan(planCreateRequest);
+        PlanDetailResponse planResponse = planService.savePlan(planCreateRequest, userDetails.getUsername());
 
         /* when */
         /* then */
@@ -74,6 +82,7 @@ class PlanControllerTest {
     /* 플랜 생성 */
     @Test
     @DisplayName("일정을 생성한다.")
+    @WithMockUser(username = "test@naver.com", password = "testtest!")
     void 일정을_생성한다 () throws Exception {
         /* given */
         PlanCreateRequest planCreateRequest = new PlanCreateRequest(일정_이름, 일정_태그, 일정_시작_날짜, 일정_종료_날짜, 일정_지역_아이디);
@@ -90,6 +99,7 @@ class PlanControllerTest {
 
     @Test
     @DisplayName("일정 생성 요청이 잘못된 경우 예외를 발생시킨다.")
+    @WithMockUser(username = "test@naver.com", password = "testtest!")
     void 일정_생성_요청이_잘못된_경우_예외를_발생시킨다 () throws Exception {
         /* given */
         PlanCreateRequest planCreateRequest = new PlanCreateRequest(" ", 일정_태그, 일정_시작_날짜, 일정_종료_날짜, 일정_지역_아이디);
@@ -127,6 +137,7 @@ class PlanControllerTest {
     /* 플랜 수정 */
     @Test
     @DisplayName("일정을 수정한다.")
+    @WithMockUser(username = "test@naver.com", password = "testtest!")
     void 일정을_수정한다 () throws Exception {
         /* given */
         PlanUpdateRequest planUpdateRequest = new PlanUpdateRequest(
@@ -153,6 +164,7 @@ class PlanControllerTest {
 
     @Test
     @DisplayName("일정 수정 요청이 잘못된 경우 예외를 발생시킨다.")
+    @WithMockUser(username = "test@naver.com", password = "testtest!")
     void 일정_수정_요청이_잘못된_경우_예외를_발생시킨다 () throws Exception {
         /* given */
         PlanUpdateRequest planUpdateRequest = new PlanUpdateRequest(
@@ -192,6 +204,7 @@ class PlanControllerTest {
     /* 플랜 삭제 */
     @Test
     @DisplayName("일정을 삭제한다.")
+    @WithMockUser(username = "test@naver.com", password = "testtest!")
     void 일정을_삭제한다 () throws Exception {
         /* given */
         /* when */
