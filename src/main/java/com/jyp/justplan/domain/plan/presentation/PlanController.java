@@ -7,6 +7,7 @@ import com.jyp.justplan.domain.plan.dto.request.PlanCreateRequest;
 import com.jyp.justplan.domain.plan.dto.request.PlanUpdateRequest;
 import com.jyp.justplan.domain.plan.dto.response.PlanDetailResponse;
 import com.jyp.justplan.domain.plan.dto.response.PlanResponse;
+import com.jyp.justplan.domain.plan.dto.response.PlansResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -35,13 +36,13 @@ public class PlanController {
                     content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
     })
     @GetMapping
-    public ApiResponseDto<List<PlanResponse>> getPlans (
+    public ApiResponseDto<PlansResponse> getPlans (
             @RequestParam(required = false, defaultValue = "") String type,
             @RequestParam(required = false, defaultValue = "0") int page,
             @RequestParam(required = false, defaultValue = "10") int size,
             @RequestParam(required = false, defaultValue = "createdAt") String sort
     ) {
-        List<PlanResponse> response = planService.getPlans(type, page, size, sort);
+        PlansResponse response = planService.getPlans(type, page, size, sort);
 
         return ApiResponseDto.successResponse(response);
     }

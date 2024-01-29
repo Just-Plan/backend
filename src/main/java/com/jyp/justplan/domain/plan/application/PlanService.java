@@ -13,10 +13,7 @@ import com.jyp.justplan.domain.plan.domain.tag.Tag;
 import com.jyp.justplan.domain.plan.dto.request.PlanIdRequest;
 import com.jyp.justplan.domain.plan.dto.request.PlanCreateRequest;
 import com.jyp.justplan.domain.plan.dto.request.PlanUpdateRequest;
-import com.jyp.justplan.domain.plan.dto.response.BudgetResponse;
-import com.jyp.justplan.domain.plan.dto.response.ExpenseResponse;
-import com.jyp.justplan.domain.plan.dto.response.PlanDetailResponse;
-import com.jyp.justplan.domain.plan.dto.response.PlanResponse;
+import com.jyp.justplan.domain.plan.dto.response.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -73,7 +70,7 @@ public class PlanService {
     }
 
     /* 전체 플랜 조회 */
-    public List<PlanResponse> getPlans(String type, int page, int size, String sort) {
+    public PlansResponse getPlans(String type, int page, int size, String sort) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort).descending());
 
         Page<Plan> plans = planRepository.findAll(pageable);
@@ -82,7 +79,15 @@ public class PlanService {
                 .map(this::getPlanResponse)
                 .collect(Collectors.toList());
 
-        return planResponses;
+        PlansResponse plansResponse = new PlansResponse(
+                plans.getTotalElements(),
+                plans.getTotalPages(),
+                plans.getNumber(),
+                plans.getSize(),
+                planResponses
+        );
+
+        return plansResponse;
     }
 
     /* 플랜 단일 조회 */
