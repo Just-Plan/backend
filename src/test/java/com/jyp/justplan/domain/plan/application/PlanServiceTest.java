@@ -46,7 +46,7 @@ class PlanServiceTest {
     @BeforeEach
     void setUp () {
         Country country = new Country("테스트 국가", "Test Country", "Asia", "220");
-        City city = new City("테스트 도시", "Test City", "Test city of Test country", "0.0", "0.0", "Asia/Seoul",  country, 9);
+        City city = new City("테스트 도시", "Test City", "Test city of Test country", 0.0, 0.0, "Asia/Seoul",  country, 9);
 
         City saved_city = cityRepository.save(city);
     }
