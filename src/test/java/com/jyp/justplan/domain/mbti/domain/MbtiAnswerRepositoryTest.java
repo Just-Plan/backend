@@ -2,7 +2,7 @@ package com.jyp.justplan.domain.mbti.domain;
 
 import static org.assertj.core.api.Assertions.*;
 
-import com.jyp.justplan.domain.mbti.domain.Repository.MbtiAnswerRepository;
+import com.jyp.justplan.domain.mbti.domain.MbtiAnswerRepository;
 import com.jyp.justplan.domain.mbti.exception.MbtiAnswerNotFoundException;
 import com.jyp.justplan.domain.mbti.MbtiTestConfig;
 import java.util.List;
