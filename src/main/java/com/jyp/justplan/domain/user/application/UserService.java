@@ -43,7 +43,8 @@ public class UserService {
         User user = new User(
                 userSignUpRequest.getEmail(),
                 userSignUpRequest.getName(),
-                passwordEncoder.encode("{bcrypt}"+userSignUpRequest.getPassword())
+//                passwordEncoder.encode("{bcrypt}"+userSignUpRequest.getPassword())
+                passwordEncoder.encode(userSignUpRequest.getPassword())
         );
 
         User savedUser = userRepository.save(user);

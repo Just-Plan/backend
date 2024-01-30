@@ -29,9 +29,9 @@ public class City extends BaseEntity {
     @Column(name="introduction", nullable = false, length = 500)
     private String introduction;
     @Column(name="latitude", nullable = false)
-    private String latitude;
+    private double latitude;
     @Column(name="longitude", nullable = false)
-    private String longitude;
+    private double longitude;
     @Column(name="timezone", nullable = false)
     private String timezone;
     @Column(name="time_difference", nullable = false)
@@ -45,8 +45,8 @@ public class City extends BaseEntity {
         final String koreanName,
         final String englishName,
         final String introduction,
-        final String latitude,
-        final String longitude,
+        final double latitude,
+        final double longitude,
         final String timezone,
         final Country country,
         int timeDifference

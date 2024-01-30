@@ -4,6 +4,7 @@ package com.jyp.justplan.config;
 import com.jyp.justplan.api.oauth.PrincipalOauth2UserService;
 import com.jyp.justplan.jwt.JwtAccessDeniedHandler;
 import com.jyp.justplan.jwt.JwtAuthenticationEntryPoint;
+import com.jyp.justplan.jwt.JwtAuthenticationFilter;
 import com.jyp.justplan.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +17,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -35,6 +37,7 @@ kakao Login 진행하기 위해서는 Security Config에 @EnableWebSecurity, @Co
 public class OAuthSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final PrincipalOauth2UserService principalOauth2UserService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -93,6 +96,7 @@ public class OAuthSecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling()
                 .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
                 .accessDeniedHandler(new JwtAccessDeniedHandler());
+        http.apply(new JwtSecurityConfig(jwtTokenProvider));
     }
 
     // CORS 관련 설정
@@ -107,6 +111,7 @@ public class OAuthSecurityConfig extends WebSecurityConfigurerAdapter {
         source.registerCorsConfiguration("/**", corsConfiguration);
         return source;
     }
+
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authenticationConfiguration

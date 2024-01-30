@@ -13,14 +13,13 @@ public class BCryptConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public PasswordEncoder getPasswordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+//    @Bean
+//    public PasswordEncoder noOpPasswordEncoder() {
+//        return NoOpPasswordEncoder.getInstance();
+//    }
 
-    @Bean
-    public PasswordEncoder noOpPasswordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
-    }
-
+//    @Bean
+//    public PasswordEncoder getPasswordEncoder() {
+//        return new BCryptPasswordEncoder();
+//    }
 }
