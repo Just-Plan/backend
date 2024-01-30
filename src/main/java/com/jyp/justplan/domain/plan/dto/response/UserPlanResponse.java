@@ -1,5 +1,6 @@
 package com.jyp.justplan.domain.plan.dto.response;
 
+import com.jyp.justplan.domain.mbti.domain.Mbti;
 import com.jyp.justplan.domain.plan.domain.UserPlan;
 import com.jyp.justplan.domain.user.domain.User;
 import lombok.AccessLevel;
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class UserPlanResponse {
     private String email;
     private String name;
-    private String mbti;
+    private Mbti mbti;
     private boolean owner;
 
     public static UserPlanResponse toDto(UserPlan userPlan) {

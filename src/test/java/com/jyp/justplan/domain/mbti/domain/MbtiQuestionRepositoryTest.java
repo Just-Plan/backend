@@ -3,7 +3,6 @@ package com.jyp.justplan.domain.mbti.domain;
 import static org.assertj.core.api.Assertions.*;
 
 import com.jyp.justplan.domain.mbti.MbtiTestConfig;
-import com.jyp.justplan.domain.mbti.domain.MbtiQuestionRepository;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

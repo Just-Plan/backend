@@ -1,5 +1,10 @@
 package com.jyp.justplan.domain.user.domain;
 
+import com.jyp.justplan.domain.mbti.domain.Mbti;
+import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import lombok.*;
 
 import javax.persistence.Entity;
@@ -35,8 +40,11 @@ public class User {
     private String providerId;
 
     //mbti
-    private long mbtiId;
-    private String mbti;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = true)
+    private Mbti mbti;
+//    private long mbtiId;
+//    private String mbti;
 
     public User(String email, String name, String password) {
         this.email = email;
