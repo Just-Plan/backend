@@ -1,6 +1,7 @@
 package com.jyp.justplan.jwt;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -30,13 +32,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         } catch (RedisConnectionFailureException e) {
-            SecurityContextHolder.clearContext();;
+            SecurityContextHolder.clearContext();
             // TODO: Exception 처리
             throw new RuntimeException("Redis Connection Failure");
         } catch (Exception e) {
             throw new RuntimeException("JwtAuthenticationFilter.doFilterInternal: " + e.getMessage());
         }
-
         filterChain.doFilter(request, response);
     }
 }

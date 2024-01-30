@@ -1,12 +1,11 @@
 package com.jyp.justplan.domain.mbti.application;
 
 import com.jyp.justplan.domain.mbti.domain.MbtiAnswer;
-import com.jyp.justplan.domain.mbti.domain.MbtiAnswerRepository;
+import com.jyp.justplan.domain.mbti.domain.Repository.MbtiAnswerRepository;
 import com.jyp.justplan.domain.mbti.domain.MbtiQuestion;
-import com.jyp.justplan.domain.mbti.domain.MbtiQuestionRepository;
+import com.jyp.justplan.domain.mbti.domain.Repository.MbtiQuestionRepository;
 import com.jyp.justplan.domain.mbti.domain.MbtiResult;
 import com.jyp.justplan.domain.mbti.domain.MbtiType;
-import com.jyp.justplan.domain.mbti.dto.request.MbtiUserTestRequest;
 import com.jyp.justplan.domain.mbti.dto.response.MbtiQuestionResponse;
 import com.jyp.justplan.domain.mbti.exception.MbtiAnswerCountMismatchException;
 import java.util.List;

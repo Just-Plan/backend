@@ -19,8 +19,13 @@ class MbtiTestControllerTest extends MbtiTestConfig {
 
     @Autowired
     private MockMvc mockMvc;
-
     ObjectMapper objectMapper = new ObjectMapper();
+
+    // 테스트에 대한 의도가 분명해야한다.
+    // test 스펙 입력, 출력
+    // mockMvc -> 통합테스트 -> 서비스단에 핵심 로직이 있다.
+    // 호출을 대신 하는건 별로
+    // controller 테스트 -> 인증 테스트 -> hasRole, ... 헤더의 쿠키값을 인증하는 테스트많이 사용함 -> controller unit test
 
     @Test
     void 랜덤한_질문을_조회한다() throws Exception {
