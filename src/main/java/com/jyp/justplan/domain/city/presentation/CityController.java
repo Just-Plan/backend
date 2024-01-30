@@ -3,6 +3,7 @@ package com.jyp.justplan.domain.city.presentation;
 import com.jyp.justplan.api.response.ApiResponseDto;
 import com.jyp.justplan.domain.city.application.CityService;
 import com.jyp.justplan.domain.city.dto.response.CitiesResponse;
+import com.jyp.justplan.domain.city.dto.response.CityResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -11,6 +12,7 @@ import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "cities", description = "cities API")
@@ -29,5 +31,17 @@ public class CityController {
     ) {
         var randomCities = cityService.getRandomCities(count);
         return ApiResponseDto.successResponse(randomCities);
+    }
+
+    // 키워드로 도시 검색하기
+    @Operation(summary = "도시 검색", description = "도시를 검색합니다.")
+    @ApiResponse(responseCode = "200", description = "도시 검색")
+    @GetMapping("/api/cities/search")
+    public ApiResponseDto<CitiesResponse> getCityDetail(
+        @RequestParam(name = "cityName")
+        @Parameter(description = "도시 이름", example = "서울", required = true) String cityName
+    ) {
+        var cityDetail = cityService.getCityDetailByPartialName(cityName);
+        return ApiResponseDto.successResponse(cityDetail);
     }
 }
