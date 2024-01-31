@@ -20,6 +20,7 @@ public class UserPlanResponse {
 
     public static UserPlanResponse toDto(UserPlan userPlan) {
         User user = userPlan.getUser();
-        return new UserPlanResponse(user.getEmail(), user.getName(), MbtiResponse.toDto(user.getMbti()), userPlan.isOwner());
+        MbtiResponse mbti = user.getMbti() == null ? null : MbtiResponse.toDto(user.getMbti());
+        return new UserPlanResponse(user.getEmail(), user.getName(), mbti, userPlan.isOwner());
     }
 }
