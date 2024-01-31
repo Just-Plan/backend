@@ -17,8 +17,8 @@ import org.springframework.context.annotation.Configuration;
 
 
 @Configuration
-@SecurityScheme(type = SecuritySchemeType.APIKEY, name = "Access-Token", in = SecuritySchemeIn.HEADER)
-@OpenAPIDefinition(security = { @SecurityRequirement(name = "Access-Token") })
+@SecurityScheme(type = SecuritySchemeType.APIKEY, name = "Authorization", in = SecuritySchemeIn.HEADER)
+@OpenAPIDefinition(security = { @SecurityRequirement(name = "Authorization") })
 public class SwaggerConfig {
     @Bean
     public GroupedOpenApi publicApi() {
