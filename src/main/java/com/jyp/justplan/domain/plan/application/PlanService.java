@@ -220,13 +220,9 @@ public class PlanService {
         plan.updatePublic(request.isPublished());
         plan.updateUseExpense(request.isUseExpense());
 
-        // 예산 수정
+        // 예산 및 지출 수정
         budgetService.updateBudget(plan, request.getBudget());
-
-        if (plan.isUseExpense()) {
-            // 지출 수정
-            expenseService.updateExpense(plan, request.getExpense());
-        }
+        expenseService.updateExpense(plan, request.getExpense());
 
         return getPlanDetailResponse(plan);
     }
