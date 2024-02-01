@@ -41,11 +41,12 @@ public class PlanController {
     @GetMapping
     public ApiResponseDto<PlansResponse> getPlans (
             @RequestParam(required = false, defaultValue = "") String type,
+            @RequestParam(required = false, defaultValue = "0") long regionId,
             @RequestParam(required = false, defaultValue = "0") int page,
             @RequestParam(required = false, defaultValue = "10") int size,
             @RequestParam(required = false, defaultValue = "createdAt") String sort
     ) {
-        PlansResponse response = planService.getPlans(type, page, size, sort);
+        PlansResponse response = planService.getPlans(type, regionId, page, size, sort);
         return ApiResponseDto.successResponse(response);
     }
 

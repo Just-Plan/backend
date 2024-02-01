@@ -1,5 +1,6 @@
 package com.jyp.justplan.domain.plan.application;
 
+import com.jyp.justplan.domain.city.domain.City;
 import com.jyp.justplan.domain.plan.domain.Plan;
 import com.jyp.justplan.domain.plan.domain.UserPlan;
 import com.jyp.justplan.domain.plan.domain.UserPlanRepository;
@@ -61,6 +62,14 @@ public class UserPlanService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort).descending());
 
         return userPlanRepository.findAllByUserOrderByCreatedAt(pageable, user);
+    }
+
+    public Page<Plan> findPlansByMbti(Pageable pageable, String mbti) {
+        return userPlanRepository.findAllByUserMbti(pageable, mbti);
+    }
+
+    public Page<Plan> findPlansByMbtiAndRegion(Pageable pageable, String mbti, City region) {
+        return userPlanRepository.findAllByUserMbtiAndRegion(pageable, mbti, region);
     }
 
     @Transactional

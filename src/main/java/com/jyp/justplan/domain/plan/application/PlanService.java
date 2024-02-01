@@ -3,6 +3,7 @@ package com.jyp.justplan.domain.plan.application;
 import com.jyp.justplan.domain.city.domain.City;
 import com.jyp.justplan.domain.city.domain.CityRepository;
 import com.jyp.justplan.domain.city.dto.response.CityResponse;
+import com.jyp.justplan.domain.mbti.domain.Mbti;
 import com.jyp.justplan.domain.plan.application.budget.BudgetService;
 import com.jyp.justplan.domain.plan.application.expense.ExpenseService;
 import com.jyp.justplan.domain.plan.application.tag.PlanTagService;
@@ -99,11 +100,25 @@ public class PlanService {
     }
 
     /* 전체 플랜 조회 */
-    public PlansResponse getPlans(String type, int page, int size, String sort) {
+    public PlansResponse getPlans(String type, long regionId, int page, int size, String sort) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort).descending());
-        Page<Plan> plans = planRepository.findAll(pageable);
+        String mbti = type.toLowerCase();
 
-        return getPlansResponse(plans);
+        if (type.equals("") && regionId == 0) {
+            Page<Plan> plans = planRepository.findAll(pageable);
+            return getPlansResponse(plans);
+        } else if (type.equals("")) {
+            City region = cityRepository.getById(regionId);
+            Page<Plan> plans = planRepository.findAllByRegion(pageable, region);
+            return getPlansResponse(plans);
+        } else if (regionId == 0) {
+            Page<Plan> plans = userPlanService.findPlansByMbti(pageable, mbti);
+            return getPlansResponse(plans);
+        } else {
+            City region = cityRepository.getById(regionId);
+            Page<Plan> plans = userPlanService.findPlansByMbtiAndRegion(pageable, mbti, region);
+            return getPlansResponse(plans);
+        }
     }
 
 
