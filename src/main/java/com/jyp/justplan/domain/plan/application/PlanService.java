@@ -3,6 +3,7 @@ package com.jyp.justplan.domain.plan.application;
 import com.jyp.justplan.domain.city.domain.City;
 import com.jyp.justplan.domain.city.domain.CityRepository;
 import com.jyp.justplan.domain.city.dto.response.CityResponse;
+import com.jyp.justplan.domain.mbti.domain.Mbti;
 import com.jyp.justplan.domain.plan.application.budget.BudgetService;
 import com.jyp.justplan.domain.plan.application.expense.ExpenseService;
 import com.jyp.justplan.domain.plan.application.tag.PlanTagService;
@@ -63,15 +64,9 @@ public class PlanService {
 
         if (plan.getOriginPlan() != null) {
             Plan originPlan = plan.getOriginPlan();
-            List<PlanTag> originTags = planTagService.findTagsByPlan(originPlan);
-            List<String> originTagNames = originTags.stream()
-                    .map(tag -> tag.getTag().getName())
-                    .collect(Collectors.toList());
             List<UserPlanResponse> originUsers = userPlanService.findUserPlanResponsesByPlan(originPlan);
-            long originScrapCount = scrapStore.getScrapCount(originPlan);
-            BudgetResponse originBudget = budgetService.getBudget(originPlan);
 
-            PlanResponse originPlanResponse = PlanResponse.toDto(plan.getOriginPlan(), originUsers, originScrapCount, originBudget, originTagNames);
+            OriginPlanResponse originPlanResponse = OriginPlanResponse.toDto(originPlan, originUsers);
             return PlanDetailResponse.toDto(plan, users, scrapCount, tagNames, cityResponse, originPlanResponse, budgetResponse, expenseResponse);
         } else {
             return PlanDetailResponse.toDto(plan, users, scrapCount, tagNames, cityResponse, budgetResponse, expenseResponse);
@@ -105,11 +100,25 @@ public class PlanService {
     }
 
     /* 전체 플랜 조회 */
-    public PlansResponse getPlans(String type, int page, int size, String sort) {
+    public PlansResponse getPlans(String type, long regionId, int page, int size, String sort) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort).descending());
-        Page<Plan> plans = planRepository.findAll(pageable);
+        String mbti = type.toLowerCase();
 
-        return getPlansResponse(plans);
+        if (type.equals("") && regionId == 0) {
+            Page<Plan> plans = planRepository.findAll(pageable);
+            return getPlansResponse(plans);
+        } else if (type.equals("")) {
+            City region = cityRepository.getById(regionId);
+            Page<Plan> plans = planRepository.findAllByRegion(pageable, region);
+            return getPlansResponse(plans);
+        } else if (regionId == 0) {
+            Page<Plan> plans = userPlanService.findPlansByMbti(pageable, mbti);
+            return getPlansResponse(plans);
+        } else {
+            City region = cityRepository.getById(regionId);
+            Page<Plan> plans = userPlanService.findPlansByMbtiAndRegion(pageable, mbti, region);
+            return getPlansResponse(plans);
+        }
     }
 
 
@@ -178,6 +187,9 @@ public class PlanService {
         List<PlanTag> origin_tags = planTagService.findTagsByPlan(origin_plan);
         planTagService.savePlanTag(new_plan, getTagNames(origin_tags));
 
+        budgetService.createBudget(new_plan);
+        expenseService.createExpense(new_plan);
+
         return getPlanDetailResponse(new_plan);
     }
 
@@ -208,13 +220,9 @@ public class PlanService {
         plan.updatePublic(request.isPublished());
         plan.updateUseExpense(request.isUseExpense());
 
-        // 예산 수정
+        // 예산 및 지출 수정
         budgetService.updateBudget(plan, request.getBudget());
-
-        if (plan.isUseExpense()) {
-            // 지출 수정
-            expenseService.updateExpense(plan, request.getExpense());
-        }
+        expenseService.updateExpense(plan, request.getExpense());
 
         return getPlanDetailResponse(plan);
     }
