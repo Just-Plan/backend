@@ -17,9 +17,12 @@ public class PlanDetailResponse {
     private long planId;
     private String title;
     private List<UserPlanResponse> users;
+    private long scrapCount;
+
     private CityResponse region;
     private ZonedDateTime startDate;
     private ZonedDateTime endDate;
+
     private boolean published;
     private PlanResponse originPlan;
     private List<String> tags;
@@ -29,11 +32,10 @@ public class PlanDetailResponse {
     private boolean useExpense;
     private ExpenseResponse expense;
 
-    /* TODO: 장소 */
-
     public static PlanDetailResponse toDto (
             Plan plan,
             List<UserPlanResponse> users,
+            long scrapCount,
             List<String> tags,
             CityResponse cityResponse,
             BudgetResponse budgetResponse,
@@ -43,6 +45,7 @@ public class PlanDetailResponse {
                 plan.getId(),
                 plan.getTitle(),
                 users,
+                scrapCount,
                 cityResponse,
                 plan.getStartDate(),
                 plan.getEndDate(),
@@ -58,6 +61,7 @@ public class PlanDetailResponse {
     public static PlanDetailResponse toDto (
             Plan plan,
             List<UserPlanResponse> users,
+            long scrapCount,
             List<String> tags,
             CityResponse cityResponse,
             PlanResponse originPlan,
@@ -68,6 +72,7 @@ public class PlanDetailResponse {
                 plan.getId(),
                 plan.getTitle(),
                 users,
+                scrapCount,
                 cityResponse,
                 plan.getStartDate(),
                 plan.getEndDate(),

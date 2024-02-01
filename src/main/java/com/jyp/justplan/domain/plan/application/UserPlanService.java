@@ -7,6 +7,10 @@ import com.jyp.justplan.domain.plan.dto.response.UserPlanResponse;
 import com.jyp.justplan.domain.plan.exception.UserPlanAlreadyExistsException;
 import com.jyp.justplan.domain.user.domain.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,11 +57,10 @@ public class UserPlanService {
                 .collect(Collectors.toList());
     }
 
-    public List<Plan> findPlansByUser(User user) {
-        List<UserPlan> userPlans = userPlanRepository.getByUser(user);
-        return userPlans.stream()
-                .map(userPlan -> userPlan.getPlan())
-                .collect(Collectors.toList());
+    public Page<Plan> findPlansByUser(int page, int size, String sort, User user) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sort).descending());
+
+        return userPlanRepository.findAllByUserOrderByCreatedAt(pageable, user);
     }
 
     @Transactional

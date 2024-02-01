@@ -2,7 +2,10 @@ package com.jyp.justplan.domain.plan.domain;
 
 import com.jyp.justplan.domain.plan.exception.NoSuchUserPlanException;
 import com.jyp.justplan.domain.user.domain.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,6 +17,9 @@ public interface UserPlanRepository extends JpaRepository<UserPlan, Long> {
     List<UserPlan> findByPlan(Plan plan);
 
     Optional<UserPlan> findByPlanAndOwnerTrue(Plan plan);
+
+    @Query("select up.plan from UserPlan up where up.user = ?1 order by up.createdAt desc")
+    Page<Plan> findAllByUserOrderByCreatedAt (Pageable pageable, User user);
 
     boolean existsByUserAndPlan(User user, Plan plan);
 

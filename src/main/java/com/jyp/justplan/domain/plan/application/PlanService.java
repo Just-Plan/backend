@@ -8,14 +8,15 @@ import com.jyp.justplan.domain.plan.application.expense.ExpenseService;
 import com.jyp.justplan.domain.plan.application.tag.PlanTagService;
 import com.jyp.justplan.domain.plan.domain.Plan;
 import com.jyp.justplan.domain.plan.domain.PlanRepository;
+import com.jyp.justplan.domain.plan.domain.scrap.Scrap;
+import com.jyp.justplan.domain.plan.domain.scrap.ScrapStore;
 import com.jyp.justplan.domain.plan.domain.tag.PlanTag;
-import com.jyp.justplan.domain.plan.domain.tag.Tag;
 import com.jyp.justplan.domain.plan.dto.request.PlanIdRequest;
 import com.jyp.justplan.domain.plan.dto.request.PlanCreateRequest;
+import com.jyp.justplan.domain.plan.dto.request.PlanScrapRequest;
 import com.jyp.justplan.domain.plan.dto.request.PlanUpdateRequest;
 import com.jyp.justplan.domain.plan.dto.response.*;
 import com.jyp.justplan.domain.plan.exception.PlanValidationException;
-import com.jyp.justplan.domain.user.UserDetailsImpl;
 import com.jyp.justplan.domain.user.application.UserService;
 import com.jyp.justplan.domain.user.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +41,7 @@ public class PlanService {
     private final ExpenseService expenseService;
     private final UserPlanService userPlanService;
     private final UserService userService;
+    private final ScrapStore scrapStore;
 
     /* Plan을 통한 PlanResponse 반환 (origin Plan 정보 포함) */
     private PlanDetailResponse getPlanDetailResponse(Plan plan) {
@@ -48,6 +50,8 @@ public class PlanService {
         List<String> tagNames = getTagNames(tags);
 
         List<UserPlanResponse> users = userPlanService.findUserPlanResponsesByPlan(plan);
+
+        long scrapCount = scrapStore.getScrapCount(plan);
 
         CityResponse cityResponse = new CityResponse(plan.getRegion());
 
@@ -64,12 +68,13 @@ public class PlanService {
                     .map(tag -> tag.getTag().getName())
                     .collect(Collectors.toList());
             List<UserPlanResponse> originUsers = userPlanService.findUserPlanResponsesByPlan(originPlan);
+            long originScrapCount = scrapStore.getScrapCount(originPlan);
             BudgetResponse originBudget = budgetService.getBudget(originPlan);
 
-            PlanResponse originPlanResponse = PlanResponse.toDto(plan.getOriginPlan(), originUsers, originBudget, originTagNames);
-            return PlanDetailResponse.toDto(plan, users, tagNames, cityResponse, originPlanResponse, budgetResponse, expenseResponse);
+            PlanResponse originPlanResponse = PlanResponse.toDto(plan.getOriginPlan(), originUsers, originScrapCount, originBudget, originTagNames);
+            return PlanDetailResponse.toDto(plan, users, scrapCount, tagNames, cityResponse, originPlanResponse, budgetResponse, expenseResponse);
         } else {
-            return PlanDetailResponse.toDto(plan, users, tagNames, cityResponse, budgetResponse, expenseResponse);
+            return PlanDetailResponse.toDto(plan, users, scrapCount, tagNames, cityResponse, budgetResponse, expenseResponse);
         }
     }
 
@@ -77,17 +82,13 @@ public class PlanService {
         List<PlanTag> tags = planTagService.findTagsByPlan(plan);
         List<String> tagNames = getTagNames(tags);
         List<UserPlanResponse> users = userPlanService.findUserPlanResponsesByPlan(plan);
+        long scrapCount = scrapStore.getScrapCount(plan);
         BudgetResponse budgetResponse = budgetService.getBudget(plan);
 
-        return PlanResponse.toDto(plan, users, budgetResponse, tagNames);
+        return PlanResponse.toDto(plan, users, scrapCount, budgetResponse, tagNames);
     }
 
-    /* 전체 플랜 조회 */
-    public PlansResponse getPlans(String type, int page, int size, String sort) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sort).descending());
-
-        Page<Plan> plans = planRepository.findAll(pageable);
-
+    private PlansResponse getPlansResponse(Page<Plan> plans) {
         List<PlanResponse> planResponses = plans.stream()
                 .map(this::getPlanResponse)
                 .collect(Collectors.toList());
@@ -103,10 +104,37 @@ public class PlanService {
         return plansResponse;
     }
 
+    /* 전체 플랜 조회 */
+    public PlansResponse getPlans(String type, int page, int size, String sort) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sort).descending());
+        Page<Plan> plans = planRepository.findAll(pageable);
+
+        return getPlansResponse(plans);
+    }
+
+
     /* 플랜 단일 조회 */
     public PlanDetailResponse getPlan(Long planId) {
         Plan plan = planRepository.getById(planId);
         return getPlanDetailResponse(plan);
+    }
+
+    /* 나의 플랜 조회 */
+    public PlansResponse getMyPlans(int page, int size, String sort, String userEmail) {
+        User user = userService.findByEmail(userEmail);
+
+        Page<Plan> plans = userPlanService.findPlansByUser(page, size, sort, user);
+
+        return getPlansResponse(plans);
+    }
+
+    /* 나의 스크랩 플랜 조회 */
+    public PlansResponse getMyScrapPlans(int page, int size, String sort, String userEmail) {
+        User user = userService.findByEmail(userEmail);
+
+        Page<Plan> plans = scrapStore.getMyScrapList(page, size, sort, user);
+
+        return getPlansResponse(plans);
     }
 
     /* 플랜 생성 */
@@ -131,7 +159,7 @@ public class PlanService {
     /* 플랜 복제 (가져오기) */
     @Transactional
     public PlanDetailResponse copyPlan(PlanIdRequest request, String userEmail) {
-        Plan origin_plan = planRepository.getById(request.getOriginPlanId());
+        Plan origin_plan = planRepository.getById(request.getPlanId());
         User user = userService.findByEmail(userEmail);
 
         String title = origin_plan.getTitle() + " 복사본";
@@ -189,6 +217,15 @@ public class PlanService {
         }
 
         return getPlanDetailResponse(plan);
+    }
+
+    /* 플랜 스크랩 */
+    @Transactional
+    public void scrapPlan(PlanScrapRequest request, String userEmail) {
+        Plan plan = planRepository.getById(request.getPlanId());
+        User user = userService.findByEmail(userEmail);
+
+        scrapStore.scrapPlan(user, plan, request.isScrap());
     }
 
     /* 플랜 삭제 */
