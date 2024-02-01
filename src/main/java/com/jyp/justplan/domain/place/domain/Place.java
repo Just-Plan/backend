@@ -21,7 +21,7 @@ public class Place extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "PLACE_ID")
+    @Column(name = "PLACE_ID", nullable = false)
     private Long id;
     @Column(length = 10, nullable = false)
     private int day;
@@ -29,14 +29,22 @@ public class Place extends BaseEntity {
     private int orderNum;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PLAN_ID")
+    @JoinColumn(name = "PLAN_ID", nullable = false)
     private Plan plan;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "MEMO_ID")
     private Memo memo;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "GOOGLE_PLACE_ID")
+    @JoinColumn(name = "GOOGLE_PLACE_ID", nullable = false)
     private GooglePlace googlePlace;
+
+    public Place(int day, int orderNum, Plan plan, Memo memo, GooglePlace googlePlace) {
+        this.day = day;
+        this.orderNum = orderNum;
+        this.plan = plan;
+        this.memo = memo;
+        this.googlePlace = googlePlace;
+    }
 }
