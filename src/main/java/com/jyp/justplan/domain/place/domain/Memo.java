@@ -13,7 +13,6 @@ import javax.persistence.*;
 @Builder(toBuilder = true)
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
 @Entity
 @SQLDelete(sql = "UPDATE memo SET deleted_at = NOW() WHERE id = ?")
 @Where(clause = "deleted_at is null")
@@ -34,5 +33,10 @@ public class Memo extends BaseEntity {
     }
     public void reset() {
         this.content = "";
+    }
+
+    public Memo() {
+        this.content = null;
+        this.color = "WHITE";
     }
 }
