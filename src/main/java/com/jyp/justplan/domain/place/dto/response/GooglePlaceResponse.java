@@ -1,34 +1,60 @@
 package com.jyp.justplan.domain.place.dto.response;
 
+import com.jyp.justplan.domain.place.domain.GoogleMapType;
 import com.jyp.justplan.domain.place.domain.GooglePlace;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.util.Collections;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Slf4j
 public class GooglePlaceResponse {
 
-    private Long id;
+    private Long googlePlaceId;
     private String name;
     private String formattedAddress;
-    private List<String> types;
-    private double lat;
-    private double lng;
+    private String types;
+    private double latitude;
+    private double longitude;
     private String photoReference;
 
     public static GooglePlaceResponse of(GooglePlace googlePlace) {
+        String translatedType = GoogleMapType.translateToKorean(googlePlace.getTypes());
+
         return new GooglePlaceResponse(
-                googlePlace.getId(),
-                googlePlace.getName(),
-                googlePlace.getAddress(),
-                Collections.singletonList(googlePlace.getTypes()),
-                googlePlace.getLat(),
-                googlePlace.getLng(),
-                googlePlace.getPhotoReference()
+            googlePlace.getId(),
+            googlePlace.getName(),
+            googlePlace.getAddress(),
+            translatedType,
+            googlePlace.getLatitude(),
+            googlePlace.getLongitude(),
+            googlePlace.getPhotoReference()
+        );
+    }
+
+    public static GooglePlaceResponse of(GooglePlaceApiResultResponse result) {
+        String firstType = result.getTypes() != null && !result.getTypes().isEmpty()
+            ? result.getTypes().get(0) : null;
+
+        String translatedType = GoogleMapType.translateToKorean(firstType);
+
+        String photoReference = result.getPhotos() != null && !result.getPhotos().isEmpty()
+            ? result.getPhotos().get(0).getPhotoReference() : null;
+
+        return new GooglePlaceResponse(
+            result.getId(),
+            result.getName(),
+            result.getFormattedAddress(),
+            translatedType,
+            result.getGeometry().getLocation().getLat(),
+            result.getGeometry().getLocation().getLng(),
+            photoReference
         );
     }
 }
