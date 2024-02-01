@@ -1,8 +1,12 @@
 package com.jyp.justplan.domain.plan.domain;
 
+import com.jyp.justplan.domain.city.domain.City;
 import com.jyp.justplan.domain.plan.exception.NoSuchUserPlanException;
 import com.jyp.justplan.domain.user.domain.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,6 +18,35 @@ public interface UserPlanRepository extends JpaRepository<UserPlan, Long> {
     List<UserPlan> findByPlan(Plan plan);
 
     Optional<UserPlan> findByPlanAndOwnerTrue(Plan plan);
+
+    @Query("select up.plan from UserPlan up where up.user = ?1 order by up.createdAt desc")
+    Page<Plan> findAllByUserOrderByCreatedAt (Pageable pageable, User user);
+
+    @Query("select up.plan from UserPlan up " +
+            "where up.plan.published = true and up.plan.deleted = false " +
+            "and up.user.mbti.mbti = ?1 " +
+            "order by up.plan.createdAt desc")
+    Page<Plan> findAllByUserMbti(Pageable pageable, String mbti);
+
+    @Query("select up.plan from UserPlan up " +
+            "where up.plan.published = true and up.plan.deleted = false " +
+            "and up.user.mbti.mbti = ?1 and up.plan.region = ?2 " +
+            "order by up.plan.createdAt desc")
+    Page<Plan> findAllByUserMbtiAndRegion(Pageable pageable, String mbti, City region);
+
+
+//    @Query("select distinct up.plan, up.user.mbti.mbti, up.plan.createdAt " +
+//            "from UserPlan up " +
+//            "where up.user.mbti.mbti = ?1 " +
+//            "and up.plan.published = true and up.plan.deleted = false")
+//    Page<Plan> findAllByUserMbti (Pageable pageable, String mbti);
+//
+//
+//    @Query("select distinct up.plan, up.plan.createdAt " +
+//            "from UserPlan up " +
+//            "where up.user.mbti.mbti = ?1 and up.plan.region = ?2 " +
+//            "and up.plan.published = true and up.plan.deleted = false")
+//    Page<Plan> findAllByUserMbtiAndRegion (Pageable pageable, String mbti, City region);
 
     boolean existsByUserAndPlan(User user, Plan plan);
 

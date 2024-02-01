@@ -4,6 +4,7 @@ import com.jyp.justplan.api.response.ApiResponseDto;
 import com.jyp.justplan.domain.plan.application.PlanService;
 import com.jyp.justplan.domain.plan.dto.request.PlanIdRequest;
 import com.jyp.justplan.domain.plan.dto.request.PlanCreateRequest;
+import com.jyp.justplan.domain.plan.dto.request.PlanScrapRequest;
 import com.jyp.justplan.domain.plan.dto.request.PlanUpdateRequest;
 import com.jyp.justplan.domain.plan.dto.response.PlanDetailResponse;
 import com.jyp.justplan.domain.plan.dto.response.PlanResponse;
@@ -40,12 +41,12 @@ public class PlanController {
     @GetMapping
     public ApiResponseDto<PlansResponse> getPlans (
             @RequestParam(required = false, defaultValue = "") String type,
+            @RequestParam(required = false, defaultValue = "0") long regionId,
             @RequestParam(required = false, defaultValue = "0") int page,
             @RequestParam(required = false, defaultValue = "10") int size,
             @RequestParam(required = false, defaultValue = "createdAt") String sort
     ) {
-        PlansResponse response = planService.getPlans(type, page, size, sort);
-
+        PlansResponse response = planService.getPlans(type, regionId, page, size, sort);
         return ApiResponseDto.successResponse(response);
     }
 
@@ -61,6 +62,40 @@ public class PlanController {
             @PathVariable Long planId
     ) {
         PlanDetailResponse response = planService.getPlan(planId);
+        return ApiResponseDto.successResponse(response);
+    }
+
+    /* 나의 플랜 조회 */
+    @Operation(summary = "나의 일정 조회", description = "나의 일정을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
+    })
+    @GetMapping("/my")
+    public ApiResponseDto<PlansResponse> getMyPlans (
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "10") int size,
+            @RequestParam(required = false, defaultValue = "createdAt") String sort,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        PlansResponse response = planService.getMyPlans(page, size, sort, userDetails.getUsername());
+        return ApiResponseDto.successResponse(response);
+    }
+
+    /* 나의 스크랩 플랜 조회 */
+    @Operation(summary = "나의 스크랩 일정 조회", description = "나의 스크랩 일정을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
+    })
+    @GetMapping("/my/scrap")
+    public ApiResponseDto<PlansResponse> getMyScrapPlans (
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "10") int size,
+            @RequestParam(required = false, defaultValue = "createdAt") String sort,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        PlansResponse response = planService.getMyScrapPlans(page, size, sort, userDetails.getUsername());
         return ApiResponseDto.successResponse(response);
     }
 
@@ -110,6 +145,21 @@ public class PlanController {
     ) {
         PlanDetailResponse response = planService.updatePlan(request, userDetails.getUsername());
         return ApiResponseDto.successResponse(response);
+    }
+
+    /* 플랜 스크랩 */
+    @Operation(summary = "일정 스크랩", description = "일정을 스크랩합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
+    })
+    @PostMapping("/scrap")
+    public ApiResponseDto<?> scrapPlan (
+            @Valid @RequestBody PlanScrapRequest request,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        planService.scrapPlan(request, userDetails.getUsername());
+        return ApiResponseDto.successWithoutDataResponse();
     }
 
     /* 플랜 삭제 */

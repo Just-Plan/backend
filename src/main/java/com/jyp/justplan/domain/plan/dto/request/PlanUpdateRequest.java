@@ -55,6 +55,7 @@ public class PlanUpdateRequest {
     private boolean useExpense;
 
     @Schema(description = "지출 내역")
+    @NotNull(message = "지출 내역은 필수 값입니다.")
     private ExpenseUpdateRequest expense;
 
     @AssertTrue(message = "일정 시작 날짜는 종료 날짜보다 늦을 수 없습니다.")
@@ -68,10 +69,5 @@ public class PlanUpdateRequest {
                 (startDate.isEqual(MAX_DATE) || startDate.isBefore(MAX_DATE)) &&
                 (endDate.isEqual(MIN_DATE) || endDate.isAfter(MIN_DATE)) &&
                 (endDate.isEqual(MAX_DATE) || endDate.isBefore(MAX_DATE));
-    }
-
-    @AssertTrue(message = "지출 내역을 사용할 경우에만 지출 내역을 입력할 수 있습니다.")
-    private boolean isExpenseValid() {
-        return useExpense == (expense != null);
     }
 }

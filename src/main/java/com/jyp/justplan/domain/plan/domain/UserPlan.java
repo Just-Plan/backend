@@ -1,5 +1,6 @@
 package com.jyp.justplan.domain.plan.domain;
 
+import com.jyp.justplan.domain.BaseEntity;
 import com.jyp.justplan.domain.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -10,7 +11,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserPlan {
+public class UserPlan extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_plan_id")
