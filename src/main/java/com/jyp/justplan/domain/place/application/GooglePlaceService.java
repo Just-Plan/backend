@@ -14,11 +14,13 @@ import java.util.Collections;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import java.util.List;
 import java.util.stream.Collectors;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
@@ -58,9 +60,19 @@ public class GooglePlaceService {
             .bodyToMono(GooglePlacesSearchApiResponse.class)
             .block();
 
+
         // 구글 검색 결과를 GooglePlaceResponse로 변환
         List<GooglePlaceResponse> googleResponses = googlePlacesSearchApiResponse.getResults().stream()
-            .map(GooglePlaceResponse::of).toList();
+            .map(result -> {
+                if (result.getPhotos() != null && !result.getPhotos().isEmpty()) {
+                    String photoReference = result.getPhotos().get(0).getPhotoReference();
+                    // 비동기 작업을 동기화하여 처리
+                    String photoUrl = fetchPhotoUrl(photoReference, 400).block();
+                    return GooglePlaceResponse.of(result, photoUrl);
+                } else {
+                    return GooglePlaceResponse.of(result, null);
+                }
+            }).toList();
 
         // 데이터베이스에서 cityId에 해당하는 모든 장소 검색
         List<GooglePlace> localPlaces = googlePlaceRepository.findByCityId(cityId);
@@ -82,23 +94,21 @@ public class GooglePlaceService {
         return combinedResponses;
     }
 
-//    public GooglePlaceResponse convertToGooglePlaceResponse(GooglePlaceApiResultResponse result) {
-//        String firstType = result.getTypes() != null && !result.getTypes().isEmpty()
-//            ? result.getTypes().get(0) : null;
-//
-//        String photoReference = result.getPhotos() != null && !result.getPhotos().isEmpty()
-//                ? result.getPhotos().get(0).getPhotoReference() : null;
-//
-//        return new GooglePlaceResponse(
-//                result.getId(),
-//                result.getName(),
-//                result.getFormattedAddress(),
-//                firstType,
-//                result.getGeometry().getLocation().getLat(),
-//                result.getGeometry().getLocation().getLng(),
-//                photoReference
-//        );
-//    }
+    public Mono<String> fetchPhotoUrl(String photoReference, int maxwidth) {
+        String url = String.format(
+            "/photo?maxwidth=%d&photoreference=%s&key=%s",
+            maxwidth, photoReference, googlePlacesProperties.getApiKey());
+
+        return webClient
+            .get()
+            .uri(url)
+            .exchangeToMono(response -> {
+                if (response.statusCode().equals(HttpStatus.FOUND)) { // 302 리디렉션 확인
+                    return Mono.just(response.headers().header("Location").get(0)); // 리디렉션 URL 추출
+                }
+                return Mono.error(new RuntimeException("Failed to fetch photo URL"));
+            });
+    }
 
     /*CREATE*/
     @Transactional

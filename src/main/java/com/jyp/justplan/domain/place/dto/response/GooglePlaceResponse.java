@@ -38,14 +38,11 @@ public class GooglePlaceResponse {
         );
     }
 
-    public static GooglePlaceResponse of(GooglePlaceApiResultResponse result) {
+    public static GooglePlaceResponse of(GooglePlaceApiResultResponse result, String photoUrl) {
         String firstType = result.getTypes() != null && !result.getTypes().isEmpty()
             ? result.getTypes().get(0) : null;
 
         String translatedType = GoogleMapType.translateToKorean(firstType);
-
-        String photoReference = result.getPhotos() != null && !result.getPhotos().isEmpty()
-            ? result.getPhotos().get(0).getPhotoReference() : null;
 
         return new GooglePlaceResponse(
             result.getId(),
@@ -54,7 +51,7 @@ public class GooglePlaceResponse {
             translatedType,
             result.getGeometry().getLocation().getLat(),
             result.getGeometry().getLocation().getLng(),
-            photoReference
+            photoUrl
         );
     }
 }
