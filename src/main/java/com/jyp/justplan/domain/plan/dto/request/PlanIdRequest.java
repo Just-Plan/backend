@@ -15,5 +15,5 @@ import javax.validation.constraints.NotNull;
 public class PlanIdRequest {
     @Schema(description = "일정 ID", example = "1")
     @NotNull
-    private long originPlanId;
+    private long planId;
 }

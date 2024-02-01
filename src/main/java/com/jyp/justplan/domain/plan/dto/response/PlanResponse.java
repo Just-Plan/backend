@@ -19,6 +19,7 @@ public class PlanResponse {
     private long planId;
     private String title;
     private List<UserPlanResponse> users;
+    private long scrapCount;
     // TODO: 스크랩 수 추가
     private BudgetResponse budget;
     private CityResponse region;
@@ -29,12 +30,19 @@ public class PlanResponse {
     private boolean published;
     private List<String> tags;
 
-    public static PlanResponse toDto(Plan plan, List<UserPlanResponse> users, BudgetResponse budget, List<String> tags) {
+    public static PlanResponse toDto(
+            Plan plan,
+            List<UserPlanResponse> users,
+            long scrapCount,
+            BudgetResponse budget,
+            List<String> tags
+    ) {
         Duration duration = Duration.between(plan.getStartDate(), plan.getEndDate());
         return new PlanResponse(
                 plan.getId(),
                 plan.getTitle(),
                 users,
+                scrapCount,
                 budget,
                 new CityResponse(plan.getRegion()),
                 plan.getStartDate(),
