@@ -63,15 +63,9 @@ public class PlanService {
 
         if (plan.getOriginPlan() != null) {
             Plan originPlan = plan.getOriginPlan();
-            List<PlanTag> originTags = planTagService.findTagsByPlan(originPlan);
-            List<String> originTagNames = originTags.stream()
-                    .map(tag -> tag.getTag().getName())
-                    .collect(Collectors.toList());
             List<UserPlanResponse> originUsers = userPlanService.findUserPlanResponsesByPlan(originPlan);
-            long originScrapCount = scrapStore.getScrapCount(originPlan);
-            BudgetResponse originBudget = budgetService.getBudget(originPlan);
 
-            PlanResponse originPlanResponse = PlanResponse.toDto(plan.getOriginPlan(), originUsers, originScrapCount, originBudget, originTagNames);
+            OriginPlanResponse originPlanResponse = OriginPlanResponse.toDto(originPlan, originUsers);
             return PlanDetailResponse.toDto(plan, users, scrapCount, tagNames, cityResponse, originPlanResponse, budgetResponse, expenseResponse);
         } else {
             return PlanDetailResponse.toDto(plan, users, scrapCount, tagNames, cityResponse, budgetResponse, expenseResponse);
@@ -177,6 +171,9 @@ public class PlanService {
 
         List<PlanTag> origin_tags = planTagService.findTagsByPlan(origin_plan);
         planTagService.savePlanTag(new_plan, getTagNames(origin_tags));
+
+        budgetService.createBudget(new_plan);
+        expenseService.createExpense(new_plan);
 
         return getPlanDetailResponse(new_plan);
     }

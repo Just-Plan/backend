@@ -24,7 +24,7 @@ public class PlanDetailResponse {
     private ZonedDateTime endDate;
 
     private boolean published;
-    private PlanResponse originPlan;
+    private OriginPlanResponse originPlan;
     private List<String> tags;
 
     /* 가계부 */
@@ -64,7 +64,7 @@ public class PlanDetailResponse {
             long scrapCount,
             List<String> tags,
             CityResponse cityResponse,
-            PlanResponse originPlan,
+            OriginPlanResponse originPlan,
             BudgetResponse budget,
             ExpenseResponse expense
     ) {
