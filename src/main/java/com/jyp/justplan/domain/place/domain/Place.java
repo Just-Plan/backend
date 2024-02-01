@@ -1,6 +1,7 @@
 package com.jyp.justplan.domain.place.domain;
 
 import com.jyp.justplan.domain.BaseEntity;
+import com.jyp.justplan.domain.plan.domain.Plan;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,6 +28,10 @@ public class Place extends BaseEntity {
     @Column(length = 10, nullable = false)
     private int orderNum;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "PLAN_ID")
+    private Plan plan;
+
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMO_ID")
     private Memo memo;
@@ -34,6 +39,4 @@ public class Place extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "GOOGLE_PLACE_ID")
     private GooglePlace googlePlace;
-
-
 }

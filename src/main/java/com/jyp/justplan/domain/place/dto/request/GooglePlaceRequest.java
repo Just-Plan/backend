@@ -11,20 +11,21 @@ import java.util.List;
 @Getter
 public class GooglePlaceRequest {
 
+    private Long Id;
     private String name;
     private String formattedAddress;
-    private List<String> types;
-    private double lat;
-    private double lng;
+    private String types;
+    private double latitude;
+    private double longitude;
     private String photoReference;
 
     public GooglePlace toEntity() {
         return GooglePlace.builder()
                 .name(name)
                 .address(formattedAddress)
-                .types(types.toString())
-                .lat(lat)
-                .lng(lng)
+                .types(types)
+                .latitude(latitude)
+                .longitude(longitude)
                 .photoReference(photoReference)
                 .build();
     }

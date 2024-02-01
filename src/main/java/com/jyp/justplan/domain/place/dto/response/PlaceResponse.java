@@ -20,8 +20,8 @@ public class PlaceResponse {
     private String name;
     private String formattedAddress;
     private List<String> types;
-    private double lat;
-    private double lng;
+    private double latitude;
+    private double longitude;
     private String photoReference;
 
     public static PlaceResponse of(Place place) {
@@ -34,8 +34,8 @@ public class PlaceResponse {
                 place.getGooglePlace().getName(),
                 place.getGooglePlace().getAddress(),
                 Collections.singletonList(place.getGooglePlace().getTypes()),
-                place.getGooglePlace().getLat(),
-                place.getGooglePlace().getLng(),
+                place.getGooglePlace().getLatitude(),
+                place.getGooglePlace().getLongitude(),
                 place.getGooglePlace().getPhotoReference()
         );
     }
