@@ -11,6 +11,7 @@ import com.jyp.justplan.domain.place.exception.NoSuchPlaceException;
 import com.jyp.justplan.domain.plan.domain.Plan;
 import com.jyp.justplan.domain.plan.domain.PlanRepository;
 import com.jyp.justplan.domain.plan.exception.NoSuchPlanException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -37,10 +38,9 @@ public class PlaceService {
             Memo savedMemo = memoRepository.save(new Memo());
 
             // GooglePlace 찾기 또는 새로 생성
-            GooglePlace googlePlace = placeRequest.getGooglePlaceId() != null ?
-                googlePlaceRepository.findById(placeRequest.getGooglePlaceId())
-                    .orElseThrow(() -> new NoSuchGooglePlaceException("GooglePlaceId를 찾을 수 없습니다: " + placeRequest.getGooglePlaceId())) :
-                createGooglePlace(placeRequest,findPlan.getRegion());
+            GooglePlace googlePlace = Optional.ofNullable(placeRequest.getGooglePlaceId())
+                .flatMap(googlePlaceRepository::findById)
+                .orElseGet(() -> findOrCreateGooglePlace(placeRequest, findPlan.getRegion()));
 
             // 각 Place에 대한 인스턴스 생성 및 저장
             Place newPlace = new Place(0, 0, findPlan, savedMemo, googlePlace);
@@ -88,6 +88,16 @@ public class PlaceService {
             .build();
 
         return googlePlaceRepository.save(newGooglePlace);
+    }
+
+
+    private GooglePlace findOrCreateGooglePlace(PlaceRequest request, City city) {
+        // 위도와 경도를 기준으로 기존의 GooglePlace가 있는지 검사합니다.
+        return googlePlaceRepository.findByLatitudeAndLongitude(request.getLatitude(), request.getLongitude())
+            .orElseGet(() -> {
+                GooglePlace newGooglePlace = createGooglePlace(request, city);
+                return googlePlaceRepository.save(newGooglePlace);
+            });
     }
 
     private GooglePlace findGooglePlace(Long googlePlaceId) {
