@@ -66,27 +66,18 @@ public class PlaceService {
 
     // 일정에 대한 전체 장소 조회
     public SchedulePlacesResponse findPlacesByPlanId(Long planId) {
-        Plan findPlan = planRepository.findById(planId)
-            .orElseThrow(() -> new NoSuchPlanException("존재하지 않는 planId 입니다: " + planId));
+        planRepository.findById(planId).orElseThrow(() -> new NoSuchPlanException("존재하지 않는 planId 입니다: " + planId));
 
         List<Place> places = placeRepository.findByPlanId(planId);
 
-        // Step 1: day와 orderNum 기준으로 Place 객체 정렬
+        // day와 orderNum 기준으로 Place 객체 정렬
         List<Place> sortedPlaces = places.stream()
-            .sorted(Comparator.comparingInt(Place::getDay)
-                .thenComparingInt(Place::getOrderNum))
-            .toList();
+            .sorted(Comparator.comparingInt(Place::getDay).thenComparingInt(Place::getOrderNum)).toList();
 
-        // Place들을 day 기준으로 그룹화
-        Map<Integer, List<PlaceResponse>> groupedByDay = sortedPlaces.stream()
-            .collect(Collectors.groupingBy(Place::getDay,
-                LinkedHashMap::new, Collectors.mapping(PlaceResponse::of, Collectors.toList())));
-
-        List<DayPlacesResponse> schedule = groupedByDay.entrySet().stream()
-            .map(entry -> new DayPlacesResponse(entry.getKey(), entry.getValue()))
-            .collect(Collectors.toList());
-
-        return new SchedulePlacesResponse(schedule);
+        // Place들을 day 기준으로 그룹화하고 PlaceResponse 객체로 변환
+        Map<Integer, List<PlaceResponse>> groupedByDay = sortedPlaces.stream().collect(Collectors.groupingBy(Place::getDay,
+            LinkedHashMap::new, Collectors.mapping(PlaceResponse::of, Collectors.toList())));
+        return SchedulePlacesResponse.of(groupedByDay);
     }
 
     /*UPDATE*/
