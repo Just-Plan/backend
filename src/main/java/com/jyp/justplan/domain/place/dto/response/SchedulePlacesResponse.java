@@ -1,6 +1,7 @@
 package com.jyp.justplan.domain.place.dto.response;
 
 import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,9 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SchedulePlacesResponse {
-    private List<DayPlacesResponse> daysPlaces;
+    private Map<Integer, List<PlaceResponse>> daysPlaces;
 
-    public static SchedulePlacesResponse of(List<DayPlacesResponse> daysPlaces) {
+    public static SchedulePlacesResponse of(Map<Integer, List<PlaceResponse>> daysPlaces) {
         return new SchedulePlacesResponse(daysPlaces);
     }
 }
