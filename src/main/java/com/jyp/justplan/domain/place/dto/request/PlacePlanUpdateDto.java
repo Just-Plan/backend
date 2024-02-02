@@ -11,4 +11,5 @@ import java.util.Map;
 @Getter
 public class PlacePlanUpdateDto {
     private Map<Integer, List<PlaceUpdateRequest>> dayUpdates;
+    private List<Long> placeDeleteIds;
 }

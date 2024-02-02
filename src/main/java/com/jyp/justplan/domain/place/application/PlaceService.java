@@ -18,6 +18,7 @@ import com.jyp.justplan.domain.plan.exception.NoSuchPlanException;
 import com.jyp.justplan.domain.plan.exception.NoSuchUserPlanException;
 import com.jyp.justplan.domain.user.domain.User;
 import com.jyp.justplan.domain.user.domain.UserRepository;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -79,9 +80,20 @@ public class PlaceService {
     // 전체 장소 수정
     @Transactional
     public void updatePlaces(PlacePlanUpdateDto placePlanUpdateDto, Long userId, Long planId) {
-        log.info("Received update request: {}", placePlanUpdateDto);
-        log.info("Received update request: {}", placePlanUpdateDto.getDayUpdates());
         extracted(userId, planId);
+
+        // Place 삭제
+        List<Long> placeDeleteIds = placePlanUpdateDto.getPlaceDeleteIds();
+        List<Place> placesToDelete = new ArrayList<>();
+
+        placeDeleteIds.forEach(placeId -> {
+            Optional<Place> optionalPlace = placeRepository.findById(placeId);
+            optionalPlace.ifPresent(placesToDelete::add);
+        });
+
+
+        placeRepository.deleteAll(placesToDelete);
+
         placePlanUpdateDto.getDayUpdates().forEach((day, updates) -> {
             updates.forEach(updateRequest -> {
                 // Place 찾기
@@ -95,9 +107,8 @@ public class PlaceService {
     }
 
     private Place getPlace(PlaceUpdateRequest updateRequest) {
-        Place place = placeRepository.findById(updateRequest.getPlaceId())
+        return placeRepository.findById(updateRequest.getPlaceId())
             .orElseThrow(() -> new NoSuchPlaceException("Place not found with id: " + updateRequest.getPlaceId()));
-        return place;
     }
 
     private void extracted(Long userId, Long planId) {
