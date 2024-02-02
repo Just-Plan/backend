@@ -16,7 +16,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@SQLDelete(sql = "UPDATE place SET deleted_at = NOW() WHERE id = ?")
+@SQLDelete(sql = "UPDATE place SET deleted_at = NOW() WHERE PLACE_ID = ?")
 @Where(clause = "deleted_at is null")
 public class Place extends BaseEntity {
 
@@ -24,6 +24,7 @@ public class Place extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "PLACE_ID", nullable = false)
     private Long id;
+
     @Column(length = 10, nullable = false)
     private int day;
     @Column(length = 10, nullable = false)

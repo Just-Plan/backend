@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Getter
 @AllArgsConstructor
 @Entity
-@SQLDelete(sql = "UPDATE memo SET deleted_at = NOW() WHERE id = ?")
+@SQLDelete(sql = "UPDATE memo SET deleted_at = NOW() WHERE MEMO_ID = ?")
 @Where(clause = "deleted_at is null")
 public class Memo extends BaseEntity {
 
