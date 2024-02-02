@@ -80,7 +80,7 @@ public class PlaceService {
         GooglePlace newGooglePlace = GooglePlace.builder()
             .name(request.getName())
             .address(request.getFormattedAddress())
-            .types(request.getTypes())
+            .types(GoogleMapType.translateFromKorean(request.getTypes()))
             .latitude(request.getLatitude())
             .longitude(request.getLongitude())
             .photoReference(request.getPhotoReference())
