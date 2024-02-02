@@ -40,6 +40,7 @@ public class User {
     private String providerId;
 
     //mbti
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = true)
     private Mbti mbti;
