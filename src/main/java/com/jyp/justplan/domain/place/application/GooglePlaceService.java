@@ -5,12 +5,9 @@ import com.jyp.justplan.domain.city.domain.CityRepository;
 import com.jyp.justplan.domain.place.domain.GooglePlace;
 import com.jyp.justplan.domain.place.domain.GooglePlaceRepository;
 import com.jyp.justplan.domain.place.GooglePlacesProperties;
-import com.jyp.justplan.domain.place.dto.request.GooglePlaceRequest;
-import com.jyp.justplan.domain.place.dto.response.GooglePlaceApiResultResponse;
 import com.jyp.justplan.domain.place.dto.response.GooglePlaceResponse;
 import com.jyp.justplan.domain.place.dto.response.GooglePlacesSearchApiResponse;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import java.util.List;
-import java.util.stream.Collectors;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -108,17 +104,6 @@ public class GooglePlaceService {
                 }
                 return Mono.error(new RuntimeException("Failed to fetch photo URL"));
             });
-    }
-
-    /*CREATE*/
-    @Transactional
-    public GooglePlaceResponse createGooglePlace(GooglePlaceRequest googlePlaceRequest) {
-
-        GooglePlace googlePlace = googlePlaceRequest.toEntity().toBuilder()
-                .build();
-
-        GooglePlace savedGooglePlace = googlePlaceRepository.save(googlePlace);
-        return GooglePlaceResponse.of(savedGooglePlace);
     }
 
     private boolean isSamePlace(GooglePlaceResponse googlePlace, GooglePlace localPlace) {

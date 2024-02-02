@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class MemoRequest {
+public class MemoUpdateDto {
 
     private String content;
     private String color;

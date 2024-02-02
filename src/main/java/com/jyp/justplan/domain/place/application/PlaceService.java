@@ -2,10 +2,11 @@ package com.jyp.justplan.domain.place.application;
 
 import com.jyp.justplan.domain.city.domain.City;
 import com.jyp.justplan.domain.place.domain.*;
+import com.jyp.justplan.domain.place.dto.request.MemoUpdateDto;
 import com.jyp.justplan.domain.place.dto.request.PlaceListRequest;
 import com.jyp.justplan.domain.place.dto.request.PlaceRequest;
-import com.jyp.justplan.domain.place.dto.request.PlaceUpdatesWrapper;
-import com.jyp.justplan.domain.place.dto.response.DayPlacesResponse;
+import com.jyp.justplan.domain.place.dto.request.PlacePlanUpdateDto;
+import com.jyp.justplan.domain.place.dto.request.PlaceUpdateRequest;
 import com.jyp.justplan.domain.place.dto.response.PlaceResponse;
 import com.jyp.justplan.domain.place.dto.response.SchedulePlacesResponse;
 import com.jyp.justplan.domain.place.exception.NoSuchGooglePlaceException;
@@ -43,13 +44,8 @@ public class PlaceService {
     // 일정 생성
     @Transactional
     public void createPlace(PlaceListRequest placeListRequest, Long planId, Long userId) {
-        Plan findPlan = planRepository.findById(planId)
-            .orElseThrow(() -> new NoSuchPlanException("존재하지 않는 planId 입니다: " + planId));
-
-        User findUser = userRepository.findById(userId)
-            .orElseThrow(() -> new NoSuchUserPlanException("존재하지 않는 userId 입니다: " + userId));
-
-        planService.validateUserOfPlan(findPlan, findUser);
+        Plan findPlan = getPlan(planId);
+        extracted(userId, planId);
 
         for (PlaceRequest placeRequest : placeListRequest.getPlaces()) {
             // Memo 생성 로직을 각 Place에 대해 반복
@@ -80,25 +76,44 @@ public class PlaceService {
         return SchedulePlacesResponse.of(groupedByDay);
     }
 
-    /*UPDATE*/
+    // 전체 장소 수정
     @Transactional
-    public void updatePlaces(PlaceUpdatesWrapper updatesWrapper) {
-        updatesWrapper.getUpdates().forEach((day, updates) -> {
-            updates.forEach(update -> {
-                Place existingPlace = findPlace(update.getId());
-
-                Place updatedPlace = existingPlace.toBuilder()
-                        .day(day)
-                        .orderNum(update.getOrderNum())
-                        .build();
-
-                placeRepository.save(updatedPlace);
+    public void updatePlaces(PlacePlanUpdateDto placePlanUpdateDto, Long userId, Long planId) {
+        log.info("Received update request: {}", placePlanUpdateDto);
+        log.info("Received update request: {}", placePlanUpdateDto.getDayUpdates());
+        extracted(userId, planId);
+        placePlanUpdateDto.getDayUpdates().forEach((day, updates) -> {
+            updates.forEach(updateRequest -> {
+                // Place 찾기
+                Place place = getPlace(updateRequest);
+                // orderNum과 day, memo 업데이트
+                Memo memo = place.getMemo();
+                memo.update(new MemoUpdateDto(updateRequest.getMemo().getContent(), updateRequest.getMemo().getColor()));
+                place.update(updateRequest.getOrderNum(), day, memo);
             });
         });
     }
-    private Place findPlace(Long placeId) {
-        return placeRepository.findById(placeId)
-                .orElseThrow(NoSuchPlaceException::new);
+
+    private Place getPlace(PlaceUpdateRequest updateRequest) {
+        Place place = placeRepository.findById(updateRequest.getPlaceId())
+            .orElseThrow(() -> new NoSuchPlaceException("Place not found with id: " + updateRequest.getPlaceId()));
+        return place;
+    }
+
+    private void extracted(Long userId, Long planId) {
+        Plan findPlan = getPlan(planId);
+        User findUser = getUser(userId);
+        planService.validateUserOfPlan(findPlan, findUser);
+    }
+
+    private User getUser(Long userId) {
+        return userRepository.findById(userId)
+            .orElseThrow(() -> new NoSuchUserPlanException("존재하지 않는 userId 입니다: " + userId));
+    }
+
+    private Plan getPlan(Long planId) {
+        return planRepository.findById(planId)
+            .orElseThrow(() -> new NoSuchPlanException("존재하지 않는 planId 입니다: " + planId));
     }
 
     private GooglePlace createGooglePlace(PlaceRequest request, City city) {
@@ -112,10 +127,8 @@ public class PlaceService {
             .photoReference(request.getPhotoReference())
             .city(city)
             .build();
-
         return googlePlaceRepository.save(newGooglePlace);
     }
-
 
     private GooglePlace findOrCreateGooglePlace(PlaceRequest request, City city) {
         // 위도와 경도를 기준으로 기존의 GooglePlace가 있는지 검사합니다.
@@ -124,10 +137,5 @@ public class PlaceService {
                 GooglePlace newGooglePlace = createGooglePlace(request, city);
                 return googlePlaceRepository.save(newGooglePlace);
             });
-    }
-
-    private GooglePlace findGooglePlace(Long googlePlaceId) {
-        return googlePlaceRepository.findById(googlePlaceId)
-                .orElseThrow(NoSuchGooglePlaceException::new);
     }
 }
