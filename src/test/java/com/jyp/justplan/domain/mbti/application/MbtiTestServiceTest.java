@@ -29,7 +29,7 @@ class MbtiTestServiceTest extends MbtiTestConfig {
         // given
         List<Long> request = List.of(3L, 1L, 8L, 13L, 16L, 18L, 34L, 35L, 29L, 43L, 37L, 47L);
         // when
-        MbtiType mbtiType = mbtiTestService.submitMbtiTest(request);
+        MbtiType mbtiType = mbtiTestService.submitMbtiTest(request, null);
         // then
         assertThat(mbtiType).isEqualTo(MbtiType.intj);
     }
@@ -39,7 +39,7 @@ class MbtiTestServiceTest extends MbtiTestConfig {
         // given
         List<Long> request = List.of(3L, 1L, 8L, 13L, 16L, 18L, 34L);
         // when then
-        assertThatThrownBy(() -> mbtiTestService.submitMbtiTest(request))
+        assertThatThrownBy(() -> mbtiTestService.submitMbtiTest(request, null))
             .isInstanceOf(MbtiAnswerCountMismatchException.class)
             .hasMessage("답변은 12개여야 합니다.");
     }
