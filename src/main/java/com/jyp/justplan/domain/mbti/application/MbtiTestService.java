@@ -18,8 +18,8 @@ public class MbtiTestService {
     private final MbtiQuestionRepository mbtiQuestionRepository;
     private final MbtiAnswerRepository mbtiAnswerRepository;
 
-    private final MbtiTestRepository mbtiTestRepository;
-    private final UserRepository userRepository;
+//    private final MbtiTestRepository mbtiTestRepository;
+//    private final UserRepository userRepository;
 
     public List<MbtiQuestionResponse> getRandomQuestions() {
         List<MbtiQuestion> mbtiQuestions = MbtiQuestion.selectRandomQuestions(mbtiQuestionRepository.findAll(), 3);
@@ -35,13 +35,13 @@ public class MbtiTestService {
 
         String mbtiType = result.determineMbtiType();
 
-        Mbti mbti = mbtiTestRepository.findByMbti(mbtiType).orElseThrow(() -> new MbtiAnswerNotFoundException("해당하는 MBTI가 존재하지 않습니다."));
-
-        try {
-            userRepository.updateByMbti(mbti);
-        } catch (Exception e) {
-            throw new MbtiAnswerNotFoundException("Mbti 등록 중 오류가 발생하였습니다.");
-        }
+//        Mbti mbti = mbtiTestRepository.findByMbti(mbtiType).orElseThrow(() -> new MbtiAnswerNotFoundException("해당하는 MBTI가 존재하지 않습니다."));
+//
+//        try {
+//            userRepository.updateByMbti(mbti);
+//        } catch (Exception e) {
+//            throw new MbtiAnswerNotFoundException("Mbti 등록 중 오류가 발생하였습니다.");
+//        }
 
         return MbtiType.valueOf(mbtiType.toLowerCase());
     }

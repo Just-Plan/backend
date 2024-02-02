@@ -1,5 +1,8 @@
 package com.jyp.justplan.domain.place.domain;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public enum GoogleMapType {
     ACCOUNTING("회계"),
     AIRPORT("공항"),
@@ -100,6 +103,16 @@ public enum GoogleMapType {
 
     private final String koreanTranslation;
 
+    // 한글 이름을 키로, 해당 열거형 상수를 값으로 하는 맵
+    private static final Map<String, GoogleMapType> KOREAN_NAME_MAP = new HashMap<>();
+
+    static {
+        // 모든 열거형 상수에 대해 한글 이름과 열거형 상수를 맵에 추가
+        for (GoogleMapType type : values()) {
+            KOREAN_NAME_MAP.put(type.getKoreanTranslation(), type);
+        }
+    }
+
     GoogleMapType(String koreanTranslation) {
         this.koreanTranslation = koreanTranslation;
     }
@@ -113,6 +126,16 @@ public enum GoogleMapType {
             return GoogleMapType.valueOf(type.toUpperCase().replace(" ", "_")).getKoreanTranslation();
         } catch (IllegalArgumentException e) {
             return "알 수 없는 타입";
+        }
+    }
+
+    // 한글 이름으로 영문 타입명 찾기
+    public static String translateFromKorean(String koreanName) {
+        GoogleMapType type = KOREAN_NAME_MAP.get(koreanName);
+        if (type != null) {
+            return type.name().toLowerCase().replace("_", " ");
+        } else {
+            return "unknown type";
         }
     }
 }
