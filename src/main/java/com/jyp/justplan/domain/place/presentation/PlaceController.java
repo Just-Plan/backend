@@ -6,6 +6,7 @@ import com.jyp.justplan.domain.place.dto.request.PlaceListRequest;
 import com.jyp.justplan.domain.place.dto.request.PlaceRequest;
 import com.jyp.justplan.domain.place.dto.request.PlaceUpdatesWrapper;
 import com.jyp.justplan.domain.place.dto.response.PlaceResponse;
+import com.jyp.justplan.domain.place.dto.response.SchedulePlacesResponse;
 import com.jyp.justplan.domain.user.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -51,22 +52,26 @@ public class PlaceController {
             content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
     })
     @GetMapping("/place/planId/{planId}")
-    public ApiResponseDto<?> getPlacesByPlanId(
+    public ApiResponseDto<SchedulePlacesResponse> getPlacesByPlanId(
         @PathVariable Long planId
     ) {
         return ApiResponseDto.successResponse(placeService.findPlacesByPlanId(planId));
     }
 
 
-    /*UPDATE*/
-    @Operation(summary = "장소 업데이트", description = "장소를 업데이트합니다.")
+    // 장소 업데이트
+    @Operation(summary = "장소 수정", description = "장소 수정합니다.(day, orderNum, memo)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공",
                     content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
     })
     @PatchMapping("/place/update")
     public ApiResponseDto<?> updatePlace(@RequestBody PlaceUpdatesWrapper updatesWrapper) {
+
         placeService.updatePlaces(updatesWrapper);
+
         return ApiResponseDto.successWithoutDataResponse();
     }
+
+    // 장소 상세 조회
 }
