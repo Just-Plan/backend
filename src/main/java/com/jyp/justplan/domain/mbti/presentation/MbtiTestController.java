@@ -5,6 +5,7 @@ import com.jyp.justplan.domain.mbti.application.MbtiTestService;
 import com.jyp.justplan.domain.mbti.domain.MbtiType;
 import com.jyp.justplan.domain.mbti.dto.request.MbtiUserTestRequest;
 import com.jyp.justplan.domain.mbti.dto.response.MbtiQuestionResponse;
+import com.jyp.justplan.domain.user.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,7 +13,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,8 +45,12 @@ public class MbtiTestController {
     // 선택한 답변으로 mbti 결과 조회
     @Operation(summary = "MBTI 결과 조회", description = "선택한 답변으로 MBTI 결과를 조회한다.")
     @PostMapping("/result")
-    public ApiResponseDto<MbtiType> submitMbtiTest(@RequestBody final MbtiUserTestRequest request) {
-        MbtiType mbtiType = mbtiQuestionService.submitMbtiTest(request.getAnswers());
+    public ApiResponseDto<MbtiType> submitMbtiTest(
+        @RequestBody final MbtiUserTestRequest request,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        Long userId = (userDetails != null) ? userDetails.getUserId() : null;
+        MbtiType mbtiType = mbtiQuestionService.submitMbtiTest(request.getAnswers(), userId);
         return ApiResponseDto.successResponse(mbtiType);
     }
 }

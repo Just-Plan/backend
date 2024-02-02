@@ -1,7 +1,7 @@
 package com.jyp.justplan.domain.place.presentation;
 
 import com.jyp.justplan.api.response.ApiResponseDto;
-import com.jyp.justplan.domain.place.dto.request.MemoRequest;
+import com.jyp.justplan.domain.place.dto.request.MemoUpdateDto;
 import com.jyp.justplan.domain.place.dto.response.MemoResponse;
 import com.jyp.justplan.domain.place.application.MemoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,7 +40,7 @@ public class MemoController {
                     content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
     })
     @PatchMapping("/{id}")
-    public ApiResponseDto<MemoResponse> updateMemo(@RequestBody MemoRequest memoRequest, @PathVariable Long id) {
+    public ApiResponseDto<MemoResponse> updateMemo(@RequestBody MemoUpdateDto memoRequest, @PathVariable Long id) {
         MemoResponse response = memoService.updateMemo(memoRequest, id);
         return ApiResponseDto.successResponse(response);
     }

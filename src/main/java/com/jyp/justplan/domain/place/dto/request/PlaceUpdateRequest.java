@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class PlaceUpdateRequest {
-    private Long id;
-    private int orderNum;
+    private Long placeId;
+    private Integer orderNum;
+    private MemoUpdateDto memo;
 }

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PlaceResponse {
+    private Long placeId;
     private String name;
     private String formattedAddress;
     private String types;
@@ -20,6 +21,7 @@ public class PlaceResponse {
 
     public static PlaceResponse of(Place place) {
         return new PlaceResponse(
+                place.getId(),
                 place.getGooglePlace().getName(),
                 place.getGooglePlace().getAddress(),
                 place.getGooglePlace().getTypes(),
