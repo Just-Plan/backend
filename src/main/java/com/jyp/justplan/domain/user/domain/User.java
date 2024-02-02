@@ -1,7 +1,7 @@
 package com.jyp.justplan.domain.user.domain;
 
+import com.jyp.justplan.domain.BaseEntity;
 import com.jyp.justplan.domain.mbti.domain.Mbti;
-import javax.persistence.Column;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -18,7 +18,7 @@ import javax.validation.constraints.NotNull;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class User {
+public class User extends BaseEntity {
     // TODO: 데이터 유효성 검사를 위한 어노테이션 추가
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,8 +44,6 @@ public class User {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = true)
     private Mbti mbti;
-//    private long mbtiId;
-//    private String mbti;
 
     public User(String email, String name, String password) {
         this.email = email;

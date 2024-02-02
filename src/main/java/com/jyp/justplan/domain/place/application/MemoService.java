@@ -2,7 +2,7 @@ package com.jyp.justplan.domain.place.application;
 
 import com.jyp.justplan.domain.place.domain.MemoRepository;
 import com.jyp.justplan.domain.place.domain.Memo;
-import com.jyp.justplan.domain.place.dto.request.MemoRequest;
+import com.jyp.justplan.domain.place.dto.request.MemoUpdateDto;
 import com.jyp.justplan.domain.place.dto.response.MemoResponse;
 import com.jyp.justplan.domain.place.exception.NoSuchMemoException;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ public class MemoService {
 
     /*CREATE*/
     @Transactional
-    public MemoResponse createMemo(MemoRequest memoRequest) {
+    public MemoResponse createMemo(MemoUpdateDto memoRequest) {
 
         Memo memo = memoRequest.toEntity().toBuilder()
                 .content(memoRequest.getContent())
@@ -37,7 +37,7 @@ public class MemoService {
 
     /*UPDATE*/
     @Transactional
-    public MemoResponse updateMemo(MemoRequest memoRequest, Long memoId) {
+    public MemoResponse updateMemo(MemoUpdateDto memoRequest, Long memoId) {
         Memo existingMemo = findMemo(memoId);
         existingMemo.update(memoRequest);
         Memo savedMemo = memoRepository.save(existingMemo);

@@ -9,6 +9,6 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class PlaceUpdatesWrapper {
-    private Map<Integer, List<PlaceUpdateRequest>> updates;
+public class PlacePlanUpdateDto {
+    private Map<Integer, List<PlaceUpdateRequest>> dayUpdates;
 }

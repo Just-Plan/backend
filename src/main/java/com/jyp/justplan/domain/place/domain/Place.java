@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import javax.persistence.*;
@@ -34,6 +35,7 @@ public class Place extends BaseEntity {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "MEMO_ID")
+    @Setter
     private Memo memo;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -46,5 +48,11 @@ public class Place extends BaseEntity {
         this.plan = plan;
         this.memo = memo;
         this.googlePlace = googlePlace;
+    }
+
+    public void update(int orderNum, int day, Memo memo) {
+        this.orderNum = orderNum;
+        this.day = day;
+        this.memo = memo;
     }
 }
