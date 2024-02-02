@@ -11,18 +11,13 @@ import java.time.ZonedDateTime;
 @Getter
 public class MemoResponse {
 
-    private Long id;
     private String content;
     private String color;
-    private ZonedDateTime updatedAt;
 
     public static MemoResponse of(Memo memo) {
         return new MemoResponse(
-                memo.getId(),
                 memo.getContent(),
-                memo.getColor(),
-                memo.getUpdatedAt()
+                memo.getColor()
         );
     }
-
 }

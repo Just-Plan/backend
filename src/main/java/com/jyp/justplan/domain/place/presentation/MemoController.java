@@ -21,13 +21,6 @@ public class MemoController {
 
     private final MemoService memoService;
 
-    /*CREATE*/
-//    @PostMapping
-//    public ApiResponseDto<MemoResponse> createMemo(@RequestBody MemoRequest memoRequest) {
-//        MemoResponse response = memoService.createMemo(memoRequest);
-//        return ApiResponseDto.successResponse(response);
-//    }
-
     /*READ*/
     @Operation(summary = "메모 조회", description = "장소에 해당하는 메모를 조회합니다.")
     @ApiResponses(value = {

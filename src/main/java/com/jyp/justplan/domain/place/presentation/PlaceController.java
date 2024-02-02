@@ -6,6 +6,7 @@ import com.jyp.justplan.domain.place.dto.request.PlaceListRequest;
 import com.jyp.justplan.domain.place.dto.request.PlaceRequest;
 import com.jyp.justplan.domain.place.dto.request.PlaceUpdatesWrapper;
 import com.jyp.justplan.domain.place.dto.response.PlaceResponse;
+import com.jyp.justplan.domain.user.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Place", description = "장소 API")
@@ -35,28 +37,26 @@ public class PlaceController {
     @PostMapping("/place/planId/{planId}")
     public ApiResponseDto<?> createPlace(
         @Parameter(description = "플랜 아이디", example = "1", required = true) @PathVariable Long planId,
-        @RequestBody PlaceListRequest placeRequest
+        @RequestBody PlaceListRequest placeRequest,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        placeService.createPlace(placeRequest, planId);
+        placeService.createPlace(placeRequest, planId, userDetails.getUserId());
         return ApiResponseDto.successWithoutDataResponse();
     }
 
-
-
-
-
-
-    /*READ*/
-    @Operation(summary = "단일 장소 조회", description = "단일 장소를 조회합니다.")
+    // 일정에 대한 장소 전체 조회
+    @Operation(summary = "전체 장소 조회", description = "일정에 대한 전체 장소를 조회합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공",
-                    content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
+        @ApiResponse(responseCode = "200", description = "성공",
+            content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
     })
-    @GetMapping("/place/{id}")
-    public ApiResponseDto<PlaceResponse> getPlace(@PathVariable Long id) {
-        PlaceResponse response = placeService.findPlaceById(id);
-        return ApiResponseDto.successResponse(response);
+    @GetMapping("/place/planId/{planId}")
+    public ApiResponseDto<?> getPlacesByPlanId(
+        @PathVariable Long planId
+    ) {
+        return ApiResponseDto.successResponse(placeService.findPlacesByPlanId(planId));
     }
+
 
     /*UPDATE*/
     @Operation(summary = "장소 업데이트", description = "장소를 업데이트합니다.")
