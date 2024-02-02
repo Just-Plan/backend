@@ -11,14 +11,19 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Place", description = "장소 API")
 @RestController
@@ -76,18 +81,20 @@ public class PlaceController {
                 examples = {
                     @ExampleObject(
                         name = "Update Place Example",
-                        value = """
-    {
-      "dayUpdates": {
-        "1": [
-          { "placeId": 1, "orderNum": 1, "memo": { "content": "Updated content", "color": "RED" } },
-          { "placeId": 2, "orderNum": 2, "memo": { "content": "Another updated content", "color": "BLUE" } }
-        ],
-        "2": [
-          { "placeId": 3, "orderNum": 1, "memo": { "content": "Content for another day", "color": "GREEN" } }
-        ]
-      }
-    }
+                        value =
+    """
+        {
+          "dayUpdates": {
+            "1": [
+              { "placeId": 1, "orderNum": 1, "memo": { "content": "Updated content", "color": "WHITE" } },
+              { "placeId": 2, "orderNum": 2, "memo": { "content": "Another updated content", "color": "WHITE" } }
+            ],
+            "2": [
+              { "placeId": 3, "orderNum": 1, "memo": { "content": "Content for another day", "color": "WHITE" } }
+            ]
+          },
+          "placeDeleteIds": [4,5]
+        }
     """
                     )
                 }
@@ -96,12 +103,12 @@ public class PlaceController {
         @org.springframework.web.bind.annotation.RequestBody PlacePlanUpdateDto placePlanUpdateDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        log.info(placePlanUpdateDto.toString());
         placeService.updatePlaces(placePlanUpdateDto, userDetails.getUserId(), planId);
         return ApiResponseDto.successWithoutDataResponse();
     }
 
     // 장소 상세 조회
+
 
 }
 

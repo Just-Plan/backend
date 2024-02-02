@@ -34,24 +34,4 @@ public class GooglePlace extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CITY_ID", nullable = false)
     private City city;
-
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//        if (!super.equals(o)) return false;
-//
-//        GooglePlace that = (GooglePlace) o;
-//
-//        // id와 위도, 경도를 비교하여 동등성 판단
-//        return Objects.equals(id, that.id)
-//            && Math.abs(this.latitude - that.latitude) < THRESHOLD
-//            && Math.abs(this.longitude - that.longitude) < THRESHOLD;
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        // id와 위도, 경도를 기반으로 해시코드 생성
-//        return Objects.hash(super.hashCode(), id, latitude, longitude);
-//    }
 }
