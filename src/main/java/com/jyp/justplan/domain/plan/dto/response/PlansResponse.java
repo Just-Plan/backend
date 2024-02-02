@@ -8,10 +8,10 @@ import java.util.List;
 
 @Getter
 @AllArgsConstructor
-public class PlansResponse {
+public class PlansResponse<T> {
     private long totalElements;
     private int totalPages;
     private int currentPage;
     private int size;
-    private List<PlanResponse> plans;
+    private List<T> plans;
 }

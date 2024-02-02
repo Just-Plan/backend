@@ -137,6 +137,24 @@ public class PlanService {
         return getPlansResponse(plans);
     }
 
+    /* 나의 플랜 조회 (가계부 포함) */
+    public List<PlanWithAccountBookResponse> getMyPlansWithAccount(String email) {
+        User user = userService.findByEmail(email);
+
+        List<Plan> plans = userPlanService.findPlansByUser(user);
+
+        List<PlanWithAccountBookResponse> planResponses =
+                plans.stream()
+                .map(plan -> {
+                    BudgetResponse budgetResponse = budgetService.getBudget(plan);
+                    ExpenseResponse expenseResponse = expenseService.getExpense(plan);
+                    return PlanWithAccountBookResponse.toDto(plan, budgetResponse, expenseResponse);
+                })
+                .collect(Collectors.toList());
+
+        return planResponses;
+    }
+
     /* 나의 스크랩 플랜 조회 */
     public PlansResponse getMyScrapPlans(int page, int size, String sort, String userEmail) {
         User user = userService.findByEmail(userEmail);

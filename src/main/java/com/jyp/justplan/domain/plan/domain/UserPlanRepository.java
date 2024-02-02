@@ -17,6 +17,9 @@ public interface UserPlanRepository extends JpaRepository<UserPlan, Long> {
     List<UserPlan> findByUser(User user);
     List<UserPlan> findByPlan(Plan plan);
 
+    @Query("select up.plan from UserPlan up where up.user = ?1 order by up.plan.createdAt desc")
+    List<Plan> findPlanByUser(User user);
+
     Optional<UserPlan> findByPlanAndOwnerTrue(Plan plan);
 
     @Query("select up.plan from UserPlan up where up.user = ?1 order by up.createdAt desc")
@@ -34,20 +37,6 @@ public interface UserPlanRepository extends JpaRepository<UserPlan, Long> {
             "order by up.plan.createdAt desc")
     Page<Plan> findAllByUserMbtiAndRegion(Pageable pageable, String mbti, City region);
 
-
-//    @Query("select distinct up.plan, up.user.mbti.mbti, up.plan.createdAt " +
-//            "from UserPlan up " +
-//            "where up.user.mbti.mbti = ?1 " +
-//            "and up.plan.published = true and up.plan.deleted = false")
-//    Page<Plan> findAllByUserMbti (Pageable pageable, String mbti);
-//
-//
-//    @Query("select distinct up.plan, up.plan.createdAt " +
-//            "from UserPlan up " +
-//            "where up.user.mbti.mbti = ?1 and up.plan.region = ?2 " +
-//            "and up.plan.published = true and up.plan.deleted = false")
-//    Page<Plan> findAllByUserMbtiAndRegion (Pageable pageable, String mbti, City region);
-
     boolean existsByUserAndPlan(User user, Plan plan);
 
     void deleteByPlan(Plan plan);
@@ -55,9 +44,6 @@ public interface UserPlanRepository extends JpaRepository<UserPlan, Long> {
 
     default List<UserPlan> getByUser(User user) {
         List<UserPlan> userPlans = findByUser(user);
-        if (userPlans.isEmpty()) {
-            throw new NoSuchUserPlanException("해당 유저의 플랜이 존재하지 않습니다.");
-        }
         return userPlans;
     }
 

@@ -2,7 +2,6 @@ package com.jyp.justplan.domain.plan.dto.response;
 
 import com.jyp.justplan.domain.city.dto.response.CityResponse;
 import com.jyp.justplan.domain.plan.domain.Plan;
-import com.jyp.justplan.domain.plan.domain.tag.Tag;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,41 +14,35 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PlanResponse {
+public class PlanWithAccountBookResponse {
     private long planId;
     private String title;
-    private List<UserPlanResponse> users;
-    private long scrapCount;
-    private BudgetResponse budget;
     private CityResponse region;
+    private BudgetResponse budget;
+    private boolean useExpense;
+    private ExpenseResponse expense;
     private ZonedDateTime startDate;
     private ZonedDateTime endDate;
     private long nights;
     private long days;
-    private boolean published;
-    private List<String> tags;
 
-    public static PlanResponse toDto(
+    public static PlanWithAccountBookResponse toDto(
             Plan plan,
-            List<UserPlanResponse> users,
-            long scrapCount,
             BudgetResponse budget,
-            List<String> tags
+            ExpenseResponse expense
     ) {
         Duration duration = Duration.between(plan.getStartDate(), plan.getEndDate());
-        return new PlanResponse(
+        return new PlanWithAccountBookResponse(
                 plan.getId(),
                 plan.getTitle(),
-                users,
-                scrapCount,
-                budget,
                 new CityResponse(plan.getRegion()),
+                budget,
+                plan.isUseExpense(),
+                expense,
                 plan.getStartDate(),
                 plan.getEndDate(),
                 duration.toDays(),
-                duration.toDays() + 1,
-                plan.isPublished(),
-                tags
+                duration.toDays() + 1
         );
     }
 }

@@ -58,6 +58,11 @@ public class UserPlanService {
                 .collect(Collectors.toList());
     }
 
+    public List<Plan> findPlansByUser(User user) {
+        List<Plan> userPlans = userPlanRepository.findPlanByUser(user);
+        return userPlans;
+    }
+
     public Page<Plan> findPlansByUser(int page, int size, String sort, User user) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort).descending());
 

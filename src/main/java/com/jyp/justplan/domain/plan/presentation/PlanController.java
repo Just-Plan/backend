@@ -7,7 +7,7 @@ import com.jyp.justplan.domain.plan.dto.request.PlanCreateRequest;
 import com.jyp.justplan.domain.plan.dto.request.PlanScrapRequest;
 import com.jyp.justplan.domain.plan.dto.request.PlanUpdateRequest;
 import com.jyp.justplan.domain.plan.dto.response.PlanDetailResponse;
-import com.jyp.justplan.domain.plan.dto.response.PlanResponse;
+import com.jyp.justplan.domain.plan.dto.response.PlanWithAccountBookResponse;
 import com.jyp.justplan.domain.plan.dto.response.PlansResponse;
 import com.jyp.justplan.domain.user.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,7 +22,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.awt.print.Pageable;
 import java.util.List;
 
 @Tag(name = "Plan", description = "일정 API")
@@ -79,6 +78,20 @@ public class PlanController {
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         PlansResponse response = planService.getMyPlans(page, size, sort, userDetails.getUsername());
+        return ApiResponseDto.successResponse(response);
+    }
+
+    /* 나의 플랜 (가계부) 조회 */
+    @Operation(summary = "나의 가계부 조회", description = "나의 가계부를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
+    })
+    @GetMapping("/my/account-book")
+    public ApiResponseDto<List<PlanWithAccountBookResponse>> getMyAccountBook (
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        List<PlanWithAccountBookResponse> response = planService.getMyPlansWithAccount(userDetails.getUsername());
         return ApiResponseDto.successResponse(response);
     }
 
