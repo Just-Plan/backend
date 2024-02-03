@@ -2,12 +2,10 @@ package com.jyp.justplan.domain.place.dto.response;
 
 import com.jyp.justplan.domain.place.domain.GoogleMapType;
 import com.jyp.justplan.domain.place.domain.GooglePlace;
-import java.util.Objects;
+import com.jyp.justplan.domain.place.dto.response.GooglePlacesSearchApiResponse.GooglePlaceApiResultResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import java.util.Collections;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
 @AllArgsConstructor

@@ -4,7 +4,6 @@ import com.jyp.justplan.domain.place.domain.Memo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import java.time.ZonedDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
