@@ -62,7 +62,6 @@ public class PlaceDetailResponse {
         @NoArgsConstructor
         @AllArgsConstructor
         public static class Period {
-
             private DayTime open;
             private DayTime close;
         }
@@ -71,7 +70,6 @@ public class PlaceDetailResponse {
         @NoArgsConstructor
         @AllArgsConstructor
         public static class DayTime {
-
             private Integer day;
             private String time;
         }

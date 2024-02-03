@@ -11,4 +11,15 @@ import lombok.NoArgsConstructor;
 public class GooglePlacesSearchResponse {
     private List<GooglePlaceSearchResult> results;
     private String status;
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class GooglePlaceSearchResult {
+        private String place_id;
+
+        public String getPlaceId() {
+            return place_id;
+        }
+    }
 }
