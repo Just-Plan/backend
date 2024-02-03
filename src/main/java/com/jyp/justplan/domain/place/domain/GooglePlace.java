@@ -2,14 +2,20 @@ package com.jyp.justplan.domain.place.domain;
 
 import com.jyp.justplan.domain.BaseEntity;
 import com.jyp.justplan.domain.city.domain.City;
-import java.util.Objects;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
-import javax.persistence.*;
 
 @Builder(toBuilder = true)
 @Getter

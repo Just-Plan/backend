@@ -2,12 +2,13 @@ package com.jyp.justplan.domain.place.application;
 
 import com.jyp.justplan.domain.city.domain.City;
 import com.jyp.justplan.domain.city.domain.CityRepository;
+import com.jyp.justplan.domain.place.GooglePlacesProperties;
 import com.jyp.justplan.domain.place.domain.GooglePlace;
 import com.jyp.justplan.domain.place.domain.GooglePlaceRepository;
-import com.jyp.justplan.domain.place.GooglePlacesProperties;
 import com.jyp.justplan.domain.place.dto.response.GooglePlaceResponse;
 import com.jyp.justplan.domain.place.dto.response.GooglePlacesSearchApiResponse;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
-import java.util.List;
 import reactor.core.publisher.Mono;
 
 @Service
