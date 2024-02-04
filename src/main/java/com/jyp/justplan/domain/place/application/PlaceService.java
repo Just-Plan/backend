@@ -1,6 +1,7 @@
 package com.jyp.justplan.domain.place.application;
 
 import com.jyp.justplan.domain.city.domain.City;
+import com.jyp.justplan.domain.mbti.domain.MbtiType;
 import com.jyp.justplan.domain.place.GooglePlacesProperties;
 import com.jyp.justplan.domain.place.domain.GoogleMapType;
 import com.jyp.justplan.domain.place.domain.GooglePlace;
@@ -28,6 +29,7 @@ import com.jyp.justplan.domain.plan.exception.NoSuchUserPlanException;
 import com.jyp.justplan.domain.user.domain.User;
 import com.jyp.justplan.domain.user.domain.UserRepository;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -92,12 +94,8 @@ public class PlaceService {
         planRepository.findById(planId).orElseThrow(() -> new NoSuchPlanException("존재하지 않는 planId 입니다: " + planId));
 
         List<Place> places = placeRepository.findByPlanId(planId);
-
-        // day와 orderNum 기준으로 Place 객체 정렬
         List<Place> sortedPlaces = places.stream()
             .sorted(Comparator.comparingInt(Place::getDay).thenComparingInt(Place::getOrderNum)).toList();
-
-        // Place들을 day 기준으로 그룹화하고 PlaceResponse 객체로 변환
         Map<Integer, List<PlaceResponse>> groupedByDay = sortedPlaces.stream().collect(Collectors.groupingBy(Place::getDay,
             LinkedHashMap::new, Collectors.mapping(PlaceResponse::of, Collectors.toList())));
         return SchedulePlacesResponse.of(groupedByDay);
@@ -132,24 +130,21 @@ public class PlaceService {
     }
 
     // 장소 상세 조회 플로우
-    public PlaceDetailResponse getPlaceDetail(String name, String latitude, String longitude, String googlePlaceId) {
-        if (googlePlaceId == null) {
-            googlePlaceId = findPlaceIdByNameAndLocation(name, latitude, longitude).block();
-        }
-        var placeDetailResponse = findPlaceDetailsByGoogleId(googlePlaceId).block();
-        placeDetailResponse.getResult().setTranslatedTypes();
-
-        GooglePlace findGooglePlace = googlePlaceRepository.findByName(placeDetailResponse.getResult().getName()).orElse(null);
-
-        if (findGooglePlace == null) {
-            return placeDetailResponse;
-        }
-
-        // todo mbti 통계하고 댓글 가져와서 저장하기
-
-        return placeDetailResponse;
+    public Mono<PlaceDetailResponse> getPlaceDetail(String name, String latitude, String longitude, String googlePlaceId) {
+        return Mono.justOrEmpty(googlePlaceId)
+            .switchIfEmpty(findPlaceIdByNameAndLocation(name, latitude, longitude))
+            .flatMap(this::findPlaceDetailsByGoogleId)
+            .flatMap(placeDetailResponse -> {
+                placeDetailResponse.getResult().setTranslatedTypes();
+                Optional<GooglePlace> optionalGooglePlace = googlePlaceRepository.findByName(placeDetailResponse.getResult().getName());
+                if (optionalGooglePlace.isPresent()) {
+                    // TODO: 추가 작업을 수행하고, placeDetailResponse를 수정하거나 업데이트합니다.
+                    placeDetailResponse.getResult().setMbti(new ArrayList<>(
+                        Arrays.asList(MbtiType.enfp, MbtiType.enfj, MbtiType.entp, MbtiType.entj, MbtiType.infj)));
+                }
+                 return Mono.just(placeDetailResponse);
+            });
     }
-
 
     // 이름, 위도, 경도로 placeId 찾기
     public Mono<String> findPlaceIdByNameAndLocation(String name, String latitude, String longitude) {
@@ -172,7 +167,7 @@ public class PlaceService {
                 if (response.getStatus().equals("OK") && !response.getResults().isEmpty()) {
                     return response.getResults().get(0).getPlaceId();
                 } else {
-                    throw new NoSuchGooglePlaceException("No Google Place found with the provided name and location.");
+                    throw new NoSuchGooglePlaceException("구글 아이디를 찾을 수 업습니다:" + name +" "+ latitude +" "+longitude);
                 }
             });
     }

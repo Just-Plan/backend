@@ -2,6 +2,7 @@ package com.jyp.justplan.domain.place.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jyp.justplan.domain.mbti.domain.Mbti;
+import com.jyp.justplan.domain.mbti.domain.MbtiType;
 import com.jyp.justplan.domain.place.domain.GoogleMapType;
 import com.jyp.justplan.domain.place.domain.PlaceComment;
 import java.util.List;
@@ -37,13 +38,17 @@ public class PlaceDetailResponse {
         @JsonProperty("opening_hours")
         private OpeningHours openingHours;
 
-        private List<Mbti> mbti;
+        private List<MbtiType> mbti;
         private List<PlaceComment> comment;
 
         // 타입 변환을 위한 setter
         public void setTranslatedTypes() {
             this.types = types.stream().findFirst()
                 .map(GoogleMapType::translateToKorean).stream().toList();
+        }
+
+        public void setMbti(List<MbtiType> mbti) {
+            this.mbti = mbti;
         }
 
         @Getter
