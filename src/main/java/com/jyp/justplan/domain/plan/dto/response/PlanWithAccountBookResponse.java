@@ -27,18 +27,16 @@ public class PlanWithAccountBookResponse {
     private long days;
 
     public static PlanWithAccountBookResponse toDto(
-            Plan plan,
-            BudgetResponse budget,
-            ExpenseResponse expense
+            Plan plan
     ) {
         Duration duration = Duration.between(plan.getStartDate(), plan.getEndDate());
         return new PlanWithAccountBookResponse(
                 plan.getId(),
                 plan.getTitle(),
                 new CityResponse(plan.getRegion()),
-                budget,
+                BudgetResponse.toDto(plan.getBudget()),
                 plan.isUseExpense(),
-                expense,
+                ExpenseResponse.toDto(plan.getExpense()),
                 plan.getStartDate(),
                 plan.getEndDate(),
                 duration.toDays(),

@@ -54,20 +54,14 @@ public class PlanService {
 
         CityResponse cityResponse = new CityResponse(plan.getRegion());
 
-        // 일정에 해당하는 예산 조회
-        BudgetResponse budgetResponse = budgetService.getBudget(plan);
-
-        // 일정에 해당하는 지출 조회
-        ExpenseResponse expenseResponse = expenseService.getExpense(plan);
-
         if (plan.getOriginPlan() != null) {
             Plan originPlan = plan.getOriginPlan();
             List<UserPlanResponse> originUsers = getUserPlanResponses(findUsersByPlan(originPlan));
 
             OriginPlanResponse originPlanResponse = OriginPlanResponse.toDto(originPlan, originUsers);
-            return PlanDetailResponse.toDto(plan, users, scrapCount, tagNames, cityResponse, originPlanResponse, budgetResponse, expenseResponse);
+            return PlanDetailResponse.toDto(plan, users, scrapCount, tagNames, cityResponse, originPlanResponse);
         } else {
-            return PlanDetailResponse.toDto(plan, users, scrapCount, tagNames, cityResponse, budgetResponse, expenseResponse);
+            return PlanDetailResponse.toDto(plan, users, scrapCount, tagNames, cityResponse);
         }
     }
 
@@ -78,9 +72,8 @@ public class PlanService {
                 .map(UserPlanResponse::toDto)
                 .collect(Collectors.toList());
         long scrapCount = scrapStore.getScrapCount(plan);
-        BudgetResponse budgetResponse = budgetService.getBudget(plan);
 
-        return PlanResponse.toDto(plan, users, scrapCount, budgetResponse, tagNames);
+        return PlanResponse.toDto(plan, users, scrapCount, tagNames);
     }
 
     private PlansResponse getPlansResponse(Page<Plan> plans) {
@@ -153,9 +146,7 @@ public class PlanService {
         List<PlanWithAccountBookResponse> planResponses =
                 plans.stream()
                 .map(plan -> {
-                    BudgetResponse budgetResponse = budgetService.getBudget(plan);
-                    ExpenseResponse expenseResponse = expenseService.getExpense(plan);
-                    return PlanWithAccountBookResponse.toDto(plan, budgetResponse, expenseResponse);
+                    return PlanWithAccountBookResponse.toDto(plan);
                 })
                 .collect(Collectors.toList());
 
@@ -246,8 +237,8 @@ public class PlanService {
         plan.updateUseExpense(request.isUseExpense());
 
         // 예산 및 지출 수정
-        budgetService.updateBudget(plan, request.getBudget());
-        expenseService.updateExpense(plan, request.getExpense());
+        budgetService.updateBudget(plan.getBudget(), request.getBudget());
+        expenseService.updateExpense(plan.getExpense(), request.getExpense());
 
         return getPlanDetailResponse(plan);
     }

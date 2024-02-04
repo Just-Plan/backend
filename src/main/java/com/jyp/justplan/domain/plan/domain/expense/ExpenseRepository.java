@@ -9,10 +9,4 @@ import java.util.Optional;
 
 @Repository
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
-    boolean existsByPlan(Plan plan);
-    Optional<Expense> findByPlan(Plan plan);
-    default Expense getByPlan(final Plan plan) {
-        return findByPlan(plan)
-                .orElseThrow(() -> new NoSuchExpenseException("존재하지 않는 지출입니다."));
-    }
 }

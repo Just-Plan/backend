@@ -2,6 +2,8 @@ package com.jyp.justplan.domain.plan.domain;
 
 import com.jyp.justplan.domain.BaseEntity;
 import com.jyp.justplan.domain.city.domain.City;
+import com.jyp.justplan.domain.plan.domain.budget.Budget;
+import com.jyp.justplan.domain.plan.domain.expense.Expense;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,6 +39,17 @@ public class Plan extends BaseEntity {
     @Column(name = "end_date")
     private ZonedDateTime endDate;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "budget_id")
+    private Budget budget;
+
+    @Column(name = "use_expense")
+    private boolean useExpense = false;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "expense_id")
+    private Expense expense;
+
     private boolean published = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -44,9 +57,6 @@ public class Plan extends BaseEntity {
     private Plan originPlan;
 
     private boolean deleted = false;
-
-    @Column(name = "use_expense")
-    private boolean useExpense = false;
 
     public Plan(String title, ZonedDateTime startDate, ZonedDateTime endDate) {
         this.title = title;
@@ -74,6 +84,14 @@ public class Plan extends BaseEntity {
     }
     public void updateUseExpense (boolean use_expense) {
         this.useExpense = use_expense;
+    }
+
+    public void setBudget (Budget budget) {
+        this.budget = budget;
+    }
+
+    public void setExpense (Expense expense) {
+        this.expense = expense;
     }
 
     public void setOriginPlan (Plan origin_plan) {
