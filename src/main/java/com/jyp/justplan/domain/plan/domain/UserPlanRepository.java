@@ -17,25 +17,7 @@ public interface UserPlanRepository extends JpaRepository<UserPlan, Long> {
     List<UserPlan> findByUser(User user);
     List<UserPlan> findByPlan(Plan plan);
 
-    @Query("select up.plan from UserPlan up where up.user = ?1 order by up.plan.createdAt desc")
-    List<Plan> findPlanByUser(User user);
-
     Optional<UserPlan> findByPlanAndOwnerTrue(Plan plan);
-
-    @Query("select up.plan from UserPlan up where up.user = ?1 order by up.createdAt desc")
-    Page<Plan> findAllByUserOrderByCreatedAt (Pageable pageable, User user);
-
-    @Query("select up.plan from UserPlan up " +
-            "where up.plan.published = true and up.plan.deleted = false " +
-            "and up.user.mbti.mbti = ?1 " +
-            "order by up.plan.createdAt desc")
-    Page<Plan> findAllByUserMbti(Pageable pageable, String mbti);
-
-    @Query("select up.plan from UserPlan up " +
-            "where up.plan.published = true and up.plan.deleted = false " +
-            "and up.user.mbti.mbti = ?1 and up.plan.region = ?2 " +
-            "order by up.plan.createdAt desc")
-    Page<Plan> findAllByUserMbtiAndRegion(Pageable pageable, String mbti, City region);
 
     boolean existsByUserAndPlan(User user, Plan plan);
 

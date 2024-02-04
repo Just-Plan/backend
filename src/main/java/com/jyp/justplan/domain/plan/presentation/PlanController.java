@@ -43,7 +43,7 @@ public class PlanController {
             @RequestParam(required = false, defaultValue = "0") long regionId,
             @RequestParam(required = false, defaultValue = "0") int page,
             @RequestParam(required = false, defaultValue = "10") int size,
-            @RequestParam(required = false, defaultValue = "createdAt") String sort
+            @RequestParam(required = false, defaultValue = "scrapCnt") String sort
     ) {
         PlansResponse response = planService.getPlans(type, regionId, page, size, sort);
         return ApiResponseDto.successResponse(response);
