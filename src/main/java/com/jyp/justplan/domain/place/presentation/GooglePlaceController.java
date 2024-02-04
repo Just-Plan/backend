@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Tag(name = "Place", description = "장소 API")
 @RestController
@@ -33,11 +35,14 @@ public class GooglePlaceController {
                     content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
     })
     @GetMapping("/search/place/cityId/{cityId}")
-    public ApiResponseDto<List<GooglePlaceResponse>> getGooglePlaces(
+    public Mono<ApiResponseDto<List<GooglePlaceResponse>>> getGooglePlaces(
         @Parameter(description = "도시 아이디", example = "1", required = true) @PathVariable Long cityId,
         @Parameter(description = "장소 키워드", example = "카페", required = true) @RequestParam String query
     ) {
-        List<GooglePlaceResponse> response = placeService.getGooglePlace(query, cityId);
-        return ApiResponseDto.successResponse(response);
+//        Flux<GooglePlaceResponse> response = placeService.getGooglePlace(query, cityId);
+//        return Mono.just(ApiResponseDto.successResponse(response));
+        return placeService.getGooglePlace(query, cityId)
+            .collectList()
+            .map(ApiResponseDto::successResponse);
     }
 }
