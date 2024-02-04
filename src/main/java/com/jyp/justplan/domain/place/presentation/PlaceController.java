@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 @Tag(name = "Place", description = "장소 API")
 @RestController
@@ -112,13 +113,13 @@ public class PlaceController {
     // 장소 상세 조회
     @Operation(summary = "장소 상세 조회", description = "장소에 대한 상셍 정보를 조회합니다. 구글 장소 아이디 or 이름, 위도, 경도로 조회")
     @GetMapping("/place/detail")
-    public ApiResponseDto<?> getPlace(
+    public Mono<ApiResponseDto<PlaceDetailResponse>> getPlace(
         @Parameter(description = "장소 이름", example = "카페 델문도함덕점") @RequestParam(required = false) String name,
         @Parameter(description = "장소 위도", example = "33.5437787") @RequestParam(required = false) String latitude,
         @Parameter(description = "장소 경도", example = "126.6688353") @RequestParam(required = false) String longitude,
         @Parameter(description = "구글 장소 아이디", example = "ChIJf721YZkeDTURpGO42wZUb-E") @RequestParam(required = false) String googlePlaceId
     ) {
-        PlaceDetailResponse placeDetail = placeService.getPlaceDetail(name, latitude, longitude, googlePlaceId);
-        return ApiResponseDto.successResponse(placeDetail);
+        return placeService.getPlaceDetail(name, latitude, longitude, googlePlaceId)
+            .map(ApiResponseDto::successResponse);
     }
 }
