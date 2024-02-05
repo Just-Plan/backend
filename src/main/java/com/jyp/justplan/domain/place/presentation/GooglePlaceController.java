@@ -39,8 +39,6 @@ public class GooglePlaceController {
         @Parameter(description = "도시 아이디", example = "1", required = true) @PathVariable Long cityId,
         @Parameter(description = "장소 키워드", example = "카페", required = true) @RequestParam String query
     ) {
-//        Flux<GooglePlaceResponse> response = placeService.getGooglePlace(query, cityId);
-//        return Mono.just(ApiResponseDto.successResponse(response));
         return placeService.getGooglePlace(query, cityId)
             .collectList()
             .map(ApiResponseDto::successResponse);
