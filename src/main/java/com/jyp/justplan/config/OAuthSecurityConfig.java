@@ -43,9 +43,6 @@ public class OAuthSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().configurationSource(corsConfigurationSource()).and() // CORS 설정 추가
             .csrf().disable()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
                 .authorizeRequests()
                 // 인증
                 //.antMatchers("/user/info").authenticated()

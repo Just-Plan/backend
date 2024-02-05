@@ -34,7 +34,7 @@ public class EmailAuthService {
 
     /* 인증을 위한 이메일 발송 */
     public EmailAuthCreateResponse saveEmailAuth(String email) throws EmailAuthException {
-        if (userRepository.findByEmail(email).isPresent()) {
+        if (userRepository.findByEmailAndDeletedAtIsNull(email).isPresent()) {
             throw new EmailAuthException();
         }
 
