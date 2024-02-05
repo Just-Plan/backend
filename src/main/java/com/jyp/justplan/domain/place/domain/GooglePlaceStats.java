@@ -1,6 +1,6 @@
-package com.jyp.justplan.domain.mbti.domain;
+package com.jyp.justplan.domain.place.domain;
 
-import com.jyp.justplan.domain.place.domain.GooglePlace;
+import com.jyp.justplan.domain.mbti.domain.Mbti;
 import java.time.ZonedDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,26 +10,25 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Table(name = "google_place_stats")
 @Entity
 @NoArgsConstructor
 @Getter
+@SQLDelete(sql = "UPDATE GooglePlaceStats SET deleted_at = NOW() WHERE google_place_stats_id = ?")
+@Where(clause = "deleted_at is null")
 public class GooglePlaceStats {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "google_place_stats_id")
     private Long id;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "google_place_id")
-    private GooglePlace googlePlace;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mbti_id")
@@ -47,6 +46,6 @@ public class GooglePlaceStats {
         this.updatedAt = ZonedDateTime.now();
     }
 
-
-
+    @Column(name = "deleted_at")
+    private ZonedDateTime deletedAt;
 }
