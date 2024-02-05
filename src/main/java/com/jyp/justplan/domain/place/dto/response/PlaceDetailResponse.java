@@ -1,7 +1,6 @@
 package com.jyp.justplan.domain.place.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.jyp.justplan.domain.mbti.domain.Mbti;
 import com.jyp.justplan.domain.mbti.domain.MbtiType;
 import com.jyp.justplan.domain.place.domain.GoogleMapType;
 import com.jyp.justplan.domain.place.domain.PlaceComment;
@@ -9,6 +8,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Getter
@@ -38,6 +38,10 @@ public class PlaceDetailResponse {
         @JsonProperty("opening_hours")
         private OpeningHours openingHours;
 
+        @Setter
+        private List<Photo> photos;
+
+        @Setter
         private List<MbtiType> mbti;
         private List<PlaceComment> comment;
 
@@ -45,10 +49,6 @@ public class PlaceDetailResponse {
         public void setTranslatedTypes() {
             this.types = types.stream().findFirst()
                 .map(GoogleMapType::translateToKorean).stream().toList();
-        }
-
-        public void setMbti(List<MbtiType> mbti) {
-            this.mbti = mbti;
         }
 
         @Getter
@@ -77,6 +77,18 @@ public class PlaceDetailResponse {
         public static class DayTime {
             private Integer day;
             private String time;
+        }
+
+        @Getter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class Photo {
+            private int height;
+            private int width;
+            @JsonProperty("photo_reference")
+            private String photoReference;
+            @JsonProperty("html_attributions")
+            private List<String> htmlAttributions;
         }
     }
 }
