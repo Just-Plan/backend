@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @Slf4j
 @Tag(name = "kakao", description = "카카오로그인 관련 API Controller")
@@ -40,13 +41,13 @@ public class KakaoController {
     private String iLogoutRedirectUri;
 
     @Tag(name = "kakao", description = "카카오 로그인 관련 API Controller")
-    @Operation(summary = "카카오 로그인", description = "카카오 로그인을 수행한다.")
+    @Operation(summary = "카카오 로그인 redirect", description = "카카오 로그인 후 메인화면 redirect 호출.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공",
                     content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
     })
     @GetMapping("/kakao/home")
-    public ApiResponseDto<UserResponse> signin(Authentication auth) {
+    public ApiResponseDto<UserResponse> home(Authentication auth) {
         String authUser = auth.getName();
         User userInfo = userRepository.findByEmail(authUser).get();
 
@@ -60,7 +61,19 @@ public class KakaoController {
     }
 
     @Tag(name = "kakao", description = "카카오 로그인 관련 API Controller")
-    @Operation(summary = "카카오 로그아웃", description = "카카오 로그아웃을 수행한다.")
+    @Operation(summary = "카카오 로그인", description = "카카오 로그인을 수행한다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
+    })
+    @GetMapping("/kakao/login")
+    public void signin(HttpServletResponse response) throws IOException {
+        String url = "/oauth2/authorization/kakao";
+        response.sendRedirect(url);
+    }
+
+    @Tag(name = "kakao", description = "카카오 로그인 관련 API Controller")
+    @Operation(summary = "카카오 로그아웃 redirect", description = "카카오 로그아웃 후 redirect 수행한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공",
                     content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
@@ -72,28 +85,16 @@ public class KakaoController {
 
     // redirect
     @Tag(name = "kakao", description = "카카오 로그인 관련 API Controller")
-    @Operation(summary = "카카오 로그인 Redirect", description = "카카오 로그인 Redirect를 수행한다.")
+    @Operation(summary = "카카오 로그아웃", description = "카카오 로그아웃을 수행한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공",
                     content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
     })
-    @GetMapping("/kakao/{sendUrl}")
-    public void getKakaoAuthUrl(HttpServletResponse response, @PathVariable String sendUrl) throws Exception {
+    @GetMapping("/kakao/unlink")
+    public void getKakaoAuthUrl(HttpServletResponse response) throws Exception {
 
-            String url = "";
-
-            switch(sendUrl) {
-                // 카카오 로그아웃 API
-                case "unlink":
-                    url = "https://kauth.kakao.com/oauth/logout"
+            String url = "https://kauth.kakao.com/oauth/logout"
                             +"?client_id="+iClientId+"&logout_redirect_uri="+iLogoutRedirectUri;
-                    break;
-
-                // 로그인화면 호출
-                case "login":
-                    url = "/oauth2/authorization/kakao";
-                    break;
-            }
 
             response.sendRedirect(url);
     }
