@@ -80,7 +80,7 @@ public class KakaoController {
     })
     @GetMapping("/security-login/login")
     public void kakaoLogout(HttpServletResponse response) throws Exception {
-        response.sendRedirect("/kakao/callLogin");
+        response.sendRedirect("/kakao/login");
     }
 
     // redirect

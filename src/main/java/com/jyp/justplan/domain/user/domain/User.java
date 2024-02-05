@@ -6,6 +6,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -18,6 +19,7 @@ import javax.validation.constraints.NotNull;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@SQLDelete(sql = "UPDATE user SET deleted_at = current_timestamp WHERE id = ?")
 public class User extends BaseEntity {
     // TODO: 데이터 유효성 검사를 위한 어노테이션 추가
     @Id
