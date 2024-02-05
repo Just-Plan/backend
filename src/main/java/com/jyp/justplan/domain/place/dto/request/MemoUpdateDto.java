@@ -1,6 +1,5 @@
 package com.jyp.justplan.domain.place.dto.request;
 
-import com.jyp.justplan.domain.place.domain.Memo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,11 +11,4 @@ public class MemoUpdateDto {
 
     private String content;
     private String color;
-
-    public Memo toEntity() {
-        return Memo.builder()
-                .content(content)
-                .color(color)
-                .build();
-    }
 }

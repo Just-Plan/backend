@@ -6,14 +6,16 @@ import com.jyp.justplan.domain.place.GooglePlacesProperties;
 import com.jyp.justplan.domain.place.domain.GoogleMapType;
 import com.jyp.justplan.domain.place.domain.GooglePlace;
 import com.jyp.justplan.domain.place.domain.GooglePlaceRepository;
+import com.jyp.justplan.domain.place.domain.GooglePlaceStats;
+import com.jyp.justplan.domain.place.domain.GooglePlaceStatsRepository;
 import com.jyp.justplan.domain.place.domain.Memo;
 import com.jyp.justplan.domain.place.domain.MemoRepository;
 import com.jyp.justplan.domain.place.domain.Place;
 import com.jyp.justplan.domain.place.domain.PlaceRepository;
 import com.jyp.justplan.domain.place.dto.request.MemoUpdateDto;
 import com.jyp.justplan.domain.place.dto.request.PlaceListRequest;
+import com.jyp.justplan.domain.place.dto.request.PlaceListRequest.PlaceRequest;
 import com.jyp.justplan.domain.place.dto.request.PlacePlanUpdateDto;
-import com.jyp.justplan.domain.place.dto.request.PlaceRequest;
 import com.jyp.justplan.domain.place.dto.request.PlaceUpdateRequest;
 import com.jyp.justplan.domain.place.dto.response.GooglePlacesSearchResponse;
 import com.jyp.justplan.domain.place.dto.response.PlaceDetailResponse;
@@ -30,7 +32,6 @@ import com.jyp.justplan.domain.plan.exception.NoSuchUserPlanException;
 import com.jyp.justplan.domain.user.domain.User;
 import com.jyp.justplan.domain.user.domain.UserRepository;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -58,11 +59,13 @@ public class PlaceService {
     private final WebClient webClient;
     private final GooglePlacesProperties googlePlacesProperties;
     private final GooglePlaceService googlePlaceService;
+    private final GooglePlaceStatsRepository googlePlaceStatsRepository;
 
     @Autowired
     public PlaceService(PlaceRepository placeRepository, MemoRepository memoRepository,
         GooglePlaceRepository googlePlaceRepository, PlanRepository planRepository,
-        PlanService planService, UserRepository userRepository, WebClient.Builder webClientBuilder, GooglePlacesProperties googlePlacesProperties, GooglePlaceService googlePlaceService) {
+        PlanService planService, UserRepository userRepository, WebClient.Builder webClientBuilder, GooglePlacesProperties googlePlacesProperties,
+        GooglePlaceService googlePlaceService, GooglePlaceStatsRepository googlePlaceStatsRepository) {
         this.placeRepository = placeRepository;
         this.memoRepository = memoRepository;
         this.googlePlaceRepository = googlePlaceRepository;
@@ -72,18 +75,19 @@ public class PlaceService {
         this.webClient = webClientBuilder.baseUrl("https://maps.googleapis.com").build();
         this.googlePlacesProperties = googlePlacesProperties;
         this.googlePlaceService = googlePlaceService;
+        this.googlePlaceStatsRepository = googlePlaceStatsRepository;
     }
 
-    // 일정 생성
+    // 장소 생성
     @Transactional
     public void createPlace(PlaceListRequest placeListRequest, Long planId, Long userId) {
         Plan findPlan = getPlan(planId);
         extracted(userId, planId);
-
         for (PlaceRequest placeRequest : placeListRequest.getPlaces()) {
             // Memo 생성 로직을 각 Place에 대해 반복
             Memo savedMemo = memoRepository.save(new Memo());
-            // GooglePlace 찾기 또는 새로 생성
+
+            // GooglePlace 찾기 또는 생성
             GooglePlace googlePlace = Optional.ofNullable(placeRequest.getGooglePlaceId())
                 .flatMap(googlePlaceRepository::findById)
                 .orElseGet(() -> findOrCreateGooglePlace(placeRequest, findPlan.getRegion()));
@@ -148,7 +152,7 @@ public class PlaceService {
             .flatMap(placeDetailResponse -> {
                 Optional<GooglePlace> optionalGooglePlace = googlePlaceRepository.findByName(placeDetailResponse.getResult().getName());
                 if (optionalGooglePlace.isPresent()) {
-                    // TODO: 추가 작업을 수행하고, placeDetailResponse를 수정하거나 업데이트합니다.
+                    // TODO: 추가 작업을 수행하고, mbti와 댓글을 추가합니다.
                     placeDetailResponse.getResult().setMbti(List.of(MbtiType.enfp, MbtiType.enfj, MbtiType.entp, MbtiType.entj, MbtiType.infj));
                 }
                 return Mono.just(placeDetailResponse);
@@ -220,6 +224,7 @@ public class PlaceService {
 
     private GooglePlace createGooglePlace(PlaceRequest request, City city) {
         // GooglePlace 객체 생성 및 초기화 로직
+        GooglePlaceStats saveGooglePlaceStats = googlePlaceStatsRepository.save(new GooglePlaceStats());
         GooglePlace newGooglePlace = GooglePlace.builder()
             .name(request.getName())
             .address(request.getFormattedAddress())
@@ -228,6 +233,7 @@ public class PlaceService {
             .longitude(request.getLongitude())
             .photoReference(request.getPhotoReference())
             .city(city)
+            .googlePlaceStats(saveGooglePlaceStats)
             .build();
         return googlePlaceRepository.save(newGooglePlace);
     }

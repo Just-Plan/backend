@@ -2,6 +2,7 @@ package com.jyp.justplan.domain.place.domain;
 
 import com.jyp.justplan.domain.BaseEntity;
 import com.jyp.justplan.domain.city.domain.City;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,6 +11,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -37,7 +40,11 @@ public class GooglePlace extends BaseEntity {
     private double longitude;
     private String photoReference;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "google_place_stats_id")
+    private GooglePlaceStats googlePlaceStats;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "CITY_ID", nullable = false)
     private City city;
 }
