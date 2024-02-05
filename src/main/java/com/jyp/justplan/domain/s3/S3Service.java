@@ -3,6 +3,8 @@ package com.jyp.justplan.domain.s3;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -36,4 +39,16 @@ public class S3Service {
         amazonS3.putObject(bucket, key, contentStream, metadata);
         return amazonS3.getUrl(bucket, key).toString();
     }
+
+    public String uploadProfilePicture(String userEmail, MultipartFile file) throws IOException {
+        String key = "profiles/" + userEmail + "/profile_" + Instant.now().toEpochMilli() + ".jpg";
+
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(file.getSize());
+        metadata.setContentType(file.getContentType());
+
+        amazonS3.putObject(bucket, key, file.getInputStream(), metadata);
+        return amazonS3.getUrl(bucket, key).toString();
+    }
+
 }
