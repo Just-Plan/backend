@@ -2,7 +2,6 @@ package com.jyp.justplan.domain.plan.domain;
 
 import com.jyp.justplan.domain.BaseEntity;
 import com.jyp.justplan.domain.city.domain.City;
-import com.jyp.justplan.domain.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +9,8 @@ import org.hibernate.annotations.SQLDelete;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -22,6 +23,9 @@ public class Plan extends BaseEntity {
     private long id;
 
     private String title;
+
+    @OneToMany(mappedBy = "plan")
+    private List<UserPlan> users = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "city_id")
@@ -48,6 +52,11 @@ public class Plan extends BaseEntity {
         this.title = title;
         this.startDate = startDate;
         this.endDate = endDate;
+    }
+
+    public void addUser(UserPlan userPlan) {
+        users.add(userPlan);
+        userPlan.setPlan(this);
     }
 
     public void setRegion(City region) {

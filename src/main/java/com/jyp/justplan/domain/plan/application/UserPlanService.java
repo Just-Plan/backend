@@ -25,7 +25,9 @@ public class UserPlanService {
 
     @Transactional
     public void saveUserPlan(User user, Plan plan, boolean owner) {
-        UserPlan userPlan = new UserPlan(user, plan, owner);
+        UserPlan userPlan = new UserPlan(user, owner);
+        plan.addUser(userPlan);
+
         if (userPlanRepository.existsByUserAndPlan(user, plan)) {
             throw new UserPlanAlreadyExistsException(plan.getTitle() + " 일정에 대한 " + user.getName() + "의 정보가 이미 존재합니다.");
         }
@@ -36,40 +38,6 @@ public class UserPlanService {
                 });
 
         userPlanRepository.save(userPlan);
-    }
-
-    public User findOwnerByPlan(Plan plan) {
-        UserPlan userPlan = userPlanRepository.findByPlanAndOwnerTrue(plan)
-                .orElseThrow(() -> new UserPlanAlreadyExistsException(plan.getTitle() + " 일정에 대한 소유자의 정보가 존재하지 않습니다."));
-        return userPlan.getUser();
-    }
-
-    public List<User> findUsersByPlan(Plan plan) {
-        List<UserPlan> userPlans = userPlanRepository.getByPlan(plan);
-        return userPlans.stream()
-                .map(userPlan -> userPlan.getUser())
-                .collect(Collectors.toList());
-    }
-
-    public List<UserPlanResponse> findUserPlanResponsesByPlan(Plan plan) {
-        List<UserPlan> userPlans = userPlanRepository.getByPlan(plan);
-        return userPlans.stream()
-                .map(userPlan -> UserPlanResponse.toDto(userPlan))
-                .collect(Collectors.toList());
-    }
-
-    public Page<Plan> findPlansByUser(int page, int size, String sort, User user) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sort).descending());
-
-        return userPlanRepository.findAllByUserOrderByCreatedAt(pageable, user);
-    }
-
-    public Page<Plan> findPlansByMbti(Pageable pageable, String mbti) {
-        return userPlanRepository.findAllByUserMbti(pageable, mbti);
-    }
-
-    public Page<Plan> findPlansByMbtiAndRegion(Pageable pageable, String mbti, City region) {
-        return userPlanRepository.findAllByUserMbtiAndRegion(pageable, mbti, region);
     }
 
     @Transactional

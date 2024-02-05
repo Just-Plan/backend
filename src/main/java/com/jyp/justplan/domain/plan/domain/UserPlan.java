@@ -27,9 +27,12 @@ public class UserPlan extends BaseEntity {
 
     private boolean owner;
 
-    public UserPlan(User user, Plan plan, boolean owner) {
+    public UserPlan(User user, boolean owner) {
         this.user = user;
-        this.plan = plan;
         this.owner = owner;
+    }
+
+    public void setPlan(Plan plan) {
+        this.plan = plan;
     }
 }
