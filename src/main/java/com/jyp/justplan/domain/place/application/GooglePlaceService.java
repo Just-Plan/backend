@@ -92,7 +92,7 @@ public class GooglePlaceService {
         );
     }
 
-    private Mono<String> fetchPhotoUrl(String photoReference, int maxwidth) {
+    public Mono<String> fetchPhotoUrl(String photoReference, int maxwidth) {
         String url = String.format(
             "/photo?maxwidth=%d&photoreference=%s&key=%s",
             maxwidth, photoReference, googlePlacesProperties.getApiKey());

@@ -17,6 +17,7 @@ import com.jyp.justplan.domain.place.dto.request.PlaceRequest;
 import com.jyp.justplan.domain.place.dto.request.PlaceUpdateRequest;
 import com.jyp.justplan.domain.place.dto.response.GooglePlacesSearchResponse;
 import com.jyp.justplan.domain.place.dto.response.PlaceDetailResponse;
+import com.jyp.justplan.domain.place.dto.response.PlaceDetailResponse.Result.Photo;
 import com.jyp.justplan.domain.place.dto.response.PlaceResponse;
 import com.jyp.justplan.domain.place.dto.response.SchedulePlacesResponse;
 import com.jyp.justplan.domain.place.exception.NoSuchGooglePlaceException;
@@ -30,6 +31,7 @@ import com.jyp.justplan.domain.user.domain.User;
 import com.jyp.justplan.domain.user.domain.UserRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -55,11 +57,12 @@ public class PlaceService {
     private final UserRepository userRepository;
     private final WebClient webClient;
     private final GooglePlacesProperties googlePlacesProperties;
+    private final GooglePlaceService googlePlaceService;
 
     @Autowired
     public PlaceService(PlaceRepository placeRepository, MemoRepository memoRepository,
         GooglePlaceRepository googlePlaceRepository, PlanRepository planRepository,
-        PlanService planService, UserRepository userRepository, WebClient.Builder webClientBuilder, GooglePlacesProperties googlePlacesProperties) {
+        PlanService planService, UserRepository userRepository, WebClient.Builder webClientBuilder, GooglePlacesProperties googlePlacesProperties, GooglePlaceService googlePlaceService) {
         this.placeRepository = placeRepository;
         this.memoRepository = memoRepository;
         this.googlePlaceRepository = googlePlaceRepository;
@@ -68,6 +71,7 @@ public class PlaceService {
         this.userRepository = userRepository;
         this.webClient = webClientBuilder.baseUrl("https://maps.googleapis.com").build();
         this.googlePlacesProperties = googlePlacesProperties;
+        this.googlePlaceService = googlePlaceService;
     }
 
     // 일정 생성
@@ -119,7 +123,6 @@ public class PlaceService {
 
         placePlanUpdateDto.getDayUpdates().forEach((day, updates) -> {
             updates.forEach(updateRequest -> {
-                // Place 찾기
                 Place place = getPlace(updateRequest);
                 // orderNum과 day, memo 업데이트
                 Memo memo = place.getMemo();
@@ -136,13 +139,19 @@ public class PlaceService {
             .flatMap(this::findPlaceDetailsByGoogleId)
             .flatMap(placeDetailResponse -> {
                 placeDetailResponse.getResult().setTranslatedTypes();
+                return googlePlaceService.fetchPhotoUrl(placeDetailResponse.getResult().getPhotos().get(0).getPhotoReference(), 400)
+                    .map(url -> {
+                        placeDetailResponse.getResult().setPhotos(List.of(new Photo(0, 0, url, Collections.emptyList())));
+                        return placeDetailResponse;
+                    });
+            })
+            .flatMap(placeDetailResponse -> {
                 Optional<GooglePlace> optionalGooglePlace = googlePlaceRepository.findByName(placeDetailResponse.getResult().getName());
                 if (optionalGooglePlace.isPresent()) {
                     // TODO: 추가 작업을 수행하고, placeDetailResponse를 수정하거나 업데이트합니다.
-                    placeDetailResponse.getResult().setMbti(new ArrayList<>(
-                        Arrays.asList(MbtiType.enfp, MbtiType.enfj, MbtiType.entp, MbtiType.entj, MbtiType.infj)));
+                    placeDetailResponse.getResult().setMbti(List.of(MbtiType.enfp, MbtiType.enfj, MbtiType.entp, MbtiType.entj, MbtiType.infj));
                 }
-                 return Mono.just(placeDetailResponse);
+                return Mono.just(placeDetailResponse);
             });
     }
 
@@ -180,7 +189,7 @@ public class PlaceService {
             .uri(uriBuilder -> uriBuilder
                 .path("/maps/api/place/details/json")
                 .queryParam("place_id", googlePlaceId)
-                .queryParam("fields", "name,rating,user_ratings_total,formatted_phone_number,types,opening_hours")
+                .queryParam("fields", "name,rating,user_ratings_total,formatted_phone_number,types,opening_hours,photos")
                 .queryParam("key", apiKey)
                 .queryParam("language", "ko")
                 .build())
