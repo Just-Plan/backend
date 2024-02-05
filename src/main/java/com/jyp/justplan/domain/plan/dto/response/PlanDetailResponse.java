@@ -37,9 +37,7 @@ public class PlanDetailResponse {
             List<UserPlanResponse> users,
             long scrapCount,
             List<String> tags,
-            CityResponse cityResponse,
-            BudgetResponse budgetResponse,
-            ExpenseResponse expenseResponse
+            CityResponse cityResponse
     ) {
         return new PlanDetailResponse(
                 plan.getId(),
@@ -52,9 +50,9 @@ public class PlanDetailResponse {
                 plan.isPublished(),
                 null,
                 tags,
-                budgetResponse,
+                BudgetResponse.toDto(plan.getBudget()),
                 plan.isUseExpense(),
-                expenseResponse
+                ExpenseResponse.toDto(plan.getExpense())
         );
     }
 
@@ -64,9 +62,7 @@ public class PlanDetailResponse {
             long scrapCount,
             List<String> tags,
             CityResponse cityResponse,
-            OriginPlanResponse originPlan,
-            BudgetResponse budget,
-            ExpenseResponse expense
+            OriginPlanResponse originPlan
     ) {
         return new PlanDetailResponse(
                 plan.getId(),
@@ -79,9 +75,9 @@ public class PlanDetailResponse {
                 plan.isPublished(),
                 originPlan,
                 tags,
-                budget,
+                BudgetResponse.toDto(plan.getBudget()),
                 plan.isUseExpense(),
-                expense
+                ExpenseResponse.toDto(plan.getExpense())
         );
     }
 }

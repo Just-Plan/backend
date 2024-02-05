@@ -1,5 +1,6 @@
 package com.jyp.justplan.domain.plan.domain.scrap;
 
+import com.jyp.justplan.domain.plan.application.ScrapStore;
 import com.jyp.justplan.domain.plan.domain.Plan;
 import com.jyp.justplan.domain.plan.exception.scrap.NoSuchScrapException;
 import com.jyp.justplan.domain.user.domain.User;

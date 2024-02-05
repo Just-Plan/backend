@@ -1,4 +1,4 @@
-package com.jyp.justplan.domain.plan.domain.scrap;
+package com.jyp.justplan.domain.plan.application;
 
 import com.jyp.justplan.domain.plan.domain.Plan;
 import com.jyp.justplan.domain.user.domain.User;
