@@ -31,6 +31,8 @@ import com.jyp.justplan.domain.plan.exception.NoSuchPlanException;
 import com.jyp.justplan.domain.plan.exception.NoSuchUserPlanException;
 import com.jyp.justplan.domain.user.domain.User;
 import com.jyp.justplan.domain.user.domain.UserRepository;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -99,14 +101,31 @@ public class PlaceService {
 
     // 일정에 대한 전체 장소 조회
     public SchedulePlacesResponse findPlacesByPlanId(Long planId) {
-        planRepository.findById(planId).orElseThrow(() -> new NoSuchPlanException("존재하지 않는 planId 입니다: " + planId));
+        Plan plan = planRepository.findById(planId)
+            .orElseThrow(() -> new NoSuchPlanException("존재하지 않는 planId 입니다: " + planId));
+        int totalDays = calculateTotalDays(plan.getStartDate(), plan.getEndDate());
 
         List<Place> places = placeRepository.findByPlanId(planId);
         List<Place> sortedPlaces = places.stream()
             .sorted(Comparator.comparingInt(Place::getDay).thenComparingInt(Place::getOrderNum)).toList();
-        Map<Integer, List<PlaceResponse>> groupedByDay = sortedPlaces.stream().collect(Collectors.groupingBy(Place::getDay,
-            LinkedHashMap::new, Collectors.mapping(PlaceResponse::of, Collectors.toList())));
+
+
+        Map<Integer, List<PlaceResponse>> groupedByDay = new LinkedHashMap<>();
+        for (int day = 0; day <= totalDays; day++) {
+            groupedByDay.put(day, new ArrayList<>());
+        }
+        sortedPlaces.forEach(place -> {
+            groupedByDay.computeIfAbsent(place.getDay(), k -> new ArrayList<>()).add(PlaceResponse.of(place));
+        });
+
         return SchedulePlacesResponse.of(groupedByDay);
+    }
+
+    private int calculateTotalDays(ZonedDateTime startDate, ZonedDateTime endDate) {
+
+        // 시작일과 종료일 사이의 일수 차이 + 1 (시작일 포함)
+        long daysBetween = ChronoUnit.DAYS.between(startDate.toLocalDate(), endDate.toLocalDate()) + 1;
+        return (int) daysBetween;
     }
 
     // 전체 장소 수정
