@@ -18,27 +18,16 @@ public class ExpenseService {
     /* 지출 생성 */
     @Transactional
     public ExpenseResponse createExpense(Plan plan) {
-        if (expenseRepository.existsByPlan(plan)) {
-            throw new ExpenseAlreadyExistsException(plan.getTitle() + "에 대한 지출이 이미 존재합니다.");
-        }
-
-        Expense expense = new Expense(plan);
+        Expense expense = new Expense();
+        plan.setExpense(expense);
         expenseRepository.save(expense);
 
         return ExpenseResponse.toDto(expense);
     }
 
-    /* 지출 조회 */
-    public ExpenseResponse getExpense(Plan plan) {
-        Expense expense = expenseRepository.getByPlan(plan);
-        return ExpenseResponse.toDto(expense);
-    }
-
     /* 지출 수정 */
     @Transactional
-    public ExpenseResponse updateExpense(Plan plan, ExpenseUpdateRequest request) {
-        Expense expense = expenseRepository.getByPlan(plan);
-
+    public ExpenseResponse updateExpense(Expense expense, ExpenseUpdateRequest request) {
         expense.updateExpense(
                 request.getFood(),
                 request.getTransportation(),

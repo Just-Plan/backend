@@ -18,27 +18,16 @@ public class BudgetService {
     /* 예산 생성, 기본 값 0원 */
     @Transactional
     public BudgetResponse createBudget(Plan plan) {
-        if (budgetRepository.existsByPlan(plan)) {
-            throw new BudgetAlreadyExistsException(plan.getTitle() + "에 대한 예산이 이미 존재합니다.");
-        }
-
-        Budget budget = new Budget(plan);
+        Budget budget = new Budget();
+        plan.setBudget(budget);
         budgetRepository.save(budget);
 
         return BudgetResponse.toDto(budget);
     }
 
-    /* 예산 조회 */
-    public BudgetResponse getBudget(Plan plan) {
-        Budget budget = budgetRepository.getByPlan(plan);
-        return BudgetResponse.toDto(budget);
-    }
-
     /* 예산 수정 */
     @Transactional
-    public BudgetResponse updateBudget(Plan plan, BudgetUpdateRequest request) {
-        Budget budget = budgetRepository.getByPlan(plan);
-
+    public BudgetResponse updateBudget(Budget budget, BudgetUpdateRequest request) {
         budget.updateBudget(request.getCard(), request.getCash());
         return BudgetResponse.toDto(budget);
     }
