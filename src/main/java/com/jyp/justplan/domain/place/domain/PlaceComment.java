@@ -3,7 +3,6 @@ package com.jyp.justplan.domain.place.domain;
 import com.jyp.justplan.domain.BaseEntity;
 import com.jyp.justplan.domain.user.domain.User;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
