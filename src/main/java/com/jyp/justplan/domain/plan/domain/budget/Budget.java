@@ -9,24 +9,14 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class Budget {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "budget_id")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "plan_id")
-    private Plan plan;
-
     private int card;
     private int cash;
-
-    public Budget(Plan plan) {
-        this.plan = plan;
-        this.card = 0;
-        this.cash = 0;
-    }
 
     public void updateBudget(int card, int cash) {
         this.card = card;

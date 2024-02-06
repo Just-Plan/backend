@@ -33,7 +33,6 @@ public class PlanResponse {
             Plan plan,
             List<UserPlanResponse> users,
             long scrapCount,
-            BudgetResponse budget,
             List<String> tags
     ) {
         Duration duration = Duration.between(plan.getStartDate(), plan.getEndDate());
@@ -42,7 +41,7 @@ public class PlanResponse {
                 plan.getTitle(),
                 users,
                 scrapCount,
-                budget,
+                BudgetResponse.toDto(plan.getBudget()),
                 new CityResponse(plan.getRegion()),
                 plan.getStartDate(),
                 plan.getEndDate(),
