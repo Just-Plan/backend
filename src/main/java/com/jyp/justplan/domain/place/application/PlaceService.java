@@ -22,8 +22,8 @@ import com.jyp.justplan.domain.place.dto.request.PlaceUpdateRequest;
 import com.jyp.justplan.domain.place.dto.response.GooglePlacesSearchResponse;
 import com.jyp.justplan.domain.place.dto.response.PlaceDetailResponse;
 import com.jyp.justplan.domain.place.dto.response.PlaceDetailResponse.Result.Photo;
-import com.jyp.justplan.domain.place.dto.response.PlaceResponse;
 import com.jyp.justplan.domain.place.dto.response.SchedulePlacesResponse;
+import com.jyp.justplan.domain.place.dto.response.SchedulePlacesResponse.PlaceResponse;
 import com.jyp.justplan.domain.place.exception.NoSuchGooglePlaceException;
 import com.jyp.justplan.domain.place.exception.NoSuchPlaceException;
 import com.jyp.justplan.domain.plan.application.PlanService;
@@ -120,7 +120,11 @@ public class PlaceService {
             groupedByDay.put(day, new ArrayList<>());
         }
         sortedPlaces.forEach(place -> {
-            groupedByDay.computeIfAbsent(place.getDay(), k -> new ArrayList<>()).add(PlaceResponse.of(place));
+            List<MbtiType> mbti = googlePlaceStatsRepository.findAllByGooglePlaceId(place.getGooglePlace().getId())
+                .stream()
+                .map(stats -> MbtiType.valueOf(stats.getMbti().getMbti()))
+                .toList();
+            groupedByDay.computeIfAbsent(place.getDay(), k -> new ArrayList<>()).add(PlaceResponse.of(place, mbti));
         });
 
         return SchedulePlacesResponse.of(groupedByDay);
@@ -176,7 +180,7 @@ public class PlaceService {
             .flatMap(placeDetailResponse -> {
                 Optional<GooglePlace> optionalGooglePlace = googlePlaceRepository.findByName(placeDetailResponse.getResult().getName());
                 if (optionalGooglePlace.isPresent()) {
-                    // TODO: 추가 작업을 수행하고, mbti와 댓글을 추가합니다.
+                    // 추가 작업을 수행하고, mbti와 댓글을 추가합니다.
                     Long findGooglePlaceId = optionalGooglePlace.get().getId();
                     List<MbtiType> lists = googlePlaceStatsRepository.findAllByGooglePlaceId(findGooglePlaceId)
                         .stream()
