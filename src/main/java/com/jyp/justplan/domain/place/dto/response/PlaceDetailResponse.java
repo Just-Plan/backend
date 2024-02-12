@@ -43,6 +43,7 @@ public class PlaceDetailResponse {
 
         @Setter
         private List<MbtiType> mbti;
+        @Setter
         private List<PlaceComment> comment;
 
         // 타입 변환을 위한 setter

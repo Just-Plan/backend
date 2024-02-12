@@ -1,12 +1,11 @@
 package com.jyp.justplan.domain.plan.domain;
 
-import com.jyp.justplan.domain.city.domain.City;
 import com.jyp.justplan.domain.plan.exception.NoSuchUserPlanException;
 import com.jyp.justplan.domain.user.domain.User;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -36,4 +35,13 @@ public interface UserPlanRepository extends JpaRepository<UserPlan, Long> {
         }
         return userPlans;
     }
+
+    @Query("SELECT u.mbti, COUNT(u.mbti) AS cnt " +
+        "FROM UserPlan up " +
+        "JOIN up.plan p " +
+        "JOIN up.user u " +
+        "WHERE p.id IN (SELECT pl.plan.id FROM Place pl WHERE pl.googlePlace.id = :googlePlaceId) " +
+        "GROUP BY u.mbti " +
+        "ORDER BY cnt DESC")
+    List<Object[]> findMbtiDistributionByGooglePlaceId(@Param("googlePlaceId") Long googlePlaceId, Pageable pageable);
 }

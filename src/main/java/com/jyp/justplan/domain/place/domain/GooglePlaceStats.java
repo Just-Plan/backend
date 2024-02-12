@@ -15,27 +15,27 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 @Table(name = "google_place_stats")
 @Entity
 @NoArgsConstructor
 @Getter
-@SQLDelete(sql = "UPDATE GooglePlaceStats SET deleted_at = NOW() WHERE google_place_stats_id = ?")
-@Where(clause = "deleted_at is null")
 public class GooglePlaceStats {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "google_place_stats_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "mbti_id")
     private Mbti mbti;
 
     @Column(name = "count")
     private int count;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "google_place_id")
+    private GooglePlace googlePlace;
 
     @Column(name = "updated_at", nullable = false)
     private ZonedDateTime updatedAt;
@@ -46,6 +46,9 @@ public class GooglePlaceStats {
         this.updatedAt = ZonedDateTime.now();
     }
 
-    @Column(name = "deleted_at")
-    private ZonedDateTime deletedAt;
+    public GooglePlaceStats(Mbti mbti, int count, GooglePlace googlePlace) {
+        this.mbti = mbti;
+        this.count = count;
+        this.googlePlace = googlePlace;
+    }
 }

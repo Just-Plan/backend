@@ -2,9 +2,11 @@ package com.jyp.justplan.domain.place.application;
 
 import com.jyp.justplan.domain.city.domain.City;
 import com.jyp.justplan.domain.city.domain.CityRepository;
+import com.jyp.justplan.domain.mbti.domain.MbtiType;
 import com.jyp.justplan.domain.place.GooglePlacesProperties;
 import com.jyp.justplan.domain.place.domain.GooglePlace;
 import com.jyp.justplan.domain.place.domain.GooglePlaceRepository;
+import com.jyp.justplan.domain.place.domain.GooglePlaceStatsRepository;
 import com.jyp.justplan.domain.place.dto.response.GooglePlaceResponse;
 import com.jyp.justplan.domain.place.dto.response.GooglePlacesSearchApiResponse;
 import com.jyp.justplan.domain.place.dto.response.GooglePlacesSearchApiResponse.GooglePlaceApiResultResponse;
@@ -25,17 +27,23 @@ public class GooglePlaceService {
 
     private final GooglePlaceRepository googlePlaceRepository;
     private final GooglePlacesProperties googlePlacesProperties;
+    private final GooglePlaceStatsRepository googlePlaceStatsRepository;
     private final CityRepository cityRepository;
     private final WebClient webClient;
 
     @Autowired
     public GooglePlaceService(
-        GooglePlaceRepository googlePlaceRepository, GooglePlacesProperties googlePlacesProperties, WebClient.Builder webClientBuilder, CityRepository cityRepository
+        GooglePlaceRepository googlePlaceRepository,
+        GooglePlacesProperties googlePlacesProperties,
+        WebClient.Builder webClientBuilder,
+        CityRepository cityRepository,
+        GooglePlaceStatsRepository googlePlaceStatsRepository
     ) {
         this.googlePlaceRepository = googlePlaceRepository;
         this.googlePlacesProperties = googlePlacesProperties;
         this.cityRepository = cityRepository;
         this.webClient = webClientBuilder.baseUrl("https://maps.googleapis.com/maps/api/place").build();
+        this.googlePlaceStatsRepository = googlePlaceStatsRepository;
     }
 
     @Transactional(readOnly = true)
@@ -82,12 +90,15 @@ public class GooglePlaceService {
 
     private Flux<GooglePlaceResponse> mergeWithLocalPlaces(Flux<GooglePlaceResponse> googleResponses, Long cityId) {
         List<GooglePlace> localPlaces = googlePlaceRepository.findByCityId(cityId);
-
         return googleResponses.flatMap(googleResponse ->
             Flux.fromIterable(localPlaces)
                 .filter(localPlace -> isSamePlace(googleResponse, localPlace))
-                .next()
-                .map(GooglePlaceResponse::of) // 일치하는 로컬 DB의 정보로 교체
+                .flatMap(localPlace -> Flux.fromIterable(googlePlaceStatsRepository.findAllByGooglePlaceId(localPlace.getId()))
+                    .map(googlePlaceStats -> googlePlaceStats.getMbti().getMbti())
+                    .map(MbtiType::valueOf)
+                    .collectList()
+                    .map(mbtiList -> GooglePlaceResponse.of(localPlace, mbtiList))
+                )
                 .defaultIfEmpty(googleResponse)
         );
     }
@@ -101,15 +112,14 @@ public class GooglePlaceService {
             .get()
             .uri(url)
             .exchangeToMono(response -> {
-                if (response.statusCode().equals(HttpStatus.FOUND)) { // 302 리디렉션 확인
-                    return Mono.just(response.headers().header("Location").get(0)); // 리디렉션 URL 추출
+                if (response.statusCode().equals(HttpStatus.FOUND)) {
+                    return Mono.just(response.headers().header("Location").get(0));
                 }
                 return Mono.error(new RuntimeException("Failed to fetch photo URL"));
             });
     }
 
     private boolean isSamePlace(GooglePlaceResponse googlePlace, GooglePlace localPlace) {
-        // 위도와 경도를 비교하여 장소가 같은지 확인하는 로직 구현
         double threshold = 0.0001;
         return Math.abs(googlePlace.getLatitude() - localPlace.getLatitude()) < threshold
             && Math.abs(googlePlace.getLongitude() - localPlace.getLongitude()) < threshold;

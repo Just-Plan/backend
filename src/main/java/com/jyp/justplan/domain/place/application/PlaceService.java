@@ -11,6 +11,8 @@ import com.jyp.justplan.domain.place.domain.GooglePlaceStatsRepository;
 import com.jyp.justplan.domain.place.domain.Memo;
 import com.jyp.justplan.domain.place.domain.MemoRepository;
 import com.jyp.justplan.domain.place.domain.Place;
+import com.jyp.justplan.domain.place.domain.PlaceComment;
+import com.jyp.justplan.domain.place.domain.PlaceCommentRepository;
 import com.jyp.justplan.domain.place.domain.PlaceRepository;
 import com.jyp.justplan.domain.place.dto.request.MemoUpdateDto;
 import com.jyp.justplan.domain.place.dto.request.PlaceListRequest;
@@ -40,7 +42,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,12 +63,15 @@ public class PlaceService {
     private final GooglePlacesProperties googlePlacesProperties;
     private final GooglePlaceService googlePlaceService;
     private final GooglePlaceStatsRepository googlePlaceStatsRepository;
+    private final PlaceCommentRepository googleCommentRepository;
 
     @Autowired
     public PlaceService(PlaceRepository placeRepository, MemoRepository memoRepository,
         GooglePlaceRepository googlePlaceRepository, PlanRepository planRepository,
         PlanService planService, UserRepository userRepository, WebClient.Builder webClientBuilder, GooglePlacesProperties googlePlacesProperties,
-        GooglePlaceService googlePlaceService, GooglePlaceStatsRepository googlePlaceStatsRepository) {
+        GooglePlaceService googlePlaceService, GooglePlaceStatsRepository googlePlaceStatsRepository
+        , PlaceCommentRepository googleCommentRepository
+    ) {
         this.placeRepository = placeRepository;
         this.memoRepository = memoRepository;
         this.googlePlaceRepository = googlePlaceRepository;
@@ -78,6 +82,7 @@ public class PlaceService {
         this.googlePlacesProperties = googlePlacesProperties;
         this.googlePlaceService = googlePlaceService;
         this.googlePlaceStatsRepository = googlePlaceStatsRepository;
+        this.googleCommentRepository = googleCommentRepository;
     }
 
     // 장소 생성
@@ -172,7 +177,16 @@ public class PlaceService {
                 Optional<GooglePlace> optionalGooglePlace = googlePlaceRepository.findByName(placeDetailResponse.getResult().getName());
                 if (optionalGooglePlace.isPresent()) {
                     // TODO: 추가 작업을 수행하고, mbti와 댓글을 추가합니다.
-                    placeDetailResponse.getResult().setMbti(List.of(MbtiType.enfp, MbtiType.enfj, MbtiType.entp, MbtiType.entj, MbtiType.infj));
+                    Long findGooglePlaceId = optionalGooglePlace.get().getId();
+                    List<MbtiType> lists = googlePlaceStatsRepository.findAllByGooglePlaceId(findGooglePlaceId)
+                        .stream()
+                        .map(stats -> MbtiType.valueOf(stats.getMbti().getMbti()))
+                        .toList();
+                    placeDetailResponse.getResult().setMbti(lists);
+
+                    List<PlaceComment> comments = googleCommentRepository.findAllByPlaceId(findGooglePlaceId);
+                    placeDetailResponse.getResult().setComment(comments);
+
                 }
                 return Mono.just(placeDetailResponse);
             });
@@ -252,7 +266,7 @@ public class PlaceService {
             .longitude(request.getLongitude())
             .photoReference(request.getPhotoReference())
             .city(city)
-            .googlePlaceStats(saveGooglePlaceStats)
+            .googlePlaceStats((List<GooglePlaceStats>) saveGooglePlaceStats)
             .build();
         return googlePlaceRepository.save(newGooglePlace);
     }
