@@ -13,4 +13,6 @@ public interface PlaceCommentRepository extends JpaRepository<PlaceComment, Long
     default PlaceComment getById(Long id) {
         return findById(id).orElseThrow(() -> new NoSuchPlaceCommentException("해당 댓글 정보가 존재하지 않습니다."));
     }
+
+    List<PlaceComment> findAllByPlaceId(Long findGooglePlaceId);
 }
