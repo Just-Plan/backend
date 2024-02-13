@@ -37,6 +37,10 @@ public class User extends BaseEntity {
 
     private String profile;
 
+    private String background;
+
+    private String introduction;
+
     // OAuth 로그인에 사용
     private String provider;
     private String providerId;
@@ -61,5 +65,9 @@ public class User extends BaseEntity {
         this.password = password;
     }
 
-    public void updateMbti(String mbti) {}
+    public void updateProfile(String profile) {this.profile = profile; }
+
+    public void updateBackground(String background) {this.background = background;}
+
+    public void updateIntroduction(String introduction) {this.introduction = introduction;}
 }

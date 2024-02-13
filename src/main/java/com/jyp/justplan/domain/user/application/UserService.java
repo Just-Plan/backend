@@ -1,6 +1,10 @@
 package com.jyp.justplan.domain.user.application;
 
 
+import com.jyp.justplan.domain.mbti.domain.Mbti;
+import com.jyp.justplan.domain.mbti.domain.MbtiTestRepository;
+import com.jyp.justplan.domain.plan.domain.UserPlanRepository;
+import com.jyp.justplan.domain.plan.domain.scrap.ScrapRepository;
 import com.jyp.justplan.domain.user.UserDetailsImpl;
 import com.jyp.justplan.domain.user.domain.EmailAuth;
 import com.jyp.justplan.domain.user.domain.EmailAuthRepository;
@@ -28,7 +32,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class UserService {
     private final UserRepository userRepository;
+    private final MbtiTestRepository mbtiTestRepository;
     private final EmailAuthRepository emailAuthRepository;
+    private final ScrapRepository scrapRepository;
+    private final UserPlanRepository userPlanRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final BCryptPasswordEncoder passwordEncoder;
@@ -111,11 +118,16 @@ public class UserService {
         User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new UserException("해당 유저가 존재하지 않습니다."));
         user.updateName(userUpdateInfoRequest.getName());
+        //추가
+        user.updateProfile(userUpdateInfoRequest.getProfile());
+        user.updateBackground(userUpdateInfoRequest.getBackground());
+        user.updateIntroduction(userUpdateInfoRequest.getIntroduction());
 
         return UserResponse.toDto(user);
     }
 
     /* 비밀번호 재설정 */
+    // TODO : 이메일 인증없이 비밀번호 변경 진행
     public void resetPassword(UserUpdatePasswordRequest userUpdatePasswordRequest) {
         User user = userRepository.findByEmail(userUpdatePasswordRequest.getEmail())
                 .orElseThrow(() -> new UserException("해당 유저가 존재하지 않습니다."));
@@ -166,5 +178,20 @@ public class UserService {
         );
 
         return userSignInResponseInfo;
+    }
+
+    public UserResponse readUser(UserDetailsImpl userDetails) {
+
+        log.info("user id : " + userDetails.getUserId());
+        User user = user = userRepository.findByEmail(userDetails.getUsername())
+                    .orElseThrow(() -> new UserException("해당 유저가 존재하지 않습니다."));
+
+        long totalScrap = scrapRepository.countByUser(user);
+        long totalUserPlan = userPlanRepository.countByUser(user);
+
+        Mbti mbti = mbtiTestRepository.findById(user.getMbti().getId())
+                .orElseThrow(() -> new UserException("해당 유저의 MBTI가 존재하지 않습니다."));
+
+        return UserResponse.toTotDto(user, totalScrap, totalUserPlan, mbti);
     }
 }

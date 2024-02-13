@@ -10,4 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserUpdateInfoRequest {
     private String name;
+    private String profile;
+    private String background;
+    private String introduction;
 }
