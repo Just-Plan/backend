@@ -22,6 +22,7 @@ public class PlanDetailResponse {
     private CityResponse region;
     private ZonedDateTime startDate;
     private ZonedDateTime endDate;
+    private String photoUrl;
 
     private boolean published;
     private OriginPlanResponse originPlan;
@@ -35,6 +36,7 @@ public class PlanDetailResponse {
     public static PlanDetailResponse toDto (
             Plan plan,
             List<UserPlanResponse> users,
+            String photoUrl,
             long scrapCount,
             List<String> tags,
             CityResponse cityResponse
@@ -47,6 +49,7 @@ public class PlanDetailResponse {
                 cityResponse,
                 plan.getStartDate(),
                 plan.getEndDate(),
+                photoUrl,
                 plan.isPublished(),
                 null,
                 tags,
@@ -59,6 +62,7 @@ public class PlanDetailResponse {
     public static PlanDetailResponse toDto (
             Plan plan,
             List<UserPlanResponse> users,
+            String photoUrl,
             long scrapCount,
             List<String> tags,
             CityResponse cityResponse,
@@ -72,6 +76,7 @@ public class PlanDetailResponse {
                 cityResponse,
                 plan.getStartDate(),
                 plan.getEndDate(),
+                photoUrl,
                 plan.isPublished(),
                 originPlan,
                 tags,
