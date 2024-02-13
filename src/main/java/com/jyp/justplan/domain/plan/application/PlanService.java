@@ -3,6 +3,9 @@ package com.jyp.justplan.domain.plan.application;
 import com.jyp.justplan.domain.city.domain.City;
 import com.jyp.justplan.domain.city.domain.CityRepository;
 import com.jyp.justplan.domain.city.dto.response.CityResponse;
+import com.jyp.justplan.domain.place.domain.GooglePlaceStore;
+import com.jyp.justplan.domain.place.domain.Place;
+import com.jyp.justplan.domain.place.domain.PlaceStore;
 import com.jyp.justplan.domain.plan.application.budget.BudgetService;
 import com.jyp.justplan.domain.plan.application.expense.ExpenseService;
 import com.jyp.justplan.domain.plan.application.tag.PlanTagService;
@@ -41,6 +44,9 @@ public class PlanService {
     private final UserPlanService userPlanService;
     private final UserService userService;
     private final ScrapStore scrapStore;
+    private final PlaceStore placeStore;
+    private final GooglePlaceStore googlePlaceStore;
+
 
     /* Plan을 통한 PlanResponse 반환 (origin Plan 정보 포함) */
     private PlanDetailResponse getPlanDetailResponse(Plan plan) {
@@ -50,6 +56,11 @@ public class PlanService {
 
         List<UserPlanResponse> users = getUserPlanResponses(findUsersByPlan(plan));
 
+        Place place = placeStore.getRandomPlaceById(plan.getId());
+        String photoUrl = place != null
+                ? googlePlaceStore.getGooglePlaceById(place.getGooglePlace().getId()).getPhotoReference()
+                : null;
+
         long scrapCount = scrapStore.getScrapCount(plan);
 
         CityResponse cityResponse = new CityResponse(plan.getRegion());
@@ -58,10 +69,15 @@ public class PlanService {
             Plan originPlan = plan.getOriginPlan();
             List<UserPlanResponse> originUsers = getUserPlanResponses(findUsersByPlan(originPlan));
 
+            Place originPlace = placeStore.getRandomPlaceById(originPlan.getId());
+            String originPhotoUrl = originPlace != null
+                    ? googlePlaceStore.getGooglePlaceById(originPlace.getGooglePlace().getId()).getPhotoReference()
+                    : null;
+
             OriginPlanResponse originPlanResponse = OriginPlanResponse.toDto(originPlan, originUsers);
-            return PlanDetailResponse.toDto(plan, users, scrapCount, tagNames, cityResponse, originPlanResponse);
+            return PlanDetailResponse.toDto(plan, users, originPhotoUrl, scrapCount, tagNames, cityResponse, originPlanResponse);
         } else {
-            return PlanDetailResponse.toDto(plan, users, scrapCount, tagNames, cityResponse);
+            return PlanDetailResponse.toDto(plan, users, photoUrl, scrapCount, tagNames, cityResponse);
         }
     }
 
@@ -71,9 +87,15 @@ public class PlanService {
         List<UserPlanResponse> users = findUsersByPlan(plan).stream()
                 .map(UserPlanResponse::toDto)
                 .collect(Collectors.toList());
+
+        Place place = placeStore.getRandomPlaceById(plan.getId());
+        String photoUrl = place != null
+                ? googlePlaceStore.getGooglePlaceById(place.getGooglePlace().getId()).getPhotoReference()
+                : null;
+
         long scrapCount = scrapStore.getScrapCount(plan);
 
-        return PlanResponse.toDto(plan, users, scrapCount, tagNames);
+        return PlanResponse.toDto(plan, users, photoUrl, scrapCount, tagNames);
     }
 
     private PlansResponse getPlansResponse(Page<Plan> plans) {
