@@ -44,4 +44,6 @@ public interface UserPlanRepository extends JpaRepository<UserPlan, Long> {
         "GROUP BY u.mbti " +
         "ORDER BY cnt DESC")
     List<Object[]> findMbtiDistributionByGooglePlaceId(@Param("googlePlaceId") Long googlePlaceId, Pageable pageable);
+
+    long countByUser(User user);
 }
