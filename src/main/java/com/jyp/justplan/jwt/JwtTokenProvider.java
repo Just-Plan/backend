@@ -92,13 +92,15 @@ public class JwtTokenProvider {
     /* Token 검증 */
     public boolean validateToken(String token) {
         // TODO: Exception 처리
-        try {
-            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
-            return true;
-        } catch (ExpiredJwtException e) {
-            throw new RuntimeException("Expired Access Token");
-        } catch (JwtException e) {
-            throw new RuntimeException("Invalid Access Token");
-        }
+        Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+        return true;
+//        try {
+//            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+//            return true;
+//        } catch (ExpiredJwtException e) {
+//            throw new ExpiredJwtException();
+//        } catch (JwtException e) {
+//            throw new JwtException();
+//        }
     }
 }
