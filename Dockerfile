@@ -10,7 +10,7 @@ RUN gradle build -x test
 FROM openjdk:17.0-slim
 WORKDIR /app
 
-COPY --from=build /home/gradle/src/build/libs/*-SNAPSHOT.jar /app/app.jar
+COPY --from=builder /home/gradle/src/build/libs/*-SNAPSHOT.jar /app/app.jar
 
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
