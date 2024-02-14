@@ -31,6 +31,7 @@ import com.jyp.justplan.domain.plan.domain.Plan;
 import com.jyp.justplan.domain.plan.domain.PlanRepository;
 import com.jyp.justplan.domain.plan.exception.NoSuchPlanException;
 import com.jyp.justplan.domain.plan.exception.NoSuchUserPlanException;
+import com.jyp.justplan.domain.user.UserDetailsImpl;
 import com.jyp.justplan.domain.user.domain.User;
 import com.jyp.justplan.domain.user.domain.UserRepository;
 import java.time.ZonedDateTime;
@@ -236,6 +237,17 @@ public class PlaceService {
                 .build())
             .retrieve()
             .bodyToMono(PlaceDetailResponse.class);
+    }
+
+    // 장소 복제
+    @Transactional
+    public SchedulePlacesResponse clonePlace(UserDetailsImpl userDetails, Long originPlanId, Long newPlanId) {
+        Plan newPlan = planRepository.getById(newPlanId);
+        placeRepository.findAllByPlanId(originPlanId).forEach(place -> {
+        Place newPlace = new Place(place.getDay(), place.getOrderNum(), newPlan, new Memo(), place.getGooglePlace());
+        placeRepository.save(newPlace);
+        });
+        return findPlacesByPlanId(newPlanId);
     }
 
     private Place getPlace(PlaceUpdateRequest updateRequest) {

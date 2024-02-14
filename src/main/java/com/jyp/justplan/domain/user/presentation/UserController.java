@@ -1,9 +1,11 @@
 package com.jyp.justplan.domain.user.presentation;
 
 
+import com.amazonaws.util.StringUtils;
 import com.jyp.justplan.api.response.ApiResponseDto;
 import com.jyp.justplan.domain.user.UserDetailsImpl;
 import com.jyp.justplan.domain.user.application.UserService;
+import com.jyp.justplan.domain.user.domain.User;
 import com.jyp.justplan.domain.user.dto.request.*;
 import com.jyp.justplan.domain.user.dto.response.UserResponse;
 import com.jyp.justplan.domain.user.dto.response.UserSignInResponseDto;
@@ -16,12 +18,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
+@Slf4j
 @Tag(name = "User", description = "사용자 관련 API Controller")
 @RestController
 @RequiredArgsConstructor
@@ -85,10 +89,27 @@ public class UserController {
         return ApiResponseDto.successWithoutDataResponse();
     }
 
+    /* 회원정보 조회 */
+    @Tag(name = "User", description = "사용자 관련 API Controller")
+    @Operation(summary = "회원정보 조회", description = "회원정보를 조회한다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
+    })
+    @GetMapping("/read")
+    public ApiResponseDto<UserResponse> readUser(
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ){
+        UserResponse user = userService.readUser(userDetails);
+
+        log.info("user plan cnt : " + user.getTotalUserPlan());
+
+        return ApiResponseDto.successResponse(user);
+    }
 
     /* 회원정보 수정 */
     @Tag(name = "User", description = "사용자 관련 API Controller")
-    @Operation(summary = "회원정보 수정", description = "회원정보(name)을 수정한다.")
+    @Operation(summary = "회원정보 수정", description = "회원정보를 수정한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공",
                     content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
