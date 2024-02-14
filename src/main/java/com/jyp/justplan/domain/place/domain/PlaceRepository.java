@@ -24,4 +24,6 @@ public interface PlaceRepository extends JpaRepository<Place,Long> {
             "limit 1",
             nativeQuery = true)
     Optional<Place> findRandomByPlanId(Long planId);
+
+    List<Place> findAllByPlanId(Long planId);
 }
