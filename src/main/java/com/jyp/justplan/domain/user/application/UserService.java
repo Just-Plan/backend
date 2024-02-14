@@ -1,6 +1,7 @@
 package com.jyp.justplan.domain.user.application;
 
 
+import antlr.StringUtils;
 import com.jyp.justplan.domain.mbti.domain.Mbti;
 import com.jyp.justplan.domain.mbti.domain.MbtiTestRepository;
 import com.jyp.justplan.domain.plan.domain.UserPlanRepository;
@@ -25,6 +26,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -118,13 +121,28 @@ public class UserService {
         User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new UserException("해당 유저가 존재하지 않습니다."));
         user.updateName(userUpdateInfoRequest.getName());
-        //추가
-        user.updateProfile(userUpdateInfoRequest.getProfile());
-        user.updateBackground(userUpdateInfoRequest.getBackground());
-        user.updateIntroduction(userUpdateInfoRequest.getIntroduction());
+
+        Mbti mbti = mbtiTestRepository.findByMbti(userUpdateInfoRequest.getMbtiName())
+                .orElseThrow(() -> new UserException("해당 유저의 MBTI가 존재하지 않습니다."));
+
+        user.updateMbti(mbti);
 
         return UserResponse.toDto(user);
     }
+
+    /*프로필 수정*/
+    public UserResponse updateProfile(UserUpdateProfileRequest userUpdateProfileRequest, UserDetailsImpl userDetails){
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new UserException("해당 유저가 존재하지 않습니다."));
+
+        //추가
+        user.updateProfile(userUpdateProfileRequest.getProfile());
+        user.updateBackground(userUpdateProfileRequest.getBackground());
+        user.updateIntroduction(userUpdateProfileRequest.getIntroduction());
+
+        return UserResponse.toDto(user);
+    }
+
 
     /* 비밀번호 재설정 */
     // TODO : 이메일 인증없이 비밀번호 변경 진행
