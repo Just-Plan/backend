@@ -120,14 +120,20 @@ public class UserService {
         // TODO: Exception 처리
         User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new UserException("해당 유저가 존재하지 않습니다."));
+
+        long totalScrap = scrapRepository.countByUser(user);
+        long totalUserPlan = userPlanRepository.countByUser(user);
+
         user.updateName(userUpdateInfoRequest.getName());
+        user.updateIntroduction(userUpdateInfoRequest.getIntroduction());
 
         Mbti mbti = mbtiTestRepository.findByMbti(userUpdateInfoRequest.getMbtiName())
                 .orElseThrow(() -> new UserException("해당 유저의 MBTI가 존재하지 않습니다."));
 
         user.updateMbti(mbti);
 
-        return UserResponse.toDto(user);
+        //return UserResponse.toDto(user);
+        return UserResponse.toTotDto(user, totalScrap, totalUserPlan, mbti);
     }
 
     /*프로필 수정*/
@@ -135,10 +141,9 @@ public class UserService {
         User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new UserException("해당 유저가 존재하지 않습니다."));
 
-        //추가
         user.updateProfile(userUpdateProfileRequest.getProfile());
         user.updateBackground(userUpdateProfileRequest.getBackground());
-        user.updateIntroduction(userUpdateProfileRequest.getIntroduction());
+        //user.updateIntroduction(userUpdateProfileRequest.getIntroduction());
 
         return UserResponse.toDto(user);
     }
