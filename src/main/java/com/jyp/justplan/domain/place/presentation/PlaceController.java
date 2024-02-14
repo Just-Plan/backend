@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -122,4 +123,19 @@ public class PlaceController {
         return placeService.getPlaceDetail(name, latitude, longitude, googlePlaceId)
             .map(ApiResponseDto::successResponse);
     }
+
+
+    // 장소 복제
+    @Operation(summary = "장소 복제", description = "플랜 아이디로 장소를 복제합니다.")
+    @PostMapping("/place/copy")
+    public ApiResponseDto<?> clonePlace(
+        @Parameter(description = "복제할 플랜 아이디", example = "1", required = true) @RequestParam Long originPlanId,
+        @Parameter(description = "새로 만든 플랜 아이디", example = "2", required = true) @RequestParam Long newPlanId,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        var schedulePlacesResponse = placeService.clonePlace(userDetails,
+            originPlanId, newPlanId);
+        return ApiResponseDto.successResponse(schedulePlacesResponse);
+    }
+
 }
