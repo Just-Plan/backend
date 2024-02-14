@@ -124,6 +124,24 @@ public class UserController {
         return ApiResponseDto.successResponse(user);
     }
 
+    /*프로필 수정*/
+    @Tag(name = "User", description = "사용자 관련 API Controller")
+    @Operation(summary = "프로필 수정", description = "프로필 정보를 수정한다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
+    })
+    @PatchMapping("/updateProfile")
+    public ApiResponseDto<UserResponse> updateProfile(
+            @RequestBody UserUpdateProfileRequest userUpdateProfileRequest,
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        UserResponse user = userService.updateProfile(userUpdateProfileRequest, userDetails);
+        return ApiResponseDto.successResponse(user);
+    }
+
+
     /* 비밀번호 재설정 */
     @Tag(name = "User", description = "사용자 관련 API Controller")
     @Operation(summary = "비밀번호 재설정", description = "비밀번호를 재설정한다.")

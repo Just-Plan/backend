@@ -70,4 +70,6 @@ public class User extends BaseEntity {
     public void updateBackground(String background) {this.background = background;}
 
     public void updateIntroduction(String introduction) {this.introduction = introduction;}
+
+    public void updateMbti(Mbti mbti) {this.mbti = mbti;}
 }
