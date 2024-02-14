@@ -1,31 +1,11 @@
-# 사용할 Gradle 및 JDK 버전을 명시
-FROM gradle:7.6-jdk17 AS builder
-WORKDIR /build
-
-# 그래들 설정 파일 복사
-COPY build.gradle settings.gradle /build/
-
-# Gradle 의존성 캐시를 위한 레이어
-RUN gradle build -x test --parallel --continue > /dev/null 2>&1 || true
-
-# 전체 프로젝트 복사
-COPY . /build
-
-# 실제 애플리케이션 빌드
-RUN gradle build -x test --parallel
-
-# 최종 애플리케이션 실행을 위한 베이스 이미지
 FROM openjdk:17.0-slim
-WORKDIR /app
 
-# 빌더 스테이지에서 빌드된 jar 파일 복사
-COPY --from=builder /build/build/libs/*-SNAPSHOT.jar ./app.jar
+WORKDIR /backend
 
-# 포트 8080 노출
+# 빌드 과정에서 생성된 JAR 파일을 Docker 이미지 안의 작업 디렉토리로 복사
+# 복사할 JAR 파일의 이름과 경로는 실제 프로젝트 구조와 빌드 설정에 따라 다를 수 있으므로 적절히 조정하세요.
+COPY ./build/libs/*-SNAPSHOT.jar /backend/app.jar
+
 EXPOSE 8080
 
-# 프로덕션 프로파일 설정
-ENV SPRING_PROFILES_ACTIVE=prod
-
-# root 대신 nobody 권한으로 애플리케이션 실행
 ENTRYPOINT ["java", "-jar", "app.jar"]
