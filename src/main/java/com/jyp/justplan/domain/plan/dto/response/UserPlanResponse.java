@@ -15,12 +15,13 @@ import lombok.NoArgsConstructor;
 public class UserPlanResponse {
     private String email;
     private String name;
+    private String profileUrl;
     private MbtiResponse mbti;
     private boolean owner;
 
     public static UserPlanResponse toDto(UserPlan userPlan) {
         User user = userPlan.getUser();
         MbtiResponse mbti = user.getMbti() == null ? null : MbtiResponse.toDto(user.getMbti());
-        return new UserPlanResponse(user.getEmail(), user.getName(), mbti, userPlan.isOwner());
+        return new UserPlanResponse(user.getEmail(), user.getName(), user.getProfile(), mbti, userPlan.isOwner());
     }
 }
