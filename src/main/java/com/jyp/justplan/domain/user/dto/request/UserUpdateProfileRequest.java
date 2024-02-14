@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 public class UserUpdateProfileRequest {
     private String profile;
     private String background;
-    private String introduction;
+    //private String introduction;
 }

@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 public class UserUpdateInfoRequest {
     private String name;
     private String mbtiName;
+    private String introduction;
 }
