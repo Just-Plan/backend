@@ -8,7 +8,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class UserUpdateInfoRequest {
-    private String name;
-    private String mbtiName;
+public class UserUpdateProfileRequest {
+    private String profile;
+    private String background;
+    private String introduction;
 }
