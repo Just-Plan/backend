@@ -13,10 +13,7 @@ import com.jyp.justplan.domain.plan.domain.Plan;
 import com.jyp.justplan.domain.plan.domain.PlanRepository;
 import com.jyp.justplan.domain.plan.domain.UserPlan;
 import com.jyp.justplan.domain.plan.domain.tag.PlanTag;
-import com.jyp.justplan.domain.plan.dto.request.PlanIdRequest;
-import com.jyp.justplan.domain.plan.dto.request.PlanCreateRequest;
-import com.jyp.justplan.domain.plan.dto.request.PlanScrapRequest;
-import com.jyp.justplan.domain.plan.dto.request.PlanUpdateRequest;
+import com.jyp.justplan.domain.plan.dto.request.*;
 import com.jyp.justplan.domain.plan.dto.response.*;
 import com.jyp.justplan.domain.plan.exception.PlanValidationException;
 import com.jyp.justplan.domain.user.application.UserService;
@@ -115,18 +112,18 @@ public class PlanService {
     }
 
     /* 전체 플랜 조회 */
-    public PlansResponse getPlans(String type, long regionId, int page, int size, String sort) {
+    public PlansResponse getPlans(PlanReadRequest request, long regionId, int page, int size, String sort) {
+        List<String> mbti = request.getMbti();
         Pageable pageable = PageRequest.of(page, size);
-        String mbti = type.toLowerCase();
         PlansResponse plansResponse;
 
 //        if (sort.equals("scrapCnt")) {
             pageable = PageRequest.of(page, size);
 
-            if (type.equals("") && regionId == 0) {
+            if (mbti.isEmpty() && regionId == 0) {
                 Page<Plan> plans = planRepository.findAllOrderByScrapCnt(pageable);
                 plansResponse = getPlansResponse(plans);
-            } else if (type.equals("")) {
+            } else if (mbti.isEmpty()) {
                 City region = cityRepository.getById(regionId);
                 Page<Plan> plans = planRepository.findAllByRegionOrderByScrapCnt(pageable, region);
                 plansResponse = getPlansResponse(plans);

@@ -45,20 +45,20 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
             "left join Scrap s on p = s.plan " +
             "left join UserPlan up on p = up.plan " +
             "where p.deleted = false and p.published = true " +
-            "and up.user.mbti.mbti = ?1 " +
+            "and up.user.mbti.mbti in ?1 " +
             "group by p " +
             "order by count(s.plan) desc")
-    Page<Plan> findAllByMbtiOrderByScrapCnt(Pageable pageable, String mbti);
+    Page<Plan> findAllByMbtiOrderByScrapCnt(Pageable pageable, List<String> mbti);
 
     @Query("select p from Plan p " +
             "left join Scrap s on p = s.plan " +
             "left join UserPlan up on p = up.plan " +
             "where p.deleted = false and p.published = true " +
-            "and up.user.mbti.mbti = ?1 " +
+            "and up.user.mbti.mbti in ?1 " +
             "and p.region = ?2 " +
             "group by p " +
             "order by count(s.plan) desc")
-    Page<Plan> findAllByMbtiAndRegionOrderByScrapCnt(Pageable pageable, String mbti, City region);
+    Page<Plan> findAllByMbtiAndRegionOrderByScrapCnt(Pageable pageable, List<String> mbti, City region);
 
     default Plan getById(final Long id) {
         return findById(id)
