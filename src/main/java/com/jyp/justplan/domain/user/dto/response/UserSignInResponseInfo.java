@@ -1,5 +1,6 @@
 package com.jyp.justplan.domain.user.dto.response;
 
+import com.jyp.justplan.domain.mbti.domain.Mbti;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,8 +15,12 @@ public class UserSignInResponseInfo {
     private String name;
     private String accessToken;
     private String refreshToken;
+    private String mbtiName;
 
+    public static UserSignInResponseInfo toInfo(Long id, String email, String name, String accessToken, String refreshToken, Mbti mbti) {
+        return new UserSignInResponseInfo(id, email, name, accessToken, refreshToken, mbti.getMbti());
+    }
     public static UserSignInResponseInfo toInfo(Long id, String email, String name, String accessToken, String refreshToken) {
-        return new UserSignInResponseInfo(id, email, name, accessToken, refreshToken);
+        return new UserSignInResponseInfo(id, email, name, accessToken, refreshToken,"");
     }
 }
