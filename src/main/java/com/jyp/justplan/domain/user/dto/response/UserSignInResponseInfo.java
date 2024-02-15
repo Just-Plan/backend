@@ -18,7 +18,8 @@ public class UserSignInResponseInfo {
     private String mbtiName;
 
     public static UserSignInResponseInfo toInfo(Long id, String email, String name, String accessToken, String refreshToken, Mbti mbti) {
-        return new UserSignInResponseInfo(id, email, name, accessToken, refreshToken, mbti.getMbti());
+
+        return new UserSignInResponseInfo(id, email, name, accessToken, refreshToken, (mbti == null) ? "" : mbti.getMbti());
     }
     public static UserSignInResponseInfo toInfo(Long id, String email, String name, String accessToken, String refreshToken) {
         return new UserSignInResponseInfo(id, email, name, accessToken, refreshToken,"");
