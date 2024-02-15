@@ -12,6 +12,9 @@ public class CityResponse {
     private String introduction;
     private String countryKoreanName;
     private String countryEnglishName;
+    private double latitude;
+    private double longitude;
+
 
     public CityResponse() {
     }
@@ -23,5 +26,7 @@ public class CityResponse {
         this.introduction = city.getIntroduction();
         this.countryKoreanName = city.getCountry().getKoreanName();
         this.countryEnglishName = city.getCountry().getEnglishName();
+        this.latitude = city.getLatitude();
+        this.longitude = city.getLongitude();
     }
 }
