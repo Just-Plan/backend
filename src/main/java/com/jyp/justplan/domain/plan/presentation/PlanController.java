@@ -2,10 +2,7 @@ package com.jyp.justplan.domain.plan.presentation;
 
 import com.jyp.justplan.api.response.ApiResponseDto;
 import com.jyp.justplan.domain.plan.application.PlanService;
-import com.jyp.justplan.domain.plan.dto.request.PlanIdRequest;
-import com.jyp.justplan.domain.plan.dto.request.PlanCreateRequest;
-import com.jyp.justplan.domain.plan.dto.request.PlanScrapRequest;
-import com.jyp.justplan.domain.plan.dto.request.PlanUpdateRequest;
+import com.jyp.justplan.domain.plan.dto.request.*;
 import com.jyp.justplan.domain.plan.dto.response.PlanDetailResponse;
 import com.jyp.justplan.domain.plan.dto.response.PlanWithAccountBookResponse;
 import com.jyp.justplan.domain.plan.dto.response.PlansResponse;
@@ -37,15 +34,16 @@ public class PlanController {
             @ApiResponse(responseCode = "200", description = "성공",
                     content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
     })
-    @GetMapping
+    @PostMapping("/plans")
     public ApiResponseDto<PlansResponse> getPlans (
-            @RequestParam(required = false, defaultValue = "") String type,
-            @RequestParam(required = false, defaultValue = "0") long regionId,
-            @RequestParam(required = false, defaultValue = "0") int page,
-            @RequestParam(required = false, defaultValue = "10") int size,
-            @RequestParam(required = false, defaultValue = "scrapCnt") String sort
+            @Parameter(description = "일정 조회를 위한 MBTI 데이터", required = true)
+            @RequestBody PlanReadRequest request,
+            @RequestParam(defaultValue = "0") long regionId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "scrapCnt") String sort
     ) {
-        PlansResponse response = planService.getPlans(type, regionId, page, size, sort);
+        PlansResponse response = planService.getPlans(request, regionId, page, size, sort);
         return ApiResponseDto.successResponse(response);
     }
 
