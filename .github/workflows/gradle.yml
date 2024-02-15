@@ -40,7 +40,7 @@ jobs:
       - name: Docker Build and Push
         run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:latest .
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:latest -f Dockerfile.gitAction .
           docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:latest
 
       - name: Deploy to EC2
@@ -51,9 +51,11 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd /home/ubuntu
-            sudo docker-compose pull ${DOCKER_USERNAME}/${DOCKER_REPO}:latest
+            sudo docker-compose pull backend
             sudo docker-compose down
-            sudo docker-compose up -d
+            sudo docker-compose up -d --force-recreate
+            
+          # sudo docker-compose pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:latest
           # sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:latest
           #   sudo docker stop backend || true
           #   sudo docker rm backend || true
