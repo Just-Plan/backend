@@ -3,6 +3,7 @@ package com.jyp.justplan.domain.plan.application;
 import com.jyp.justplan.domain.city.domain.City;
 import com.jyp.justplan.domain.city.domain.CityRepository;
 import com.jyp.justplan.domain.city.dto.response.CityResponse;
+import com.jyp.justplan.domain.mbti.exception.MbtiNotFoundException;
 import com.jyp.justplan.domain.place.domain.GooglePlaceStore;
 import com.jyp.justplan.domain.place.domain.Place;
 import com.jyp.justplan.domain.place.domain.PlaceStore;
@@ -117,6 +118,12 @@ public class PlanService {
         Pageable pageable = PageRequest.of(page, size);
         PlansResponse plansResponse;
 
+        for (int i = 0; i < mbti.size(); i++) {
+            String m = mbti.get(i);
+            mbti.set(i, m.toUpperCase());
+            if (!validateMbti(m)) throw new MbtiNotFoundException("존재하지 않는 MBTI입니다.");
+        }
+
 //        if (sort.equals("scrapCnt")) {
             pageable = PageRequest.of(page, size);
 
@@ -137,6 +144,24 @@ public class PlanService {
             }
 //        }
         return plansResponse;
+    }
+
+    private boolean validateMbti (String mbti) {
+        if (mbti.length() != 4) return false;
+
+        mbti = mbti.toUpperCase();
+        char first = mbti.charAt(0);
+        char second = mbti.charAt(1);
+        char third = mbti.charAt(2);
+        char fourth = mbti.charAt(3);
+
+        if ((first != 'I' && first != 'E') ||
+                (second != 'N' && second != 'S') ||
+                (third != 'T' && third != 'F') ||
+                (fourth != 'J' && fourth != 'P')) {
+            return false;
+        }
+        return true;
     }
 
 
