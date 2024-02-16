@@ -8,7 +8,7 @@ public class JustPlanApplication {
 
 	public static void main(String[] args) {
 		SpringApplication app = new SpringApplication(JustPlanApplication.class);
-		app.setAdditionalProfiles("local");
+		app.setAdditionalProfiles("prod");
 		app.run(args);
 	}
 }
