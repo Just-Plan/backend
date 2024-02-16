@@ -6,6 +6,7 @@ import com.jyp.justplan.domain.place.dto.request.PlaceListRequest;
 import com.jyp.justplan.domain.place.dto.request.PlacePlanUpdateDto;
 import com.jyp.justplan.domain.place.dto.response.PlaceDetailResponse;
 import com.jyp.justplan.domain.place.dto.response.SchedulePlacesResponse;
+import com.jyp.justplan.domain.place.dto.response.SchedulePlacesResponse.PlaceResponse;
 import com.jyp.justplan.domain.user.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,6 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,8 +52,8 @@ public class PlaceController {
         @RequestBody PlaceListRequest placeRequest,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        placeService.createPlace(placeRequest, planId, userDetails.getUserId());
-        return ApiResponseDto.successWithoutDataResponse();
+        return ApiResponseDto.successResponse(placeService.createPlace(placeRequest, planId,
+            userDetails.getUserId()));
     }
 
     // 일정에 대한 장소 전체 조회
