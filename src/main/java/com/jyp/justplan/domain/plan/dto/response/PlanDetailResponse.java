@@ -17,6 +17,8 @@ public class PlanDetailResponse {
     private long planId;
     private String title;
     private List<UserPlanResponse> users;
+
+    private Boolean scrapped;
     private long scrapCount;
 
     private CityResponse region;
@@ -37,6 +39,7 @@ public class PlanDetailResponse {
             Plan plan,
             List<UserPlanResponse> users,
             String photoUrl,
+            Boolean scrapped,
             long scrapCount,
             List<String> tags,
             CityResponse cityResponse
@@ -45,6 +48,7 @@ public class PlanDetailResponse {
                 plan.getId(),
                 plan.getTitle(),
                 users,
+                scrapped,
                 scrapCount,
                 cityResponse,
                 plan.getStartDate(),
@@ -63,6 +67,7 @@ public class PlanDetailResponse {
             Plan plan,
             List<UserPlanResponse> users,
             String photoUrl,
+            Boolean scrapped,
             long scrapCount,
             List<String> tags,
             CityResponse cityResponse,
@@ -72,6 +77,7 @@ public class PlanDetailResponse {
                 plan.getId(),
                 plan.getTitle(),
                 users,
+                scrapped,
                 scrapCount,
                 cityResponse,
                 plan.getStartDate(),

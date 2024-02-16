@@ -37,4 +37,9 @@ public class ScrapStoreImpl implements ScrapStore {
             scrapRepository.delete(scrapEntity);
         }
     }
+
+    @Override
+    public boolean isScrapped(User user, Plan plan) {
+        return scrapRepository.existsByUserAndPlan(user, plan);
+    }
 }

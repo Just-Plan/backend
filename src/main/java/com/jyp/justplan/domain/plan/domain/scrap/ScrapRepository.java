@@ -20,4 +20,6 @@ public interface ScrapRepository extends JpaRepository<Scrap, Long> {
     long countByPlan(Plan plan);
 
     long countByUser(User user);
+
+    boolean existsByUserAndPlan(User user, Plan plan);
 }
