@@ -30,6 +30,7 @@ public class ScrapStoreImpl implements ScrapStore {
     @Override
     public void scrapPlan(User user, Plan plan, boolean scrap) {
         if (scrap) {
+            if (scrapRepository.existsByUserAndPlan(user, plan)) throw new NoSuchScrapException("이미 스크랩한 일정입니다.");
             scrapRepository.save(new Scrap(user, plan));
         } else {
             Scrap scrapEntity = scrapRepository.findByUserAndPlan(user, plan)
