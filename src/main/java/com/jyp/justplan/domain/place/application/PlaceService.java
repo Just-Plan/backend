@@ -88,9 +88,10 @@ public class PlaceService {
 
     // 장소 생성
     @Transactional
-    public void createPlace(PlaceListRequest placeListRequest, Long planId, Long userId) {
+    public List<PlaceResponse> createPlace(PlaceListRequest placeListRequest, Long planId, Long userId) {
         Plan findPlan = getPlan(planId);
         extracted(userId, planId);
+        List<PlaceResponse> placeResponses = new ArrayList<>();
         for (PlaceRequest placeRequest : placeListRequest.getPlaces()) {
             // Memo 생성 로직을 각 Place에 대해 반복
             Memo savedMemo = memoRepository.save(new Memo());
@@ -99,10 +100,18 @@ public class PlaceService {
             GooglePlace googlePlace = Optional.ofNullable(placeRequest.getGooglePlaceId())
                 .flatMap(googlePlaceRepository::findById)
                 .orElseGet(() -> findOrCreateGooglePlace(placeRequest, findPlan.getRegion()));
+
+            List<MbtiType> mbtiList = googlePlaceStatsRepository.findAllByGooglePlaceId(
+                    googlePlace.getId())
+                .stream()
+                .map(stats -> MbtiType.valueOf(stats.getMbti().getMbti()))
+                .toList();
+
             // 각 Place에 대한 인스턴스 생성 및 저장
             Place newPlace = new Place(0, 0, findPlan, savedMemo, googlePlace);
-            placeRepository.save(newPlace);
+            placeResponses.add(PlaceResponse.of(placeRepository.save(newPlace), mbtiList));
         }
+        return placeResponses;
     }
 
     // 일정에 대한 전체 장소 조회
