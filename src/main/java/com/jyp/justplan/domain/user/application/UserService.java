@@ -106,7 +106,8 @@ public class UserService {
                     user.getName(),
                     accessToken,
                     refreshToken,
-                    user.getMbti()
+                    user.getMbti(),
+                    user.getProfile()
             );
         } catch (BadCredentialsException e) {
             throw new UserException("비밀번호가 일치하지 않습니다.");
