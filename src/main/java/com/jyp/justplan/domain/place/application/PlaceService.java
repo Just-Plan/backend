@@ -274,6 +274,9 @@ public class PlaceService {
     private GooglePlace createGooglePlace(PlaceRequest request, City city) {
         // GooglePlace 객체 생성 및 초기화 로직
         GooglePlaceStats saveGooglePlaceStats = googlePlaceStatsRepository.save(new GooglePlaceStats());
+        List<GooglePlaceStats> googlePlaceStatsList = new ArrayList<>();
+        googlePlaceStatsList.add(saveGooglePlaceStats);
+
         GooglePlace newGooglePlace = GooglePlace.builder()
             .name(request.getName())
             .address(request.getFormattedAddress())
@@ -282,7 +285,7 @@ public class PlaceService {
             .longitude(request.getLongitude())
             .photoReference(request.getPhotoReference())
             .city(city)
-            .googlePlaceStats((List<GooglePlaceStats>) saveGooglePlaceStats)
+            .googlePlaceStats(googlePlaceStatsList)
             .build();
         return googlePlaceRepository.save(newGooglePlace);
     }
