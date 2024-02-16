@@ -17,6 +17,7 @@ import com.jyp.justplan.domain.plan.domain.tag.PlanTag;
 import com.jyp.justplan.domain.plan.dto.request.*;
 import com.jyp.justplan.domain.plan.dto.response.*;
 import com.jyp.justplan.domain.plan.exception.PlanValidationException;
+import com.jyp.justplan.domain.user.UserDetailsImpl;
 import com.jyp.justplan.domain.user.application.UserService;
 import com.jyp.justplan.domain.user.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +48,7 @@ public class PlanService {
 
 
     /* Plan을 통한 PlanResponse 반환 (origin Plan 정보 포함) */
-    private PlanDetailResponse getPlanDetailResponse(Plan plan) {
+    private PlanDetailResponse getPlanDetailResponse(Plan plan, User user) {
         // 일정에 해당하는 태그 조회
         List<PlanTag> tags = planTagService.findTagsByPlan(plan);
         List<String> tagNames = getTagNames(tags);
@@ -60,6 +61,7 @@ public class PlanService {
                 : null;
 
         long scrapCount = scrapStore.getScrapCount(plan);
+        Boolean scrapped = user == null ? null : scrapStore.isScrapped(user, plan);
 
         CityResponse cityResponse = new CityResponse(plan.getRegion());
 
@@ -73,13 +75,13 @@ public class PlanService {
                     : null;
 
             OriginPlanResponse originPlanResponse = OriginPlanResponse.toDto(originPlan, originUsers);
-            return PlanDetailResponse.toDto(plan, users, originPhotoUrl, scrapCount, tagNames, cityResponse, originPlanResponse);
+            return PlanDetailResponse.toDto(plan, users, originPhotoUrl, scrapped, scrapCount, tagNames, cityResponse, originPlanResponse);
         } else {
-            return PlanDetailResponse.toDto(plan, users, photoUrl, scrapCount, tagNames, cityResponse);
+            return PlanDetailResponse.toDto(plan, users, photoUrl, scrapped, scrapCount, tagNames, cityResponse);
         }
     }
 
-    private PlanResponse getPlanResponse(Plan plan) {
+    private PlanResponse getPlanResponse(Plan plan, User user) {
         List<PlanTag> tags = planTagService.findTagsByPlan(plan);
         List<String> tagNames = getTagNames(tags);
         List<UserPlanResponse> users = findUsersByPlan(plan).stream()
@@ -92,13 +94,14 @@ public class PlanService {
                 : null;
 
         long scrapCount = scrapStore.getScrapCount(plan);
+        Boolean scrapped = user == null ? null : scrapStore.isScrapped(user, plan);
 
-        return PlanResponse.toDto(plan, users, photoUrl, scrapCount, tagNames);
+        return PlanResponse.toDto(plan, users, photoUrl, scrapped, scrapCount, tagNames);
     }
 
-    private PlansResponse getPlansResponse(Page<Plan> plans) {
+    private PlansResponse getPlansResponse(Page<Plan> plans, User user) {
         List<PlanResponse> planResponses = plans.stream()
-                .map(this::getPlanResponse)
+                .map(plan -> getPlanResponse(plan, user))
                 .collect(Collectors.toList());
 
         PlansResponse plansResponse = new PlansResponse(
@@ -113,10 +116,11 @@ public class PlanService {
     }
 
     /* 전체 플랜 조회 */
-    public PlansResponse getPlans(PlanReadRequest request, long regionId, int page, int size, String sort) {
+    public PlansResponse getPlans(PlanReadRequest request, long regionId, int page, int size, String sort, UserDetailsImpl userDetails) {
         List<String> mbti = request.getMbti();
         Pageable pageable = PageRequest.of(page, size);
         PlansResponse plansResponse;
+        User user = userDetails != null ? userService.findByEmail(userDetails.getUsername()) : null;
 
         for (int i = 0; i < mbti.size(); i++) {
             String m = mbti.get(i);
@@ -129,18 +133,18 @@ public class PlanService {
 
             if (mbti.isEmpty() && regionId == 0) {
                 Page<Plan> plans = planRepository.findAllOrderByScrapCnt(pageable);
-                plansResponse = getPlansResponse(plans);
+                plansResponse = getPlansResponse(plans, user);
             } else if (mbti.isEmpty()) {
                 City region = cityRepository.getById(regionId);
                 Page<Plan> plans = planRepository.findAllByRegionOrderByScrapCnt(pageable, region);
-                plansResponse = getPlansResponse(plans);
+                plansResponse = getPlansResponse(plans, user);
             } else if (regionId == 0) {
                 Page<Plan> plans = planRepository.findAllByMbtiOrderByScrapCnt(pageable, mbti);
-                plansResponse = getPlansResponse(plans);
+                plansResponse = getPlansResponse(plans, user);
             } else {
                 City region = cityRepository.getById(regionId);
                 Page<Plan> plans = planRepository.findAllByMbtiAndRegionOrderByScrapCnt(pageable, mbti, region);
-                plansResponse = getPlansResponse(plans);
+                plansResponse = getPlansResponse(plans, user);
             }
 //        }
         return plansResponse;
@@ -166,19 +170,21 @@ public class PlanService {
 
 
     /* 플랜 단일 조회 */
-    public PlanDetailResponse getPlan(Long planId) {
+    public PlanDetailResponse getPlan(Long planId, UserDetailsImpl userDetails) {
         Plan plan = planRepository.getById(planId);
-        return getPlanDetailResponse(plan);
+        User user = userDetails != null ? userService.findByEmail(userDetails.getUsername()) : null;
+
+        return getPlanDetailResponse(plan, user);
     }
 
     /* 나의 플랜 조회 */
-    public PlansResponse getMyPlans(int page, int size, String sort, String userEmail) {
+    public PlansResponse getMyPlans(int page, int size, String sort, UserDetailsImpl userDetails) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort).descending());
-        User user = userService.findByEmail(userEmail);
+        User user = userService.findByEmail(userDetails.getUsername());
 
         Page<Plan> plans = planRepository.findAllByUser(pageable, user);
 
-        return getPlansResponse(plans);
+        return getPlansResponse(plans, user);
     }
 
     /* 나의 플랜 조회 (가계부 포함) */
@@ -203,7 +209,7 @@ public class PlanService {
 
         Page<Plan> plans = scrapStore.getMyScrapList(page, size, sort, user);
 
-        return getPlansResponse(plans);
+        return getPlansResponse(plans, user);
     }
 
     /* 플랜 생성 */
@@ -222,7 +228,7 @@ public class PlanService {
 
         planTagService.savePlanTag(plan, request.getTags());
 
-        return getPlanDetailResponse(plan);
+        return getPlanDetailResponse(plan, user);
     }
 
     /* 플랜 복제 (가져오기) */
@@ -250,7 +256,7 @@ public class PlanService {
         budgetService.createBudget(new_plan);
         expenseService.createExpense(new_plan);
 
-        return getPlanDetailResponse(new_plan);
+        return getPlanDetailResponse(new_plan, user);
     }
 
     private static List<String> getTagNames(List<PlanTag> tags) {
@@ -284,16 +290,18 @@ public class PlanService {
         budgetService.updateBudget(plan.getBudget(), request.getBudget());
         expenseService.updateExpense(plan.getExpense(), request.getExpense());
 
-        return getPlanDetailResponse(plan);
+        return getPlanDetailResponse(plan, user);
     }
 
     /* 플랜 스크랩 */
     @Transactional
-    public void scrapPlan(PlanScrapRequest request, String userEmail) {
+    public PlanResponse scrapPlan(PlanScrapRequest request, String userEmail) {
         Plan plan = planRepository.getById(request.getPlanId());
         User user = userService.findByEmail(userEmail);
 
         scrapStore.scrapPlan(user, plan, request.isScrap());
+
+        return getPlanResponse(plan, user);
     }
 
     /* 플랜 삭제 */
