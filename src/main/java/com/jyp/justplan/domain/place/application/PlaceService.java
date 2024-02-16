@@ -149,7 +149,7 @@ public class PlaceService {
 
     // 전체 장소 수정
     @Transactional
-    public void updatePlaces(PlacePlanUpdateDto placePlanUpdateDto, Long userId, Long planId) {
+    public SchedulePlacesResponse updatePlaces(PlacePlanUpdateDto placePlanUpdateDto, Long userId, Long planId) {
         extracted(userId, planId);
 
         // Place 삭제
@@ -172,6 +172,7 @@ public class PlaceService {
                 place.update(updateRequest.getOrderNum(), day, memo);
             });
         });
+        return findPlacesByPlanId(planId);
     }
 
     // 장소 상세 조회 플로우
