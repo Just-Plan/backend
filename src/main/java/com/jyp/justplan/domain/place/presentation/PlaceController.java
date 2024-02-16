@@ -109,8 +109,8 @@ public class PlaceController {
         @org.springframework.web.bind.annotation.RequestBody PlacePlanUpdateDto placePlanUpdateDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        placeService.updatePlaces(placePlanUpdateDto, userDetails.getUserId(), planId);
-        return ApiResponseDto.successWithoutDataResponse();
+        return ApiResponseDto.successResponse(placeService.updatePlaces(
+            placePlanUpdateDto, userDetails.getUserId(), planId));
     }
 
     // 장소 상세 조회
