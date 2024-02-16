@@ -4,6 +4,7 @@ import com.jyp.justplan.api.response.ApiResponseDto;
 import com.jyp.justplan.domain.plan.application.PlanService;
 import com.jyp.justplan.domain.plan.dto.request.*;
 import com.jyp.justplan.domain.plan.dto.response.PlanDetailResponse;
+import com.jyp.justplan.domain.plan.dto.response.PlanResponse;
 import com.jyp.justplan.domain.plan.dto.response.PlanWithAccountBookResponse;
 import com.jyp.justplan.domain.plan.dto.response.PlansResponse;
 import com.jyp.justplan.domain.user.UserDetailsImpl;
@@ -15,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,9 +43,10 @@ public class PlanController {
             @RequestParam(defaultValue = "0") long regionId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "scrapCnt") String sort
+            @RequestParam(defaultValue = "scrapCnt") String sort,
+            @AuthenticationPrincipal @Nullable UserDetailsImpl userDetails
     ) {
-        PlansResponse response = planService.getPlans(request, regionId, page, size, sort);
+        PlansResponse response = planService.getPlans(request, regionId, page, size, sort, userDetails);
         return ApiResponseDto.successResponse(response);
     }
 
@@ -56,9 +59,10 @@ public class PlanController {
     @Parameter(name = "planId", description = "조회할 일정의 아이디", required = true, example = "1")
     @GetMapping("/{planId}")
     public ApiResponseDto<PlanDetailResponse> getPlan (
-            @PathVariable Long planId
+            @PathVariable Long planId,
+            @AuthenticationPrincipal @Nullable UserDetailsImpl userDetails
     ) {
-        PlanDetailResponse response = planService.getPlan(planId);
+        PlanDetailResponse response = planService.getPlan(planId, userDetails);
         return ApiResponseDto.successResponse(response);
     }
 
@@ -75,7 +79,7 @@ public class PlanController {
             @RequestParam(required = false, defaultValue = "createdAt") String sort,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        PlansResponse response = planService.getMyPlans(page, size, sort, userDetails.getUsername());
+        PlansResponse response = planService.getMyPlans(page, size, sort, userDetails);
         return ApiResponseDto.successResponse(response);
     }
 
@@ -165,12 +169,12 @@ public class PlanController {
                     content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
     })
     @PostMapping("/scrap")
-    public ApiResponseDto<?> scrapPlan (
+    public ApiResponseDto<PlanResponse> scrapPlan (
             @Valid @RequestBody PlanScrapRequest request,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        planService.scrapPlan(request, userDetails.getUsername());
-        return ApiResponseDto.successWithoutDataResponse();
+        PlanResponse response = planService.scrapPlan(request, userDetails.getUsername());
+        return ApiResponseDto.successResponse(response);
     }
 
     /* 플랜 삭제 */

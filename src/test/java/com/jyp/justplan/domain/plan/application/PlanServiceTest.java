@@ -80,7 +80,7 @@ class PlanServiceTest {
         PlanDetailResponse response = planService.savePlan(request, 테스트_이메일);
 
         /* when */
-        PlanDetailResponse actual = planService.getPlan(response.getPlanId());
+        PlanDetailResponse actual = planService.getPlan(response.getPlanId(), null);
 
         /* then */
         assertAll(
@@ -98,7 +98,7 @@ class PlanServiceTest {
         /* given */
         /* when */
         /* then */
-        assertThatThrownBy(() -> planService.getPlan(0L))
+        assertThatThrownBy(() -> planService.getPlan(0L, null))
                 .isInstanceOf(NoSuchPlanException.class);
 
     }
@@ -113,7 +113,7 @@ class PlanServiceTest {
 
         /* when */
         /* then */
-        assertThatThrownBy(() -> planService.getPlan(response.getPlanId()))
+        assertThatThrownBy(() -> planService.getPlan(response.getPlanId(), null))
                 .isInstanceOf(NoSuchPlanException.class);
     }
 
@@ -189,7 +189,7 @@ class PlanServiceTest {
         planService.deletePlan(response.getPlanId(), 테스트_이메일);
 
         /* then */
-        assertThatThrownBy(() -> planService.getPlan(response.getPlanId()))
+        assertThatThrownBy(() -> planService.getPlan(response.getPlanId(), null))
                 .isInstanceOf(NoSuchPlanException.class);
     }
 

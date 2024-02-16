@@ -19,6 +19,7 @@ public class PlanResponse {
     private long planId;
     private String title;
     private List<UserPlanResponse> users;
+    private Boolean scrapped;
     private long scrapCount;
     private BudgetResponse budget;
     private CityResponse region;
@@ -34,6 +35,7 @@ public class PlanResponse {
             Plan plan,
             List<UserPlanResponse> users,
             String photoUrl,
+            Boolean scrapped,
             long scrapCount,
             List<String> tags
     ) {
@@ -42,6 +44,7 @@ public class PlanResponse {
                 plan.getId(),
                 plan.getTitle(),
                 users,
+                scrapped,
                 scrapCount,
                 BudgetResponse.toDto(plan.getBudget()),
                 new CityResponse(plan.getRegion()),
