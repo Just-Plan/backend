@@ -205,11 +205,6 @@ public class PlaceService {
                         .map(stats -> MbtiType.valueOf(stats.getMbti().getMbti()))
                         .toList();
                     placeDetailResponse.getResult().setMbti(lists);
-
-                    List<PlaceCommentResponse> comments = googleCommentRepository.findAllByPlaceId(findGooglePlaceId).stream()
-                        .map(PlaceCommentResponse::toDto)
-                        .toList();
-                    placeDetailResponse.getResult().setComment(comments);
                 }
                 return Mono.just(placeDetailResponse);
             });
