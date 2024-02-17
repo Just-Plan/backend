@@ -6,6 +6,7 @@ import com.jyp.justplan.domain.mbti.domain.Mbti;
 import com.jyp.justplan.domain.mbti.domain.MbtiTestRepository;
 import com.jyp.justplan.domain.plan.domain.UserPlanRepository;
 import com.jyp.justplan.domain.plan.domain.scrap.ScrapRepository;
+import com.jyp.justplan.domain.s3.S3Service;
 import com.jyp.justplan.domain.user.UserDetailsImpl;
 import com.jyp.justplan.domain.user.domain.EmailAuth;
 import com.jyp.justplan.domain.user.domain.EmailAuthRepository;
@@ -43,6 +44,7 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final BCryptPasswordEncoder passwordEncoder;
     private final RedisTemplate<String, String> redisTemplate;
+    private final S3Service s3Service;
 
     /* 회원가입 */
     public UserResponse saveUser(UserSignUpRequest userSignUpRequest) {
@@ -218,5 +220,41 @@ public class UserService {
                 .orElseThrow(() -> new UserException("해당 유저의 MBTI가 존재하지 않습니다."));
 
         return UserResponse.toTotDto(user, totalScrap, totalUserPlan, mbti);
+    }
+
+    /*프로필 사진 업로드*/
+    public String uploadProfile(ProfileUploadRequest profileUploadRequest) {
+        String uri = "";
+        try {
+            uri = s3Service.uploadProfilePicture(profileUploadRequest.getEmail(), profileUploadRequest.getFile());
+        } catch (Exception e) {
+            throw new UserException(e.getMessage());
+        }
+
+        User user = userRepository.findByEmail(profileUploadRequest.getEmail())
+                .orElseThrow(() -> new UserException("해당 유저가 존재하지 않습니다."));
+
+        user.updateProfile(uri);
+
+        return uri;
+
+    }
+
+    /*배경사진 업로드*/
+    public String uploadBackground(ProfileUploadRequest profileUploadRequest) {
+        String uri = "";
+        try {
+            uri = s3Service.uploadBackgroundPicture(profileUploadRequest.getEmail(), profileUploadRequest.getFile());
+        } catch (Exception e) {
+            throw new UserException(e.getMessage());
+        }
+
+        User user = userRepository.findByEmail(profileUploadRequest.getEmail())
+                .orElseThrow(() -> new UserException("해당 유저가 존재하지 않습니다."));
+
+        user.updateBackground(uri);
+
+        return uri;
+
     }
 }
