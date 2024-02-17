@@ -43,8 +43,6 @@ public class PlaceDetailResponse {
 
         @Setter
         private List<MbtiType> mbti;
-        @Setter
-        private List<PlaceCommentResponse> comment;
 
         public void setTranslatedTypes() {
             this.types = types.stream().findFirst()
