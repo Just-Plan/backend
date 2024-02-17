@@ -1,5 +1,6 @@
 package com.jyp.justplan.domain.place.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.jyp.justplan.domain.mbti.domain.Mbti;
 import java.time.ZonedDateTime;
 import javax.persistence.Column;
@@ -35,6 +36,7 @@ public class GooglePlaceStats {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "google_place_id")
+    @JsonBackReference
     private GooglePlace googlePlace;
 
     @Column(name = "updated_at", nullable = false)
