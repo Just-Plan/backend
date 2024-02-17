@@ -44,9 +44,8 @@ public class PlaceDetailResponse {
         @Setter
         private List<MbtiType> mbti;
         @Setter
-        private List<PlaceComment> comment;
+        private List<PlaceCommentResponse> comment;
 
-        // 타입 변환을 위한 setter
         public void setTranslatedTypes() {
             this.types = types.stream().findFirst()
                 .map(GoogleMapType::translateToKorean).stream().toList();

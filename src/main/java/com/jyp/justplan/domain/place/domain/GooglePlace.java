@@ -1,5 +1,6 @@
 package com.jyp.justplan.domain.place.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.jyp.justplan.domain.BaseEntity;
 import com.jyp.justplan.domain.city.domain.City;
 import java.util.ArrayList;
@@ -42,10 +43,11 @@ public class GooglePlace extends BaseEntity {
     private double longitude;
     private String photoReference;
 
-    @OneToMany(mappedBy = "googlePlace", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "googlePlace", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<GooglePlaceStats> googlePlaceStats = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "CITY_ID", nullable = false)
     private City city;
 }

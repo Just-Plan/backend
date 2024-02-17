@@ -48,7 +48,7 @@ public class Place extends BaseEntity {
     @Setter
     private Memo memo;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "GOOGLE_PLACE_ID", nullable = false)
     private GooglePlace googlePlace;
 

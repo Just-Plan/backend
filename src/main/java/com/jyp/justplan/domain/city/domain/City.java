@@ -37,7 +37,7 @@ public class City extends BaseEntity {
     @Column(name="time_difference", nullable = false)
     private int timeDifference;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "country_id", nullable = false)
     private Country country;
 

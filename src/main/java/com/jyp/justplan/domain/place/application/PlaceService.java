@@ -20,6 +20,7 @@ import com.jyp.justplan.domain.place.dto.request.PlaceListRequest.PlaceRequest;
 import com.jyp.justplan.domain.place.dto.request.PlacePlanUpdateDto;
 import com.jyp.justplan.domain.place.dto.request.PlaceUpdateRequest;
 import com.jyp.justplan.domain.place.dto.response.GooglePlacesSearchResponse;
+import com.jyp.justplan.domain.place.dto.response.PlaceCommentResponse;
 import com.jyp.justplan.domain.place.dto.response.PlaceDetailResponse;
 import com.jyp.justplan.domain.place.dto.response.PlaceDetailResponse.Result.Photo;
 import com.jyp.justplan.domain.place.dto.response.SchedulePlacesResponse;
@@ -176,17 +177,23 @@ public class PlaceService {
     }
 
     // 장소 상세 조회 플로우
+    @Transactional
     public Mono<PlaceDetailResponse> getPlaceDetail(String name, String latitude, String longitude, String googlePlaceId) {
         return Mono.justOrEmpty(googlePlaceId)
             .switchIfEmpty(findPlaceIdByNameAndLocation(name, latitude, longitude))
             .flatMap(this::findPlaceDetailsByGoogleId)
             .flatMap(placeDetailResponse -> {
                 placeDetailResponse.getResult().setTranslatedTypes();
-                return googlePlaceService.fetchPhotoUrl(placeDetailResponse.getResult().getPhotos().get(0).getPhotoReference(), 400)
-                    .map(url -> {
-                        placeDetailResponse.getResult().setPhotos(List.of(new Photo(0, 0, url, Collections.emptyList())));
-                        return placeDetailResponse;
-                    });
+                // Photos가 null이거나 비어있는 경우를 처리
+                if (placeDetailResponse.getResult().getPhotos() != null && !placeDetailResponse.getResult().getPhotos().isEmpty()) {
+                    return googlePlaceService.fetchPhotoUrl(placeDetailResponse.getResult().getPhotos().get(0).getPhotoReference(), 400)
+                        .map(url -> {
+                            placeDetailResponse.getResult().setPhotos(List.of(new Photo(0, 0, url, Collections.emptyList())));
+                            return placeDetailResponse;
+                        }).defaultIfEmpty(placeDetailResponse);
+                } else {
+                    return Mono.just(placeDetailResponse);
+                }
             })
             .flatMap(placeDetailResponse -> {
                 Optional<GooglePlace> optionalGooglePlace = googlePlaceRepository.findByName(placeDetailResponse.getResult().getName());
@@ -199,9 +206,10 @@ public class PlaceService {
                         .toList();
                     placeDetailResponse.getResult().setMbti(lists);
 
-                    List<PlaceComment> comments = googleCommentRepository.findAllByPlaceId(findGooglePlaceId);
+                    List<PlaceCommentResponse> comments = googleCommentRepository.findAllByPlaceId(findGooglePlaceId).stream()
+                        .map(PlaceCommentResponse::toDto)
+                        .toList();
                     placeDetailResponse.getResult().setComment(comments);
-
                 }
                 return Mono.just(placeDetailResponse);
             });
