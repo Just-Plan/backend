@@ -51,4 +51,15 @@ public class S3Service {
         return amazonS3.getUrl(bucket, key).toString();
     }
 
+    public String uploadBackgroundPicture (String userEmail, MultipartFile file) throws IOException {
+        String key = "background/" + userEmail + "_" + Instant.now().toEpochMilli() + ".jpg";
+
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(file.getSize());
+        metadata.setContentType(file.getContentType());
+
+        amazonS3.putObject(bucket, key, file.getInputStream(), metadata);
+        return amazonS3.getUrl(bucket, key).toString();
+    }
+
 }

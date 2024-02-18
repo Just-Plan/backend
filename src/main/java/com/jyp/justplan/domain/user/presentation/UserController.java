@@ -10,6 +10,7 @@ import com.jyp.justplan.domain.user.dto.request.*;
 import com.jyp.justplan.domain.user.dto.response.UserResponse;
 import com.jyp.justplan.domain.user.dto.response.UserSignInResponseDto;
 import com.jyp.justplan.domain.user.dto.response.UserSignInResponseInfo;
+import com.jyp.justplan.domain.user.dto.request.ProfileUploadRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -173,6 +175,43 @@ public class UserController {
         userService.deleteUser(userDeleteRequest, userDetails);
         return ApiResponseDto.successWithoutDataResponse();
     }
+
+    /* 프로필 이미지 업로드 */
+    @Tag(name = "User", description = "사용자 관련 API Controller")
+    @Operation(summary = "프로필사진 업로드", description = "프로필사진 업로드를 수행한다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
+    })
+    @PostMapping("/profile/upload")
+    public ApiResponseDto<String> uploadProfile(
+            @RequestParam MultipartFile file,
+            @RequestParam String email
+    ) {
+        ProfileUploadRequest profileUploadRequest = new ProfileUploadRequest(email,file);
+        String uri = userService.uploadProfile(profileUploadRequest);
+
+        return ApiResponseDto.successResponse(uri);
+    }
+
+    /* 배경 이미지 업로드 */
+    @Tag(name = "User", description = "사용자 관련 API Controller")
+    @Operation(summary = "배경 사진 업로드", description = "배경사진 업로드를 수행한다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
+    })
+    @PostMapping("/background/upload")
+    public ApiResponseDto<String> uploadBackground(
+            @RequestParam MultipartFile file,
+            @RequestParam String email
+    ) {
+        ProfileUploadRequest profileUploadRequest = new ProfileUploadRequest(email,file);
+        String uri = userService.uploadBackground(profileUploadRequest);
+
+        return ApiResponseDto.successResponse(uri);
+    }
+
 
     /* Token 재발급 */
     @Tag(name = "User", description = "사용자 관련 API Controller")

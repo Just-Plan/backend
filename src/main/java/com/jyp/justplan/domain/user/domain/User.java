@@ -6,6 +6,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 
 import javax.persistence.Entity;
@@ -35,6 +36,7 @@ public class User extends BaseEntity {
 
     private UserRole role;
 
+    //@ColumnDefault("'https://just-plan.s3.ap-northeast-2.amazonaws.com/profiles/test%40naver.com/profile_1708163546744.jpg'")
     private String profile;
 
     private String background;
