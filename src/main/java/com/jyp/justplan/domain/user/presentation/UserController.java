@@ -191,7 +191,7 @@ public class UserController {
         ProfileUploadRequest profileUploadRequest = new ProfileUploadRequest(email,file);
         String uri = userService.uploadProfile(profileUploadRequest);
 
-        return ApiResponseDto.successResponse(uri);
+        return ApiResponseDto.successResponse(uri, "프로필 이미지가 정상적으로 수정 되었습니다.");
     }
 
     /* 배경 이미지 업로드 */
@@ -209,7 +209,7 @@ public class UserController {
         ProfileUploadRequest profileUploadRequest = new ProfileUploadRequest(email,file);
         String uri = userService.uploadBackground(profileUploadRequest);
 
-        return ApiResponseDto.successResponse(uri);
+        return ApiResponseDto.successResponse(uri, "배경 이미지가 정상적으로 수정 되었습니다.");
     }
 
 
