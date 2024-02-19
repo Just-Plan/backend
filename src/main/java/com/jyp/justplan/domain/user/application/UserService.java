@@ -228,7 +228,7 @@ public class UserService {
         try {
             uri = s3Service.uploadProfilePicture(profileUploadRequest.getEmail(), profileUploadRequest.getFile());
         } catch (Exception e) {
-            throw new UserException(e.getMessage());
+            throw new UserException("이미지 업로드 중 오류가 발생하였습니다.");
         }
 
         User user = userRepository.findByEmail(profileUploadRequest.getEmail())
@@ -246,7 +246,7 @@ public class UserService {
         try {
             uri = s3Service.uploadBackgroundPicture(profileUploadRequest.getEmail(), profileUploadRequest.getFile());
         } catch (Exception e) {
-            throw new UserException(e.getMessage());
+            throw new UserException("이미지 업로드 중 오류가 발생하였습니다.");
         }
 
         User user = userRepository.findByEmail(profileUploadRequest.getEmail())

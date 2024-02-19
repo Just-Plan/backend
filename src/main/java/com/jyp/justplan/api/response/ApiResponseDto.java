@@ -25,6 +25,10 @@ public class ApiResponseDto<T> {
         return new ApiResponseDto<>(ResponseCode.SUCCESS.getCode(), data, null);
     }
 
+    public static <T> ApiResponseDto<T> successResponse(T data, String msg) {
+        return new ApiResponseDto<>(ResponseCode.SUCCESS.getCode(), data, msg);
+    }
+
     public static ApiResponseDto<?> successWithoutDataResponse() {
         return new ApiResponseDto<>(ResponseCode.SUCCESS.getCode(), null, null);
     }
