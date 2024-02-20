@@ -29,6 +29,6 @@ public class UserResponse {
     }
 
     public static UserResponse toTotDto(User user, long totalScrap, long totalUserPlan, Mbti mbti) {
-        return new UserResponse(user.getEmail(), user.getName(), totalScrap, totalUserPlan, user.getIntroduction(), mbti.getMbti(), user.getProfile(), user.getBackground());
+        return new UserResponse(user.getEmail(), user.getName(), totalScrap, totalUserPlan, user.getIntroduction(), mbti==null?"":mbti.getMbti(), user.getProfile(), user.getBackground());
     }
 }

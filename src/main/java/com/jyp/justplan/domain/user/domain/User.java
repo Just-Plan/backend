@@ -36,9 +36,10 @@ public class User extends BaseEntity {
 
     private UserRole role;
 
-    //@ColumnDefault("'https://just-plan.s3.ap-northeast-2.amazonaws.com/profiles/test%40naver.com/profile_1708163546744.jpg'")
+    @ColumnDefault("'https://just-plan.s3.ap-northeast-2.amazonaws.com/profiles/test%40naver.com/profile_1708407311433.jpg'")
     private String profile;
 
+    @ColumnDefault("'https://just-plan.s3.ap-northeast-2.amazonaws.com/background/test%40naver.com_1708407598191.jpg'")
     private String background;
 
     private String introduction;
