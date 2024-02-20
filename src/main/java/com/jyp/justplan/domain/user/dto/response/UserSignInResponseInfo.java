@@ -17,11 +17,12 @@ public class UserSignInResponseInfo {
     private String refreshToken;
     private String mbtiName;
     private String profile;
+    private String introduction;
 
-    public static UserSignInResponseInfo toInfo(Long id, String email, String name, String accessToken, String refreshToken, Mbti mbti, String profile) {
-        return new UserSignInResponseInfo(id, email, name, accessToken, refreshToken, (mbti == null) ? "" : mbti.getMbti(), profile);
+    public static UserSignInResponseInfo toInfo(Long id, String email, String name, String accessToken, String refreshToken, Mbti mbti, String profile, String introduction) {
+        return new UserSignInResponseInfo(id, email, name, accessToken, refreshToken, (mbti == null) ? "" : mbti.getMbti(), profile, introduction);
     }
     public static UserSignInResponseInfo toInfo(Long id, String email, String name, String accessToken, String refreshToken) {
-        return new UserSignInResponseInfo(id, email, name, accessToken, refreshToken,"", "");
+        return new UserSignInResponseInfo(id, email, name, accessToken, refreshToken,"", "","");
     }
 }

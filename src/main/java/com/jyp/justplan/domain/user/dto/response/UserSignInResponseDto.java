@@ -15,6 +15,7 @@ public class UserSignInResponseDto {
     private String accessToken;
     private String mbtiName;
     private String profile;
+    private String introduction;
 
     public static UserSignInResponseDto toDto(UserSignInResponseInfo userSignInResponseInfo) {
         return new UserSignInResponseDto(
@@ -23,6 +24,7 @@ public class UserSignInResponseDto {
             userSignInResponseInfo.getName(),
             userSignInResponseInfo.getAccessToken(),
             userSignInResponseInfo.getMbtiName(),
-            userSignInResponseInfo.getProfile());
+            userSignInResponseInfo.getProfile(),
+            userSignInResponseInfo.getIntroduction());
     }
 }
