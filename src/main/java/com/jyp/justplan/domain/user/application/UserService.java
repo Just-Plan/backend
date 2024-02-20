@@ -17,6 +17,7 @@ import com.jyp.justplan.domain.user.dto.response.UserResponse;
 import com.jyp.justplan.domain.user.dto.response.UserSignInResponseInfo;
 import com.jyp.justplan.domain.user.exception.UserException;
 import com.jyp.justplan.jwt.JwtTokenProvider;
+import io.netty.util.internal.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -132,10 +133,14 @@ public class UserService {
         user.updateName(userUpdateInfoRequest.getName());
         user.updateIntroduction(userUpdateInfoRequest.getIntroduction());
 
-        Mbti mbti = mbtiTestRepository.findByMbti(userUpdateInfoRequest.getMbtiName())
-                .orElseThrow(() -> new UserException("해당 유저의 MBTI가 존재하지 않습니다."));
+        Mbti mbti = user.getMbti();
 
-        user.updateMbti(mbti);
+        if(!StringUtil.isNullOrEmpty(userUpdateInfoRequest.getMbtiName())) {
+            mbti = mbtiTestRepository.findByMbti(userUpdateInfoRequest.getMbtiName())
+                    .orElseThrow(() -> new UserException("요청하신 MBTI가 존재하지 않습니다."));
+
+            user.updateMbti(mbti);
+        }
 
         //return UserResponse.toDto(user);
         return UserResponse.toTotDto(user, totalScrap, totalUserPlan, mbti);
