@@ -16,6 +16,7 @@ public class UserResponse {
     private String introduction;
     private String mbtiName;
     private String profile;
+    private String background;
 
     public UserResponse(String email, String name) {
         this.email = email;
@@ -28,6 +29,6 @@ public class UserResponse {
     }
 
     public static UserResponse toTotDto(User user, long totalScrap, long totalUserPlan, Mbti mbti) {
-        return new UserResponse(user.getEmail(), user.getName(), totalScrap, totalUserPlan, user.getIntroduction(), mbti.getMbti(), user.getProfile());
+        return new UserResponse(user.getEmail(), user.getName(), totalScrap, totalUserPlan, user.getIntroduction(), mbti.getMbti(), user.getProfile(), user.getBackground());
     }
 }
