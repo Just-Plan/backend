@@ -53,7 +53,7 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
         log.info(image);
 
 
-        Optional<User> optionalUser = userRepository.findByEmail(email);
+        Optional<User> optionalUser = userRepository.findByEmailAndDeletedAtIsNull(email);
         User user = null;
 
         if(optionalUser.isEmpty()) {

@@ -67,7 +67,7 @@ public class UserService {
 
     /* 유저 조회 */
     public User findByEmail(String email) {
-        return userRepository.findByEmail(email)
+        return userRepository.findByEmailAndDeletedAtIsNull(email)
                 .orElseThrow(() -> new UserException("해당 유저가 존재하지 않습니다."));
     }
 
@@ -88,7 +88,7 @@ public class UserService {
 
     /* 로그인 */
     public UserSignInResponseInfo signin(UserSignInRequest userSignInRequest) {
-        User user = userRepository.findByEmail(userSignInRequest.getEmail())
+            User user = userRepository.findByEmailAndDeletedAtIsNull(userSignInRequest.getEmail())
                 .orElseThrow(() -> new UserException("존재하지 않는 이메일입니다."));
 
         try {
@@ -123,7 +123,7 @@ public class UserService {
     /* 회원정보 수정 */
     public UserResponse updateUser(UserUpdateInfoRequest userUpdateInfoRequest, UserDetailsImpl userDetails) {
         // TODO: Exception 처리
-        User user = userRepository.findByEmail(userDetails.getUsername())
+        User user = userRepository.findByEmailAndDeletedAtIsNull(userDetails.getUsername())
                 .orElseThrow(() -> new UserException("해당 유저가 존재하지 않습니다."));
 
         long totalScrap = scrapRepository.countByUser(user);
@@ -143,7 +143,7 @@ public class UserService {
 
     /*프로필 수정*/
     public UserResponse updateProfile(UserUpdateProfileRequest userUpdateProfileRequest, UserDetailsImpl userDetails){
-        User user = userRepository.findByEmail(userDetails.getUsername())
+        User user = userRepository.findByEmailAndDeletedAtIsNull(userDetails.getUsername())
                 .orElseThrow(() -> new UserException("해당 유저가 존재하지 않습니다."));
 
         user.updateProfile(userUpdateProfileRequest.getProfile());
@@ -157,7 +157,7 @@ public class UserService {
     /* 비밀번호 재설정 */
     // TODO : 이메일 인증없이 비밀번호 변경 진행
     public void resetPassword(UserUpdatePasswordRequest userUpdatePasswordRequest) {
-        User user = userRepository.findByEmail(userUpdatePasswordRequest.getEmail())
+        User user = userRepository.findByEmailAndDeletedAtIsNull(userUpdatePasswordRequest.getEmail())
                 .orElseThrow(() -> new UserException("해당 유저가 존재하지 않습니다."));
 
         if("kakao".equals(user.getProvider())){
@@ -173,7 +173,7 @@ public class UserService {
     /* 회원 탈퇴 */
     public void deleteUser(UserDeleteRequest userDeleteRequest, UserDetailsImpl userDetails) {
         // TODO: Exception 처리
-        User user = userRepository.findByEmail(userDetails.getUsername())
+        User user = userRepository.findByEmailAndDeletedAtIsNull(userDetails.getUsername())
                 .orElseThrow(() -> new UserException("해당 유저가 존재하지 않습니다."));
 
         if (!passwordEncoder.matches(userDeleteRequest.getPassword(), user.getPassword())) {
@@ -211,16 +211,13 @@ public class UserService {
     public UserResponse readUser(UserDetailsImpl userDetails) {
 
         log.info("user id : " + userDetails.getUserId());
-        User user = user = userRepository.findByEmail(userDetails.getUsername())
+        User user = userRepository.findByEmailAndDeletedAtIsNull(userDetails.getUsername())
                     .orElseThrow(() -> new UserException("해당 유저가 존재하지 않습니다."));
 
         long totalScrap = scrapRepository.countByUser(user);
         long totalUserPlan = userPlanRepository.countByUser(user);
 
-        Mbti mbti = mbtiTestRepository.findById(user.getMbti().getId())
-                .orElseThrow(() -> new UserException("해당 유저의 MBTI가 존재하지 않습니다."));
-
-        return UserResponse.toTotDto(user, totalScrap, totalUserPlan, mbti);
+        return UserResponse.toTotDto(user, totalScrap, totalUserPlan, user.getMbti());
     }
 
     /*프로필 사진 업로드*/
@@ -232,7 +229,7 @@ public class UserService {
             throw new UserException("이미지 업로드 중 오류가 발생하였습니다.");
         }
 
-        User user = userRepository.findByEmail(profileUploadRequest.getEmail())
+        User user = userRepository.findByEmailAndDeletedAtIsNull(profileUploadRequest.getEmail())
                 .orElseThrow(() -> new UserException("해당 유저가 존재하지 않습니다."));
 
         user.updateProfile(uri);
@@ -250,7 +247,7 @@ public class UserService {
             throw new UserException("이미지 업로드 중 오류가 발생하였습니다.");
         }
 
-        User user = userRepository.findByEmail(profileUploadRequest.getEmail())
+        User user = userRepository.findByEmailAndDeletedAtIsNull(profileUploadRequest.getEmail())
                 .orElseThrow(() -> new UserException("해당 유저가 존재하지 않습니다."));
 
         user.updateBackground(uri);
