@@ -291,7 +291,7 @@ public class PlaceService {
         GooglePlace newGooglePlace = GooglePlace.builder()
             .name(request.getName())
             .address(request.getFormattedAddress())
-            .types(GoogleMapType.translateFromKorean(request.getTypes()))
+            .types(request.getTypes())
             .latitude(request.getLatitude())
             .longitude(request.getLongitude())
             .photoReference(request.getPhotoReference())
