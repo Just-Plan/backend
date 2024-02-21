@@ -63,7 +63,7 @@ public class KakaoController {
     })
     @GetMapping("/kakao/login")
     public void signin(HttpServletResponse response) throws IOException {
-        String url = "http://justplan.site:8080/oauth2/authorization/kakao";
+        String url = "https://justplan.site:8080/oauth2/authorization/kakao";
         response.sendRedirect(url);
     }
 
