@@ -63,19 +63,8 @@ public class KakaoController {
     })
     @GetMapping("/kakao/login")
     public void signin(HttpServletResponse response) throws IOException {
-        String url = "https://justplan.site:8080/oauth2/authorization/kakao";
+        String url = "http://justplan.site:8080/oauth2/authorization/kakao";
         response.sendRedirect(url);
-    }
-
-    @Tag(name = "kakao", description = "카카오 로그인 관련 API Controller")
-    @Operation(summary = "카카오 로그아웃 redirect", description = "카카오 로그아웃 후 redirect 수행한다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공",
-                    content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
-    })
-    @GetMapping("/security-login/login")
-    public void kakaoLogout(HttpServletResponse response) throws Exception {
-        response.sendRedirect("/kakao/login");
     }
 
     // redirect
