@@ -19,6 +19,7 @@ public interface ScrapRepository extends JpaRepository<Scrap, Long> {
 
     long countByPlan(Plan plan);
 
+    @Query("select count(1) from Scrap s where s.user = ?1 order by s.createdAt desc")
     long countByUser(User user);
 
     boolean existsByUserAndPlan(User user, Plan plan);
