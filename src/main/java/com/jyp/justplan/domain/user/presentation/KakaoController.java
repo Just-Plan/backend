@@ -37,6 +37,9 @@ public class KakaoController {
     @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String iClientId;
 
+    @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
+    private String iRedirectUri;
+
     @Value("${spring.security.oauth2.client.registration.kakao.logout-redirect-uri}")
     private String iLogoutRedirectUri;
 
@@ -47,17 +50,9 @@ public class KakaoController {
                     content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
     })
     @GetMapping("/kakao/home")
-    public ApiResponseDto<UserResponse> home(Authentication auth) {
-        String authUser = auth.getName();
-        User userInfo = userRepository.findByEmail(authUser).get();
+    public void home(HttpServletResponse response) throws IOException {
 
-
-        UserResponse user = UserResponse.builder()
-                .email(userInfo.getEmail())
-                .name(userInfo.getName())
-                .build();
-
-        return ApiResponseDto.successResponse(user);
+        response.sendRedirect(iRedirectUri);
     }
 
     @Tag(name = "kakao", description = "카카오 로그인 관련 API Controller")
@@ -68,7 +63,7 @@ public class KakaoController {
     })
     @GetMapping("/kakao/login")
     public void signin(HttpServletResponse response) throws IOException {
-        String url = "/oauth2/authorization/kakao";
+        String url = "https://justplan.site:8080/oauth2/authorization/kakao";
         response.sendRedirect(url);
     }
 
