@@ -4,6 +4,7 @@ package com.jyp.justplan.domain.user.application;
 import antlr.StringUtils;
 import com.jyp.justplan.domain.mbti.domain.Mbti;
 import com.jyp.justplan.domain.mbti.domain.MbtiTestRepository;
+import com.jyp.justplan.domain.plan.domain.PlanRepository;
 import com.jyp.justplan.domain.plan.domain.UserPlanRepository;
 import com.jyp.justplan.domain.plan.domain.scrap.ScrapRepository;
 import com.jyp.justplan.domain.s3.S3Service;
@@ -40,7 +41,7 @@ public class UserService {
     private final MbtiTestRepository mbtiTestRepository;
     private final EmailAuthRepository emailAuthRepository;
     private final ScrapRepository scrapRepository;
-    private final UserPlanRepository userPlanRepository;
+    private final PlanRepository planRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final BCryptPasswordEncoder passwordEncoder;
@@ -128,7 +129,7 @@ public class UserService {
                 .orElseThrow(() -> new UserException("해당 유저가 존재하지 않습니다."));
 
         long totalScrap = scrapRepository.countByUser(user);
-        long totalUserPlan = userPlanRepository.countByUser(user);
+        long totalUserPlan = planRepository.countByUser(user);
 
         user.updateName(userUpdateInfoRequest.getName());
         user.updateIntroduction(userUpdateInfoRequest.getIntroduction());
@@ -220,7 +221,7 @@ public class UserService {
                     .orElseThrow(() -> new UserException("해당 유저가 존재하지 않습니다."));
 
         long totalScrap = scrapRepository.countByUser(user);
-        long totalUserPlan = userPlanRepository.countByUser(user);
+        long totalUserPlan = planRepository.countByUser(user);
 
         return UserResponse.toTotDto(user, totalScrap, totalUserPlan, user.getMbti());
     }

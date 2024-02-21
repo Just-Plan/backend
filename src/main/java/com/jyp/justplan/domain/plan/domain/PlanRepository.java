@@ -70,4 +70,10 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
                 })
                 .orElseThrow(() -> new NoSuchPlanException("존재하지 않는 일정입니다."));
     }
+
+    @Query("select count(1) from Plan p " +
+            "join p.users up " +
+            "where p.deleted = false and p.published = true " +
+            "and up.user = ?1")
+    long countByUser(User user);
 }
